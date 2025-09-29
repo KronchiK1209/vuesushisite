@@ -1,6 +1,6 @@
 // Админ-модуль: Настройки сайта и визуальный конструктор главной страницы
 (function(){
-  const { ref, reactive, computed, watch, onMounted } = Vue;
+  const { ref, reactive, computed, watch, onMounted, onUnmounted, nextTick } = Vue;
 
   const elementRegistry = {
     heading: {
@@ -13,7 +13,22 @@
         color: '#111827',
         align: 'left',
         marginTop: '0px',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        fontFamily: '',
+        fontWeight: '700',
+        lineHeight: '1.2',
+        letterSpacing: '0px',
+        textTransform: 'none',
+        backgroundColor: '',
+        paddingX: '0px',
+        paddingY: '0px',
+        borderRadius: '0px',
+        textShadow: '',
+        positionMode: 'flow',
+        positionX: '0px',
+        positionY: '0px',
+        zIndex: '10',
+        maxWidth: '640px'
       }),
       fields: [
         { key: 'text', label: 'Текст', type: 'text', placeholder: 'Введите заголовок' },
@@ -38,6 +53,32 @@
           ]
         },
         {
+          key: 'fontWeight',
+          label: 'Начертание',
+          type: 'select',
+          options: [
+            { value: '400', label: 'Обычный' },
+            { value: '500', label: 'Средний' },
+            { value: '600', label: 'Полужирный' },
+            { value: '700', label: 'Жирный' },
+            { value: '800', label: 'Экстра жирный' }
+          ]
+        },
+        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Manrope"' },
+        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.2' },
+        { key: 'letterSpacing', label: 'Интервал между буквами', type: 'text', placeholder: '0px' },
+        {
+          key: 'textTransform',
+          label: 'Регистр',
+          type: 'select',
+          options: [
+            { value: 'none', label: 'Обычный' },
+            { value: 'uppercase', label: 'Верхний' },
+            { value: 'lowercase', label: 'Нижний' },
+            { value: 'capitalize', label: 'Каждое слово' }
+          ]
+        },
+        {
           key: 'color',
           label: 'Цвет текста',
           type: 'color'
@@ -53,7 +94,25 @@
           ]
         },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
+        { key: 'backgroundColor', label: 'Фон текста', type: 'color' },
+        { key: 'paddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '0px' },
+        { key: 'paddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '0px' },
+        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '0px' },
+        { key: 'textShadow', label: 'Тень текста', type: 'text', placeholder: '0 10px 30px rgba(15,23,42,0.35)' },
+        {
+          key: 'positionMode',
+          label: 'Расположение',
+          type: 'select',
+          options: [
+            { value: 'flow', label: 'В потоке' },
+            { value: 'free', label: 'Свободное' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
+        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
+        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '10' },
+        { key: 'maxWidth', label: 'Макс. ширина', type: 'text', placeholder: '640px' }
       ]
     },
     subheading: {
@@ -65,7 +124,22 @@
         color: '#f97316',
         align: 'left',
         marginTop: '0px',
-        marginBottom: '12px'
+        marginBottom: '12px',
+        fontFamily: '',
+        fontWeight: '600',
+        lineHeight: '1.4',
+        letterSpacing: '0px',
+        textTransform: 'none',
+        backgroundColor: '',
+        paddingX: '0px',
+        paddingY: '0px',
+        borderRadius: '0px',
+        textShadow: '',
+        positionMode: 'flow',
+        positionX: '0px',
+        positionY: '0px',
+        zIndex: '10',
+        maxWidth: '640px'
       }),
       fields: [
         { key: 'text', label: 'Текст', type: 'text', placeholder: 'Введите подзаголовок' },
@@ -80,6 +154,31 @@
           ]
         },
         {
+          key: 'fontWeight',
+          label: 'Начертание',
+          type: 'select',
+          options: [
+            { value: '400', label: 'Обычный' },
+            { value: '500', label: 'Средний' },
+            { value: '600', label: 'Полужирный' },
+            { value: '700', label: 'Жирный' }
+          ]
+        },
+        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Inter"' },
+        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.4' },
+        { key: 'letterSpacing', label: 'Интервал между буквами', type: 'text', placeholder: '0px' },
+        {
+          key: 'textTransform',
+          label: 'Регистр',
+          type: 'select',
+          options: [
+            { value: 'none', label: 'Обычный' },
+            { value: 'uppercase', label: 'Верхний' },
+            { value: 'lowercase', label: 'Нижний' },
+            { value: 'capitalize', label: 'Каждое слово' }
+          ]
+        },
+        {
           key: 'color',
           label: 'Цвет текста',
           type: 'color'
@@ -95,7 +194,25 @@
           ]
         },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '12px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '12px' },
+        { key: 'backgroundColor', label: 'Фон текста', type: 'color' },
+        { key: 'paddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '0px' },
+        { key: 'paddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '0px' },
+        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '0px' },
+        { key: 'textShadow', label: 'Тень текста', type: 'text', placeholder: '0 6px 20px rgba(15,23,42,0.25)' },
+        {
+          key: 'positionMode',
+          label: 'Расположение',
+          type: 'select',
+          options: [
+            { value: 'flow', label: 'В потоке' },
+            { value: 'free', label: 'Свободное' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
+        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
+        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '10' },
+        { key: 'maxWidth', label: 'Макс. ширина', type: 'text', placeholder: '640px' }
       ]
     },
     paragraph: {
@@ -107,7 +224,22 @@
         color: '#4b5563',
         align: 'left',
         marginTop: '0px',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        fontFamily: '',
+        fontWeight: '400',
+        lineHeight: '1.6',
+        letterSpacing: '0px',
+        textTransform: 'none',
+        maxWidth: '640px',
+        backgroundColor: '',
+        paddingX: '0px',
+        paddingY: '0px',
+        borderRadius: '0px',
+        textShadow: '',
+        positionMode: 'flow',
+        positionX: '0px',
+        positionY: '0px',
+        zIndex: '10'
       }),
       fields: [
         { key: 'text', label: 'Текст', type: 'textarea', rows: 3, placeholder: 'Расскажите подробнее' },
@@ -122,6 +254,32 @@
           ]
         },
         {
+          key: 'fontWeight',
+          label: 'Начертание',
+          type: 'select',
+          options: [
+            { value: '300', label: 'Светлый' },
+            { value: '400', label: 'Обычный' },
+            { value: '500', label: 'Средний' },
+            { value: '600', label: 'Полужирный' }
+          ]
+        },
+        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Rubik"' },
+        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.6' },
+        { key: 'letterSpacing', label: 'Интервал между буквами', type: 'text', placeholder: '0px' },
+        {
+          key: 'textTransform',
+          label: 'Регистр',
+          type: 'select',
+          options: [
+            { value: 'none', label: 'Обычный' },
+            { value: 'uppercase', label: 'Верхний' },
+            { value: 'lowercase', label: 'Нижний' },
+            { value: 'capitalize', label: 'Каждое слово' }
+          ]
+        },
+        { key: 'maxWidth', label: 'Максимальная ширина', type: 'text', placeholder: '640px' },
+        {
           key: 'color',
           label: 'Цвет текста',
           type: 'color'
@@ -137,7 +295,24 @@
           ]
         },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
+        { key: 'backgroundColor', label: 'Фон текста', type: 'color' },
+        { key: 'paddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '0px' },
+        { key: 'paddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '0px' },
+        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '0px' },
+        { key: 'textShadow', label: 'Тень текста', type: 'text', placeholder: '0 4px 16px rgba(15,23,42,0.15)' },
+        {
+          key: 'positionMode',
+          label: 'Расположение',
+          type: 'select',
+          options: [
+            { value: 'flow', label: 'В потоке' },
+            { value: 'free', label: 'Свободное' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
+        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
+        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '10' }
       ]
     },
     button: {
@@ -150,7 +325,25 @@
         href: '',
         align: 'left',
         marginTop: '0px',
-        marginBottom: '0px'
+        marginBottom: '0px',
+        backgroundColor: '#ffffff',
+        textColor: '#dc2626',
+        hoverBackgroundColor: '#f3f4f6',
+        hoverTextColor: '#b91c1c',
+        borderRadius: '9999px',
+        borderWidth: '0px',
+        borderColor: '#ffffff',
+        paddingX: '28px',
+        paddingY: '14px',
+        fontSize: '16px',
+        fontFamily: '',
+        fontWeight: '600',
+        boxShadow: '0 15px 40px rgba(255,255,255,0.18)',
+        positionMode: 'flow',
+        positionX: '0px',
+        positionY: '0px',
+        zIndex: '20',
+        width: ''
       }),
       fields: [
         { key: 'text', label: 'Текст кнопки', type: 'text', placeholder: 'Например, Заказать' },
@@ -174,6 +367,18 @@
           ]
         },
         { key: 'href', label: 'Ссылка', type: 'text', placeholder: 'https://...' },
+        { key: 'fontSize', label: 'Размер шрифта (px)', type: 'text', placeholder: '16px' },
+        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Nunito"' },
+        {
+          key: 'fontWeight',
+          label: 'Начертание',
+          type: 'select',
+          options: [
+            { value: '500', label: 'Средний' },
+            { value: '600', label: 'Полужирный' },
+            { value: '700', label: 'Жирный' }
+          ]
+        },
         {
           key: 'align',
           label: 'Выравнивание',
@@ -185,7 +390,30 @@
           ]
         },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' },
+        { key: 'backgroundColor', label: 'Цвет фона', type: 'color' },
+        { key: 'textColor', label: 'Цвет текста', type: 'color' },
+        { key: 'hoverBackgroundColor', label: 'Фон при наведении', type: 'color' },
+        { key: 'hoverTextColor', label: 'Текст при наведении', type: 'color' },
+        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '9999px' },
+        { key: 'borderWidth', label: 'Толщина границы', type: 'text', placeholder: '0px' },
+        { key: 'borderColor', label: 'Цвет границы', type: 'color' },
+        { key: 'paddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '28px' },
+        { key: 'paddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '14px' },
+        { key: 'boxShadow', label: 'Тень', type: 'text', placeholder: '0 15px 40px rgba(255,255,255,0.18)' },
+        {
+          key: 'positionMode',
+          label: 'Расположение',
+          type: 'select',
+          options: [
+            { value: 'flow', label: 'В потоке' },
+            { value: 'free', label: 'Свободное' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
+        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
+        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '20' },
+        { key: 'width', label: 'Ширина', type: 'text', placeholder: 'auto' }
       ]
     },
     image: {
@@ -199,7 +427,16 @@
         align: 'left',
         borderRadius: '16px',
         marginTop: '0px',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        objectFit: 'cover',
+        boxShadow: '0 25px 60px rgba(15,23,42,0.35)',
+        borderWidth: '0px',
+        borderColor: 'rgba(255,255,255,0.2)',
+        backgroundColor: 'transparent',
+        positionMode: 'flow',
+        positionX: '0px',
+        positionY: '0px',
+        zIndex: '5'
       }),
       fields: [
         { key: 'src', label: 'URL изображения', type: 'text', placeholder: 'https://...' },
@@ -218,7 +455,33 @@
         },
         { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '16px' },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
+        {
+          key: 'objectFit',
+          label: 'Вписывание',
+          type: 'select',
+          options: [
+            { value: 'cover', label: 'Cover' },
+            { value: 'contain', label: 'Contain' },
+            { value: 'fill', label: 'Fill' }
+          ]
+        },
+        { key: 'boxShadow', label: 'Тень', type: 'text', placeholder: '0 25px 60px rgba(15,23,42,0.35)' },
+        { key: 'borderWidth', label: 'Толщина границы', type: 'text', placeholder: '0px' },
+        { key: 'borderColor', label: 'Цвет границы', type: 'color' },
+        { key: 'backgroundColor', label: 'Фон', type: 'color' },
+        {
+          key: 'positionMode',
+          label: 'Расположение',
+          type: 'select',
+          options: [
+            { value: 'flow', label: 'В потоке' },
+            { value: 'free', label: 'Свободное' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
+        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
+        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '5' }
       ]
     },
     feature: {
@@ -230,11 +493,34 @@
         color: '#111827',
         fontSize: 'text-base',
         marginTop: '0px',
-        marginBottom: '8px'
+        marginBottom: '8px',
+        fontFamily: '',
+        fontWeight: '500',
+        lineHeight: '1.4',
+        letterSpacing: '0px',
+        textTransform: 'none',
+        iconColor: '#f97316',
+        iconBackground: 'rgba(249, 115, 22, 0.12)',
+        iconShape: 'circle',
+        positionMode: 'flow',
+        positionX: '0px',
+        positionY: '0px',
+        zIndex: '15'
       }),
       fields: [
         { key: 'text', label: 'Текст', type: 'text', placeholder: 'Например, Бесплатная доставка' },
         { key: 'icon', label: 'Иконка FontAwesome', type: 'text', placeholder: 'fa-solid fa-check' },
+        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Open Sans"' },
+        {
+          key: 'fontWeight',
+          label: 'Начертание',
+          type: 'select',
+          options: [
+            { value: '400', label: 'Обычный' },
+            { value: '500', label: 'Средний' },
+            { value: '600', label: 'Полужирный' }
+          ]
+        },
         {
           key: 'color',
           label: 'Цвет текста',
@@ -250,8 +536,44 @@
             { value: 'text-lg', label: 'Крупный' }
           ]
         },
+        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.4' },
+        { key: 'letterSpacing', label: 'Интервал между буквами', type: 'text', placeholder: '0px' },
+        {
+          key: 'textTransform',
+          label: 'Регистр',
+          type: 'select',
+          options: [
+            { value: 'none', label: 'Обычный' },
+            { value: 'uppercase', label: 'Верхний' },
+            { value: 'capitalize', label: 'Каждое слово' }
+          ]
+        },
+        { key: 'iconColor', label: 'Цвет иконки', type: 'color' },
+        { key: 'iconBackground', label: 'Фон иконки', type: 'color' },
+        {
+          key: 'iconShape',
+          label: 'Форма иконки',
+          type: 'select',
+          options: [
+            { value: 'circle', label: 'Круг' },
+            { value: 'rounded', label: 'Скруглённый квадрат' },
+            { value: 'square', label: 'Квадрат' }
+          ]
+        },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '8px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '8px' },
+        {
+          key: 'positionMode',
+          label: 'Расположение',
+          type: 'select',
+          options: [
+            { value: 'flow', label: 'В потоке' },
+            { value: 'free', label: 'Свободное' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
+        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
+        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '15' }
       ]
     },
     spacer: {
@@ -289,6 +611,17 @@
         waveEnabled: true,
         waveColor: '#f9f4e5',
         overlayColor: 'rgba(17, 24, 39, 0.55)',
+        contentMaxWidth: '620px',
+        contentPaddingX: '96px',
+        contentPaddingY: '120px',
+        contentGap: '40px',
+        minHeight: '640px',
+        freeformHeight: '640px',
+        layout: 'split',
+        backgroundPosition: 'center center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        overlayBlur: '0',
         elements: [
           {
             type: 'heading',
@@ -373,6 +706,28 @@
           ]
         },
         {
+          label: 'Макет',
+          fields: [
+            {
+              key: 'layout',
+              label: 'Расположение',
+              type: 'select',
+              options: [
+                { value: 'split', label: 'Текст и изображение' },
+                { value: 'stacked', label: 'Только текст' },
+                { value: 'spotlight', label: 'Текст над изображением' },
+                { value: 'freeform', label: 'Свободное расположение' }
+              ]
+            },
+            { key: 'contentMaxWidth', label: 'Ширина контента', type: 'text', placeholder: '620px' },
+            { key: 'contentPaddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '96px' },
+            { key: 'contentPaddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '120px' },
+            { key: 'contentGap', label: 'Отступ между колонками', type: 'text', placeholder: '40px' },
+            { key: 'minHeight', label: 'Минимальная высота', type: 'text', placeholder: '640px' },
+            { key: 'freeformHeight', label: 'Высота для свободного режима', type: 'text', placeholder: '640px' }
+          ]
+        },
+        {
           label: 'Оформление',
           fields: [
             { key: 'backgroundImage', label: 'Фоновое изображение', type: 'image' },
@@ -389,7 +744,11 @@
             { key: 'showRightImage', label: 'Показывать изображение', type: 'toggle' },
             { key: 'waveEnabled', label: 'Декоративная волна', type: 'toggle' },
             { key: 'waveColor', label: 'Цвет волны', type: 'color' },
-            { key: 'overlayColor', label: 'Цвет наложения', type: 'color' }
+            { key: 'overlayColor', label: 'Цвет наложения', type: 'color' },
+            { key: 'backgroundPosition', label: 'Позиция фона', type: 'text', placeholder: 'center center' },
+            { key: 'backgroundSize', label: 'Размер фона', type: 'text', placeholder: 'cover' },
+            { key: 'backgroundRepeat', label: 'Повторение фона', type: 'text', placeholder: 'no-repeat' },
+            { key: 'overlayBlur', label: 'Размытие наложения (px)', type: 'text', placeholder: '0' }
           ]
         }
       ],
@@ -886,13 +1245,31 @@
               </div>
 
               <div
+                ref="canvasViewportRef"
                 class="relative border border-gray-200 rounded-2xl bg-gray-50"
                 :class="canvas.mode === 'full' ? 'overflow-auto max-h-[calc(100vh-320px)]' : 'overflow-hidden'"
+                @scroll="onCanvasScroll"
               >
                 <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle,_rgba(148,163,184,0.12)_1px,_transparent_1px)] bg-[length:16px_16px]" v-if="canvas.showGrid"></div>
                 <div
+                  v-if="canvas.showOverlays && selectionOverlay.visible"
+                  class="absolute z-20 pointer-events-none"
+                  :style="selectionOverlayStyle"
+                >
+                  <div class="absolute inset-0 border-2 border-orange-400 rounded-2xl shadow-[0_0_0_1px_rgba(255,255,255,0.35)]"></div>
+                  <div
+                    class="absolute left-0 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow"
+                    :class="selectionOverlay.badgeBelow ? 'top-full mt-2' : '-top-8'"
+                  >
+                    {{ selectionOverlay.label }}
+                    <span class="uppercase tracking-wider text-white/70 ml-2">{{ selectionOverlay.type === 'element' ? 'Элемент' : 'Блок' }}</span>
+                  </div>
+                </div>
+                <div
                   class="relative origin-top transition-all duration-300 ease-out"
+                  ref="canvasInnerRef"
                   :style="canvasStyle"
+                  @click="handleCanvasClick"
                 >
                   <div class="bg-white min-h-[640px]" :style="{ backgroundColor: form.background_color || '#ffffff' }">
                     <div
@@ -918,11 +1295,13 @@
                         </div>
 
                         <section
-                          @click.stop="selectBlock(block.id)"
+                          @click="handleBlockClick(block.id, $event)"
                           :class="[
                             blockWrapperClasses(block),
                             block.meta.hidden ? 'opacity-60' : 'opacity-100'
                           ]"
+                          :ref="el => registerBlockRef(block.id, el)"
+                          :data-block-id="block.id"
                         >
                           <div
                             v-if="canvas.showOverlays"
@@ -931,15 +1310,17 @@
                           ></div>
 
                           <template v-if="block.type === 'hero'">
-                            <div class="relative overflow-hidden rounded-3xl text-white">
-                              <img
-                                :src="block.data.backgroundImage"
-                                alt="hero bg"
-                                class="absolute inset-0 w-full h-full object-cover"
-                              />
-                              <div class="absolute inset-0" :style="{ background: block.data.overlayColor || 'rgba(17,24,39,0.6)' }"></div>
-                              <div class="relative grid lg:grid-cols-2 gap-12 px-12 py-16">
-                                <div class="space-y-4">
+                            <div
+                              class="relative overflow-hidden rounded-3xl text-white shadow-xl"
+                              :style="heroWrapperStyle(block)"
+                            >
+                              <div class="absolute inset-0" :style="heroBackgroundStyle(block)"></div>
+                              <div class="absolute inset-0" :style="heroOverlayStyle(block)"></div>
+                              <div :class="heroContainerClasses(block)" :style="heroContainerStyle(block)">
+                                <div
+                                  :class="heroContentColumnClasses(block)"
+                                  :style="heroContentStyle(block)"
+                                >
                                   <div
                                     v-if="!block.data.elements || !block.data.elements.length"
                                     class="border border-dashed border-white/40 rounded-2xl px-4 py-6 text-sm text-white/70 text-center"
@@ -950,9 +1331,10 @@
                                     <div
                                       v-for="(element, elementIndex) in block.data.elements"
                                       :key="element.id"
-                                      class="space-y-2"
+                                      :class="block.data.layout === 'freeform' ? '' : 'space-y-2'"
                                     >
                                       <div
+                                        v-if="block.data.layout !== 'freeform'"
                                         class="flex justify-center h-8 transition"
                                         @dragover.prevent="onHeroElementDragOver(block.id, elementIndex)"
                                         @dragenter.prevent="onHeroElementDragOver(block.id, elementIndex)"
@@ -968,24 +1350,32 @@
                                         </div>
                                       </div>
                                       <div
-                                        :class="heroElementWrapperClasses(block.id, element)"
-                                        draggable="true"
+                                        :class="heroElementWrapperClasses(block, element)"
+                                        :style="heroElementWrapperStyle(block, element)"
+                                        :draggable="heroElementDraggable(block, element)"
                                         @dragstart="onHeroElementDragStart(block.id, element.id, $event)"
                                         @dragend="onHeroElementDragEnd"
-                                        @click.stop="selectElement(block.id, element.id)"
+                                        @pointerdown="onHeroElementPointerDown(block.id, element.id, $event)"
+                                        @click="handleElementClick(block.id, element.id, $event)"
+                                        :ref="el => registerElementRef(block.id, element.id, el)"
+                                        :data-element-id="element.id"
+                                        :data-block-id="block.id"
                                       >
                                         <div
                                           v-if="canvas.showOverlays"
                                           class="absolute inset-0 rounded-2xl border border-dashed border-white/30 pointer-events-none"
                                           :class="isElementSelected(element) && selectedBlockId === block.id ? 'border-orange-300' : ''"
                                         ></div>
-                                        <div class="absolute -left-5 top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col items-center space-y-1 text-white/70">
+                                        <div
+                                          v-if="heroElementDraggable(block, element)"
+                                          class="absolute -left-5 top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col items-center space-y-1 text-white/70"
+                                        >
                                           <span class="cursor-grab text-xs"><i class="fa-solid fa-grip-vertical"></i></span>
                                         </div>
                                         <div class="absolute top-2 right-2 text-[11px] uppercase tracking-wider text-white/80 bg-black/30 px-2 py-1 rounded-full">{{ elementRegistry[element.type]?.label || element.type }}</div>
                                         <component
                                           :is="renderHeroElement(element)"
-                                          v-bind="heroElementProps(element)"
+                                          v-bind="heroElementProps(block, element)"
                                         >
                                           <template v-if="element.type === 'button'">
                                             <span>{{ element.data.text }}</span>
@@ -999,12 +1389,22 @@
                                               :style="heroImageProps(element).style"
                                             />
                                           </template>
+                                          <template v-else-if="element.type === 'feature'">
+                                            <span
+                                              class="inline-flex items-center justify-center h-12 w-12 text-lg"
+                                              :style="heroFeatureIconWrapperStyle(element)"
+                                            >
+                                              <i :class="element.data.icon || 'fa-solid fa-check'"></i>
+                                            </span>
+                                            <span>{{ element.data.text }}</span>
+                                          </template>
                                           <template v-else-if="element.type === 'spacer'"></template>
                                           <template v-else>{{ element.data.text }}</template>
                                         </component>
                                       </div>
                                     </div>
                                     <div
+                                      v-if="block.data.layout !== 'freeform'"
                                       class="flex justify-center h-8 transition mt-2"
                                       @dragover.prevent="onHeroElementDragOver(block.id, block.data.elements.length)"
                                       @dragenter.prevent="onHeroElementDragOver(block.id, block.data.elements.length)"
@@ -1021,8 +1421,8 @@
                                     </div>
                                   </template>
                                 </div>
-                                <div class="hidden lg:flex items-center justify-center">
-                                  <div v-if="block.data.showRightImage" class="relative">
+                                <div v-if="block.data.showRightImage" :class="heroMediaWrapperClasses(block)">
+                                  <div class="relative">
                                     <img :src="block.data.previewImage" alt="preview" class="w-80 h-80 object-cover rounded-3xl shadow-2xl" />
                                     <div class="absolute inset-0 rounded-3xl ring-4 ring-white/20"></div>
                                   </div>
@@ -1453,11 +1853,40 @@
         dropIndex: null,
         targetBlockId: null
       });
+      const freeformDrag = reactive({
+        active: false,
+        blockId: null,
+        elementId: null,
+        startX: 0,
+        startY: 0,
+        originX: 0,
+        originY: 0,
+        containerWidth: 0,
+        containerHeight: 0,
+        elementWidth: 0,
+        elementHeight: 0
+      });
+
+      const canvasViewportRef = ref(null);
+      const canvasInnerRef = ref(null);
+      const blockRefs = new Map();
+      const elementRefs = new Map();
+
+      const selectionOverlay = reactive({
+        visible: false,
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0,
+        label: '',
+        type: 'block',
+        badgeBelow: false
+      });
 
       const canvas = reactive({
         device: 'desktop',
-        zoom: 0.85,
-        mode: 'preview',
+        zoom: 1,
+        mode: 'full',
         showGrid: false,
         showOverlays: true
       });
@@ -1531,6 +1960,13 @@
 
       const currentElementDefinition = computed(() => currentElement.value ? (elementRegistry[currentElement.value.type] || { fields: [] }) : { fields: [] });
 
+      const selectionOverlayStyle = computed(() => ({
+        top: selectionOverlay.top + 'px',
+        left: selectionOverlay.left + 'px',
+        width: selectionOverlay.width + 'px',
+        height: selectionOverlay.height + 'px'
+      }));
+
       function blockWrapperClasses(block) {
         return [
           'relative transition-all duration-300 cursor-pointer rounded-3xl overflow-hidden',
@@ -1552,66 +1988,129 @@
           case 'spacer':
             return 'div';
           case 'feature':
-            return 'p';
+            return 'div';
           default:
             return 'div';
         }
       }
 
-      function heroElementProps(element) {
+      function heroElementProps(block, element) {
         const data = element.data || {};
         const classes = [];
         const style = {};
+        const events = {};
+        const freePositioned = elementUsesFreePosition(block, element);
 
         if (['heading', 'subheading', 'paragraph', 'feature'].includes(element.type)) {
           classes.push(data.fontSize || (element.type === 'heading' ? 'text-4xl' : element.type === 'subheading' ? 'text-xl' : 'text-base'));
-          if (element.type === 'heading' || element.type === 'feature') {
-            classes.push('font-bold');
-          } else {
-            classes.push('font-medium');
-          }
+          style.fontWeight = data.fontWeight || (element.type === 'heading' ? '700' : element.type === 'feature' ? '600' : '500');
+          if (data.fontFamily) style.fontFamily = data.fontFamily;
+          if (data.lineHeight) style.lineHeight = data.lineHeight;
+          if (data.letterSpacing) style.letterSpacing = asCssSize(data.letterSpacing, '0px');
+          if (data.textTransform && data.textTransform !== 'none') style.textTransform = data.textTransform;
+          if (data.maxWidth) style.maxWidth = asCssSize(data.maxWidth, '640px');
           if (data.align === 'center') classes.push('text-center');
           else if (data.align === 'right') classes.push('text-right');
           else classes.push('text-left');
           style.color = data.color || (element.type === 'subheading' ? '#fbbf24' : '#ffffff');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '16px';
+          style.marginTop = freePositioned ? '0px' : asCssSize(data.marginTop, '0px');
+          const marginFallback = element.type === 'subheading' ? '12px' : element.type === 'feature' ? '8px' : '16px';
+          style.marginBottom = freePositioned ? '0px' : asCssSize(data.marginBottom, marginFallback);
+          if (data.backgroundColor) {
+            style.backgroundColor = data.backgroundColor;
+            style.display = element.type === 'feature' ? 'inline-flex' : 'inline-block';
+            style.padding = `${asCssSize(data.paddingY, '0px')} ${asCssSize(data.paddingX, '0px')}`;
+            style.borderRadius = asCssSize(data.borderRadius, '0px');
+          }
+          if (data.textShadow) {
+            style.textShadow = data.textShadow;
+          }
+          if (element.type === 'feature') {
+            classes.push('flex items-center space-x-3');
+          }
         }
 
         if (element.type === 'button') {
-          classes.push('px-6 py-3 rounded-full font-semibold inline-flex items-center transition shadow');
-          if (data.style === 'secondary') {
-            classes.push('bg-transparent border-2 border-white text-white hover:bg-white hover:text-red-600');
-          } else {
-            classes.push('bg-white text-red-600 hover:bg-gray-100');
+          classes.push('inline-flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/40');
+          if (!freePositioned) {
+            if (data.align === 'center') classes.push('mx-auto');
+            else if (data.align === 'right') classes.push('ml-auto');
           }
-          if (data.align === 'center') classes.push('mx-auto');
-          else if (data.align === 'right') classes.push('ml-auto');
-          else classes.push('mr-auto');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '0px';
+          style.marginTop = freePositioned ? '0px' : asCssSize(data.marginTop, '0px');
+          style.marginBottom = freePositioned ? '0px' : asCssSize(data.marginBottom, '0px');
+          style.paddingLeft = asCssSize(data.paddingX, '28px');
+          style.paddingRight = asCssSize(data.paddingX, '28px');
+          style.paddingTop = asCssSize(data.paddingY, '14px');
+          style.paddingBottom = asCssSize(data.paddingY, '14px');
+          style.borderRadius = asCssSize(data.borderRadius, '9999px');
+          style.borderWidth = asCssSize(data.borderWidth, data.style === 'secondary' ? '2px' : '0px');
+          style.borderStyle = 'solid';
+          style.borderColor = data.borderColor || '#ffffff';
+          style.backgroundColor = data.backgroundColor || (data.style === 'secondary' ? 'transparent' : '#ffffff');
+          style.color = data.textColor || (data.style === 'secondary' ? '#ffffff' : '#dc2626');
+          style.boxShadow = data.boxShadow || '0 15px 40px rgba(255,255,255,0.18)';
+          style.fontSize = asCssSize(data.fontSize, '16px');
+          style.fontFamily = data.fontFamily || 'inherit';
+          style.fontWeight = data.fontWeight || '600';
+          style.transition = 'all 0.25s ease';
+          if (data.width) {
+            style.width = asCssSize(data.width, 'auto');
+          }
+
+          const hoverBackground = data.hoverBackgroundColor || (data.style === 'secondary' ? '#ffffff' : '#f3f4f6');
+          const hoverColor = data.hoverTextColor || (data.style === 'secondary' ? (data.textColor || '#1f2937') : '#b91c1c');
+          events.onMouseenter = (event) => {
+            event.target.dataset.prevBg = event.target.style.backgroundColor;
+            event.target.dataset.prevColor = event.target.style.color;
+            event.target.style.backgroundColor = hoverBackground;
+            event.target.style.color = hoverColor;
+          };
+          events.onMouseleave = (event) => {
+            if (event.target.dataset.prevBg) {
+              event.target.style.backgroundColor = event.target.dataset.prevBg;
+            }
+            if (event.target.dataset.prevColor) {
+              event.target.style.color = event.target.dataset.prevColor;
+            }
+          };
         }
 
         if (element.type === 'image') {
-          if (data.align === 'center') classes.push('text-center');
-          else if (data.align === 'right') classes.push('text-right');
-          else classes.push('text-left');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '16px';
+          if (!freePositioned) {
+            if (data.align === 'center') classes.push('text-center');
+            else if (data.align === 'right') classes.push('text-right');
+            else classes.push('text-left');
+          }
+          style.marginTop = freePositioned ? '0px' : asCssSize(data.marginTop, '0px');
+          style.marginBottom = freePositioned ? '0px' : asCssSize(data.marginBottom, '16px');
+          if (!freePositioned) {
+            if (data.align === 'center') {
+              style.display = 'flex';
+              style.justifyContent = 'center';
+            } else if (data.align === 'right') {
+              style.display = 'flex';
+              style.justifyContent = 'flex-end';
+            }
+          }
         }
 
         if (element.type === 'spacer') {
-          style.height = data.height || '24px';
+          style.height = asCssSize(data.height, '24px');
           classes.push('w-full');
+          if (freePositioned) {
+            style.marginTop = '0px';
+            style.marginBottom = '0px';
+          }
         }
 
         if (element.type === 'feature') {
-          classes.push('flex items-center space-x-2');
+          classes.push('flex items-center space-x-3');
         }
 
         return {
           class: classes.join(' '),
-          style
+          style,
+          ...events
         };
       }
 
@@ -1621,9 +2120,15 @@
           src: data.src || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
           alt: data.alt || 'Изображение',
           style: {
-            width: data.width || '320px',
-            height: data.height || 'auto',
-            borderRadius: data.borderRadius || '16px'
+            width: asCssSize(data.width, '320px'),
+            height: data.height ? asCssSize(data.height, 'auto') : 'auto',
+            borderRadius: asCssSize(data.borderRadius, '16px'),
+            objectFit: data.objectFit || 'cover',
+            boxShadow: data.boxShadow || '0 25px 60px rgba(15,23,42,0.35)',
+            borderWidth: asCssSize(data.borderWidth, '0px'),
+            borderStyle: 'solid',
+            borderColor: data.borderColor || 'rgba(255,255,255,0.2)',
+            backgroundColor: data.backgroundColor || 'transparent'
           }
         };
       }
@@ -1790,11 +2295,19 @@
       }
 
       function heroDropIsActive(blockId, index) {
-        return Boolean(heroDrag.elementId) && heroDrag.targetBlockId === blockId && heroDrag.dropIndex === index;
+        if (!heroDrag.elementId) {
+          return false;
+        }
+        const block = getBlockById(blockId);
+        if (!block || isFreeformBlock(block)) {
+          return false;
+        }
+        return heroDrag.targetBlockId === blockId && heroDrag.dropIndex === index;
       }
 
       function heroDropWrapperClass(blockId, index) {
-        if (!heroDrag.elementId) {
+        const block = getBlockById(blockId);
+        if (!heroDrag.elementId || isFreeformBlock(block)) {
           return 'opacity-0 pointer-events-auto';
         }
         return heroDropIsActive(blockId, index)
@@ -1808,17 +2321,441 @@
           : 'border-white/40 text-white/70 bg-black/20';
       }
 
-      function heroElementWrapperClasses(blockId, element) {
-        const classes = ['relative group rounded-2xl px-2 py-1 transition hover:bg-white/10 hover:bg-opacity-30'];
-        if (selectedBlockId.value === blockId && isElementSelected(element)) {
-          classes.push('ring-2 ring-orange-300 bg-white/10 shadow-lg');
+      function heroElementWrapperClasses(block, element) {
+        const classes = ['relative group transition'];
+        const isSelected = selectedBlockId.value === block?.id && isElementSelected(element);
+        if (isSelected) {
+          classes.push('ring-2 ring-orange-300 shadow-lg backdrop-blur-sm');
         } else {
-          classes.push('ring-1 ring-transparent hover:ring-white/40');
+          classes.push('ring-1 ring-transparent');
+        }
+        if (elementUsesFreePosition(block, element)) {
+          classes.push('cursor-move select-none pointer-events-auto');
+        } else {
+          classes.push('rounded-2xl px-2 py-1 hover:bg-white/10 hover:bg-opacity-30 hover:ring-white/40');
         }
         return classes.join(' ');
       }
 
+      function heroElementWrapperStyle(block, element) {
+        const style = {};
+        if (!block || !element) {
+          return style;
+        }
+        const data = element.data || {};
+        if (elementUsesFreePosition(block, element)) {
+          style.position = 'absolute';
+          style.left = asCssSize(data.positionX, '0px');
+          style.top = asCssSize(data.positionY, '0px');
+          style.zIndex = parseCssNumber(data.zIndex, 10);
+          style.userSelect = 'none';
+          if (data.width) {
+            style.width = asCssSize(data.width, 'auto');
+          }
+          if (data.maxWidth) {
+            style.maxWidth = asCssSize(data.maxWidth, 'auto');
+          }
+        } else {
+          style.position = 'relative';
+        }
+        return style;
+      }
+
+      function heroElementDraggable(block, element) {
+        if (!block || !element) {
+          return false;
+        }
+        if (isFreeformBlock(block)) {
+          return false;
+        }
+        return element.data?.positionMode !== 'free';
+      }
+
+      function handleElementClick(blockId, elementId, event = null) {
+        if (event) {
+          event.stopPropagation();
+        }
+        selectBlock(blockId);
+        currentElementId.value = elementId;
+        elementPaletteOpen.value = false;
+        nextTick(scheduleSelectionOverlay);
+      }
+
+      function handleBlockClick(blockId, event = null) {
+        if (event && event.target && event.target.closest('[data-element-id]')) {
+          return;
+        }
+        selectBlock(blockId);
+        nextTick(scheduleSelectionOverlay);
+      }
+
+      function handleCanvasClick(event) {
+        if (event.target && event.target.closest('[data-block-id]')) {
+          return;
+        }
+        selectedBlockId.value = null;
+        currentElementId.value = null;
+        elementPaletteOpen.value = false;
+        selectionOverlay.visible = false;
+      }
+
+      function onHeroElementPointerDown(blockId, elementId, event) {
+        if (!event || event.button !== 0) {
+          return;
+        }
+        const block = getBlockById(blockId);
+        const element = block?.data?.elements?.find(el => el.id === elementId) || null;
+        if (!block || !element || !elementUsesFreePosition(block, element)) {
+          return;
+        }
+        const wrapper = elementRefs.get(getElementKey(blockId, elementId));
+        if (!wrapper) {
+          return;
+        }
+        const container = wrapper.offsetParent;
+        if (!container) {
+          return;
+        }
+        freeformDrag.active = true;
+        freeformDrag.blockId = blockId;
+        freeformDrag.elementId = elementId;
+        freeformDrag.startX = event.clientX;
+        freeformDrag.startY = event.clientY;
+        freeformDrag.originX = parseCssNumber(element.data.positionX, wrapper.offsetLeft);
+        freeformDrag.originY = parseCssNumber(element.data.positionY, wrapper.offsetTop);
+        freeformDrag.containerWidth = container.clientWidth;
+        freeformDrag.containerHeight = container.clientHeight;
+        freeformDrag.elementWidth = wrapper.clientWidth;
+        freeformDrag.elementHeight = wrapper.clientHeight;
+        selectBlock(blockId);
+        currentElementId.value = elementId;
+        elementPaletteOpen.value = false;
+        window.addEventListener('pointermove', onFreeformPointerMove);
+        window.addEventListener('pointerup', onFreeformPointerUp);
+        event.stopPropagation();
+        event.preventDefault();
+      }
+
+      function onFreeformPointerMove(event) {
+        if (!freeformDrag.active) {
+          return;
+        }
+        const block = getBlockById(freeformDrag.blockId);
+        const element = block?.data?.elements?.find(el => el.id === freeformDrag.elementId) || null;
+        if (!block || !element || !elementUsesFreePosition(block, element)) {
+          onFreeformPointerUp();
+          return;
+        }
+        const zoom = canvas.mode === 'full' ? 1 : canvas.zoom;
+        const deltaX = (event.clientX - freeformDrag.startX) / zoom;
+        const deltaY = (event.clientY - freeformDrag.startY) / zoom;
+        const maxX = Math.max(0, freeformDrag.containerWidth - freeformDrag.elementWidth);
+        const maxY = Math.max(0, freeformDrag.containerHeight - freeformDrag.elementHeight);
+        const nextX = clampNumber(freeformDrag.originX + deltaX, 0, maxX || 0);
+        const nextY = clampNumber(freeformDrag.originY + deltaY, 0, maxY || 0);
+        element.data.positionX = `${Math.round(nextX)}px`;
+        element.data.positionY = `${Math.round(nextY)}px`;
+        scheduleSelectionOverlay();
+      }
+
+      function onFreeformPointerUp() {
+        if (!freeformDrag.active) {
+          return;
+        }
+        freeformDrag.active = false;
+        freeformDrag.blockId = null;
+        freeformDrag.elementId = null;
+        window.removeEventListener('pointermove', onFreeformPointerMove);
+        window.removeEventListener('pointerup', onFreeformPointerUp);
+        nextTick(scheduleSelectionOverlay);
+      }
+
+      function asCssSize(value, fallback) {
+        if (value === null || value === undefined) {
+          return fallback;
+        }
+        const trimmed = String(value).trim();
+        if (!trimmed) {
+          return fallback;
+        }
+        if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
+          return `${trimmed}px`;
+        }
+        return trimmed;
+      }
+
+      function parseCssNumber(value, fallback = 0) {
+        if (value === null || value === undefined) {
+          return fallback;
+        }
+        const match = String(value).match(/-?\d+(\.\d+)?/);
+        return match ? Number(match[0]) : fallback;
+      }
+
+      function clampNumber(value, min, max) {
+        if (!Number.isFinite(value)) {
+          return min;
+        }
+        if (value < min) {
+          return min;
+        }
+        if (value > max) {
+          return max;
+        }
+        return value;
+      }
+
+      function getElementKey(blockId, elementId) {
+        return `${blockId}:${elementId}`;
+      }
+
+      function registerBlockRef(blockId, el) {
+        if (el) {
+          blockRefs.set(blockId, el);
+        } else {
+          blockRefs.delete(blockId);
+        }
+        scheduleSelectionOverlay();
+      }
+
+      function registerElementRef(blockId, elementId, el) {
+        const key = getElementKey(blockId, elementId);
+        if (el) {
+          elementRefs.set(key, el);
+        } else {
+          elementRefs.delete(key);
+        }
+        scheduleSelectionOverlay();
+      }
+
+      function getBlockById(blockId) {
+        return pageBlocks.value.find(block => block.id === blockId) || null;
+      }
+
+      function isFreeformBlock(block) {
+        return Boolean(block?.data?.layout === 'freeform');
+      }
+
+      function elementUsesFreePosition(block, element) {
+        return isFreeformBlock(block) && element?.data?.positionMode === 'free';
+      }
+
+      let overlayRaf = null;
+
+      function scheduleSelectionOverlay() {
+        if (overlayRaf) {
+          cancelAnimationFrame(overlayRaf);
+        }
+        overlayRaf = requestAnimationFrame(() => {
+          overlayRaf = null;
+          updateSelectionOverlay();
+        });
+      }
+
+      function updateSelectionOverlay() {
+        if (!canvas.showOverlays) {
+          selectionOverlay.visible = false;
+          return;
+        }
+        const viewportEl = canvasViewportRef.value;
+        if (!viewportEl) {
+          selectionOverlay.visible = false;
+          return;
+        }
+        let targetEl = null;
+        if (currentElementId.value && selectedBlockId.value) {
+          targetEl = elementRefs.get(getElementKey(selectedBlockId.value, currentElementId.value)) || null;
+        }
+        if (!targetEl && selectedBlockId.value) {
+          targetEl = blockRefs.get(selectedBlockId.value) || null;
+        }
+        if (!targetEl) {
+          selectionOverlay.visible = false;
+          return;
+        }
+
+        const viewportRect = viewportEl.getBoundingClientRect();
+        const targetRect = targetEl.getBoundingClientRect();
+        const top = targetRect.top - viewportRect.top + viewportEl.scrollTop;
+        const left = targetRect.left - viewportRect.left + viewportEl.scrollLeft;
+
+        selectionOverlay.top = top;
+        selectionOverlay.left = left;
+        selectionOverlay.width = targetRect.width;
+        selectionOverlay.height = targetRect.height;
+        selectionOverlay.visible = true;
+        selectionOverlay.type = currentElementId.value ? 'element' : 'block';
+        selectionOverlay.label = currentElementId.value
+          ? (elementRegistry[currentElement.value?.type]?.label || currentElement.value?.type || 'Элемент')
+          : (selectedBlock.value?.name || selectedBlock.value?.type || 'Блок');
+        selectionOverlay.badgeBelow = top < 32;
+      }
+
+      function onCanvasScroll() {
+        if (!canvas.showOverlays) return;
+        scheduleSelectionOverlay();
+      }
+
+      function heroWrapperStyle(block) {
+        const data = block.data || {};
+        const layout = data.layout || 'split';
+        const heightValue = layout === 'freeform'
+          ? asCssSize(data.freeformHeight || data.minHeight, '640px')
+          : asCssSize(data.minHeight, '560px');
+        return {
+          minHeight: heightValue,
+          padding: `${asCssSize(data.contentPaddingY, '120px')} ${asCssSize(data.contentPaddingX, '96px')}`,
+          position: 'relative'
+        };
+      }
+
+      function heroBackgroundStyle(block) {
+        const data = block.data || {};
+        const image = data.backgroundImage ? `url(${data.backgroundImage})` : 'none';
+        return {
+          backgroundImage: image,
+          backgroundPosition: data.backgroundPosition || 'center center',
+          backgroundSize: data.backgroundSize || 'cover',
+          backgroundRepeat: data.backgroundRepeat || 'no-repeat'
+        };
+      }
+
+      function heroOverlayStyle(block) {
+        const data = block.data || {};
+        const styles = {
+          background: data.overlayColor || 'rgba(17, 24, 39, 0.55)'
+        };
+        const blurValue = parseFloat(data.overlayBlur);
+        if (!Number.isNaN(blurValue) && blurValue > 0) {
+          styles.backdropFilter = `blur(${blurValue}px)`;
+        }
+        return styles;
+      }
+
+      function heroContainerClasses(block) {
+        const data = block.data || {};
+        const layout = data.layout || 'split';
+        if (layout === 'split') {
+          const classes = ['relative', 'grid', 'items-center', 'w-full'];
+          if (data.showRightImage) {
+            classes.push('lg:grid-cols-2');
+          } else {
+            classes.push('grid-cols-1');
+          }
+          return classes.join(' ');
+        }
+        if (layout === 'freeform') {
+          return 'relative flex flex-col w-full';
+        }
+        return 'relative flex flex-col items-center w-full';
+      }
+
+      function heroContainerStyle(block) {
+        const data = block.data || {};
+        const layout = data.layout || 'split';
+        if (layout === 'freeform') {
+          return {
+            gap: '0px',
+            position: 'relative',
+            width: '100%'
+          };
+        }
+        return {
+          gap: asCssSize(data.contentGap, '40px')
+        };
+      }
+
+      function heroContentColumnClasses(block) {
+        const data = block.data || {};
+        const layout = data.layout || 'split';
+        if (layout === 'freeform') {
+          return 'relative w-full min-h-[320px]';
+        }
+        const classes = ['space-y-4', 'w-full'];
+        if (layout === 'split') {
+          classes.push('text-left');
+          if (data.imageSide === 'left' && data.showRightImage) {
+            classes.push('lg:order-2');
+          }
+        } else {
+          classes.push('mx-auto', 'text-center');
+          if (layout === 'spotlight') {
+            classes.push('order-2');
+          }
+        }
+        return classes.join(' ');
+      }
+
+      function heroContentStyle(block) {
+        const data = block.data || {};
+        const style = {
+          maxWidth: asCssSize(data.contentMaxWidth, '620px'),
+          width: '100%'
+        };
+        if (data.layout === 'freeform') {
+          style.position = 'relative';
+          style.minHeight = asCssSize(data.freeformHeight || data.minHeight, '640px');
+        } else if (data.layout && data.layout !== 'split') {
+          style.marginLeft = 'auto';
+          style.marginRight = 'auto';
+        }
+        return style;
+      }
+
+      function heroMediaWrapperClasses(block) {
+        const data = block.data || {};
+        if (!data.showRightImage) {
+          return 'hidden';
+        }
+        const layout = data.layout || 'split';
+        if (layout === 'freeform') {
+          return 'hidden';
+        }
+        if (layout === 'split') {
+          const classes = ['hidden', 'lg:flex', 'items-center', 'justify-center'];
+          if (data.imageSide === 'left') {
+            classes.push('lg:order-1');
+          }
+          return classes.join(' ');
+        }
+        if (layout === 'spotlight') {
+          return 'flex justify-center order-1 w-full mb-10';
+        }
+        return 'flex justify-center w-full mt-10';
+      }
+
+      function heroFeatureIconWrapperStyle(element) {
+        const data = element.data || {};
+        let borderRadius = '9999px';
+        if (data.iconShape === 'square') {
+          borderRadius = '12px';
+        } else if (data.iconShape === 'rounded') {
+          borderRadius = '18px';
+        }
+        return {
+          backgroundColor: data.iconBackground || 'rgba(249, 115, 22, 0.12)',
+          color: data.iconColor || '#f97316',
+          borderRadius
+        };
+      }
+
+      function handleWindowResize() {
+        scheduleSelectionOverlay();
+      }
+
+      function handleDocumentScroll() {
+        scheduleSelectionOverlay();
+      }
+
       function onHeroElementDragStart(blockId, elementId, event = null) {
+        const block = getBlockById(blockId);
+        const element = block?.data?.elements?.find(el => el.id === elementId) || null;
+        if (!block || !element || isFreeformBlock(block) || element.data?.positionMode === 'free') {
+          if (event?.preventDefault) {
+            event.preventDefault();
+          }
+          return;
+        }
         heroDrag.sourceBlockId = blockId;
         heroDrag.elementId = elementId;
         heroDrag.dropIndex = null;
@@ -1838,12 +2775,16 @@
 
       function onHeroElementDragOver(blockId, index) {
         if (!heroDrag.elementId) return;
+        const block = getBlockById(blockId);
+        if (isFreeformBlock(block)) return;
         heroDrag.targetBlockId = blockId;
         heroDrag.dropIndex = index;
       }
 
       function onHeroElementDragLeave(blockId, index) {
         if (!heroDrag.elementId) return;
+        const block = getBlockById(blockId);
+        if (isFreeformBlock(block)) return;
         if (heroDrag.targetBlockId === blockId && heroDrag.dropIndex === index) {
           heroDrag.dropIndex = null;
         }
@@ -1853,7 +2794,7 @@
         if (!heroDrag.elementId) return;
         const sourceBlock = pageBlocks.value.find(b => b.id === heroDrag.sourceBlockId);
         const targetBlock = pageBlocks.value.find(b => b.id === blockId);
-        if (!sourceBlock || !targetBlock || targetBlock.type !== 'hero') {
+        if (!sourceBlock || !targetBlock || targetBlock.type !== 'hero' || isFreeformBlock(targetBlock)) {
           onHeroElementDragEnd();
           return;
         }
@@ -1862,6 +2803,11 @@
         const targetElements = Array.isArray(targetBlock.data.elements) ? targetBlock.data.elements : [];
         const sourceIndex = sourceElements.findIndex(el => el.id === heroDrag.elementId);
         if (sourceIndex === -1) {
+          onHeroElementDragEnd();
+          return;
+        }
+
+        if (sourceElements[sourceIndex]?.data?.positionMode === 'free') {
           onHeroElementDragEnd();
           return;
         }
@@ -1878,6 +2824,7 @@
         selectedBlockId.value = targetBlock.id;
         currentElementId.value = element.id;
         onHeroElementDragEnd();
+        scheduleSelectionOverlay();
       }
 
       function selectElement(blockId, elementId) {
@@ -2069,11 +3016,13 @@
         if (!blocks.length) {
           selectedBlockId.value = null;
           currentElementId.value = null;
+          scheduleSelectionOverlay();
           return;
         }
         if (!blocks.some(block => block.id === selectedBlockId.value)) {
           selectedBlockId.value = blocks[0].id;
         }
+        nextTick(scheduleSelectionOverlay);
       }, { deep: true });
 
       watch(selectedBlockId, (nextId, prevId) => {
@@ -2087,10 +3036,45 @@
         if (!has) {
           currentElementId.value = block.data.elements[0].id;
         }
+        nextTick(scheduleSelectionOverlay);
+      });
+
+      watch(currentElementId, () => {
+        nextTick(scheduleSelectionOverlay);
+      });
+
+      watch(() => canvas.zoom, () => {
+        scheduleSelectionOverlay();
+      });
+
+      watch(() => canvas.mode, () => {
+        nextTick(scheduleSelectionOverlay);
+      });
+
+      watch(() => canvas.showOverlays, (value) => {
+        if (value) {
+          scheduleSelectionOverlay();
+        } else {
+          selectionOverlay.visible = false;
+        }
+      });
+
+      watch(() => canvas.device, () => {
+        nextTick(scheduleSelectionOverlay);
       });
 
       onMounted(async () => {
+        window.addEventListener('resize', handleWindowResize);
+        document.addEventListener('scroll', handleDocumentScroll, true);
         await loadSettings();
+        nextTick(scheduleSelectionOverlay);
+      });
+
+      onUnmounted(() => {
+        window.removeEventListener('resize', handleWindowResize);
+        document.removeEventListener('scroll', handleDocumentScroll, true);
+        window.removeEventListener('pointermove', onFreeformPointerMove);
+        window.removeEventListener('pointerup', onFreeformPointerUp);
       });
 
       return {
@@ -2104,6 +3088,8 @@
         canvas,
         canvasWidth,
         canvasStyle,
+        canvasViewportRef,
+        canvasInnerRef,
         dropIndex,
         selectedBlockId,
         selectedBlock,
@@ -2114,6 +3100,8 @@
         currentElement,
         currentElementDefinition,
         elementRegistry,
+        selectionOverlay,
+        selectionOverlayStyle,
         saveSettings,
         loadSettings,
         addBlock,
@@ -2137,13 +3125,19 @@
         heroElementProps,
         heroImageProps,
         heroElementWrapperClasses,
+        heroElementWrapperStyle,
+        heroElementDraggable,
         heroDropWrapperClass,
         heroDropLabelClass,
         onHeroElementDragStart,
         onHeroElementDragEnd,
+        onHeroElementPointerDown,
         onHeroElementDragOver,
         onHeroElementDragLeave,
         onHeroElementDrop,
+        handleBlockClick,
+        handleElementClick,
+        handleCanvasClick,
         selectElement,
         isElementSelected,
         addElement,
@@ -2155,7 +3149,19 @@
         onBlockFileSelected,
         onFileSelected,
         getElementFieldValue,
-        updateElementField
+        updateElementField,
+        registerBlockRef,
+        registerElementRef,
+        onCanvasScroll,
+        heroWrapperStyle,
+        heroBackgroundStyle,
+        heroOverlayStyle,
+        heroContainerClasses,
+        heroContainerStyle,
+        heroContentColumnClasses,
+        heroContentStyle,
+        heroMediaWrapperClasses,
+        heroFeatureIconWrapperStyle
       };
     }
   };
