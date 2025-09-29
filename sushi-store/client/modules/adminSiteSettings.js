@@ -349,21 +349,21 @@
                       </div>
                     </div>
                     <div class="flex items-center space-x-2">
-                      <button 
+                      <button
                         @click="deviceView = 'desktop'"
                         :class="['px-3 py-1 text-sm rounded', deviceView === 'desktop' ? 'bg-orange-100 text-orange-700' : 'text-gray-600 hover:bg-gray-100']"
                       >
                         <i class="fa-solid fa-desktop mr-1"></i>
                         Desktop
                       </button>
-                      <button 
+                      <button
                         @click="deviceView = 'tablet'"
                         :class="['px-3 py-1 text-sm rounded', deviceView === 'tablet' ? 'bg-orange-100 text-orange-700' : 'text-gray-600 hover:bg-gray-100']"
                       >
                         <i class="fa-solid fa-tablet mr-1"></i>
                         Tablet
                       </button>
-                      <button 
+                      <button
                         @click="deviceView = 'mobile'"
                         :class="['px-3 py-1 text-sm rounded', deviceView === 'mobile' ? 'bg-orange-100 text-orange-700' : 'text-gray-600 hover:bg-gray-100']"
                       >
@@ -371,32 +371,43 @@
                         Mobile
                       </button>
                     </div>
-                  </div>
+                    <div class="flex items-center space-x-2">
+                      <button
+                        @click="canvasMode = 'preview'"
+                        :class="['px-3 py-1 text-sm rounded', canvasMode === 'preview' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100']"
+                      >
+                        <i class="fa-solid fa-magnifying-glass mr-1"></i>
+                        Превью
+                      </button>
+                      <button
+                        @click="canvasMode = 'fullscreen'"
+                        :class="['px-3 py-1 text-sm rounded', canvasMode === 'fullscreen' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100']"
+                      >
+                        <i class="fa-solid fa-up-right-and-down-left-from-center mr-1"></i>
+                        Полностранично
+                      </button>
+                    </div>
+      </div>
 
-                  <!-- Интерактивное рабочее пространство -->
-                  <div class="border-2 border-gray-200 rounded-lg overflow-hidden bg-white">
-                    <div class="bg-gray-100 px-4 py-2 flex items-center justify-between">
-                      <div class="flex items-center space-x-2">
-                        <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                      </div>
+      <!-- Интерактивное рабочее пространство -->
+      <div class="border-2 border-gray-200 rounded-lg overflow-hidden bg-white">
+        <div class="bg-gray-100 px-4 py-2 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+          </div>
                       <div class="text-sm text-gray-600">
                         {{ getDeviceWidth() }}px
                       </div>
                     </div>
                     
                     <!-- Контейнер конструктора -->
-                    <div 
-                      class="overflow-auto bg-gray-50"
-                      :style="{ 
-                        height: '600px',
-                        transform: 'scale(' + zoomLevel + ')',
-                        transformOrigin: 'top left',
-                        width: getDeviceWidth() + 'px',
-                        margin: '0 auto'
-                      }"
-                    >
+      <div
+        class="bg-gray-50"
+        :class="canvasMode === 'fullscreen' ? 'overflow-visible' : 'overflow-auto'"
+        :style="canvasStyle"
+      >
                       <!-- Интерактивная страница -->
                       <div class="bg-white min-h-full relative">
                         <!-- Drag & Drop зоны между блоками -->
@@ -444,36 +455,35 @@
                               <div class="max-w-7xl mx-auto px-4 py-16 lg:py-24 grid md:grid-cols-2 gap-12 items-center relative z-10">
                                 <div class="text-center md:text-left">
                                   <!-- Динамические элементы Hero -->
-                                  <div v-if="block.data.elements && block.data.elements.length > 0" class="space-y-4 relative">
+                                  <div class="space-y-4 relative">
                                     <!-- Визуальная сетка для drag & drop -->
                                     <div class="absolute inset-0 pointer-events-none opacity-20" style="background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px), linear-gradient(to bottom, #e5e7eb 1px, transparent 1px); background-size: 20px 20px;"></div>
-                                    <!-- Drop zone перед первым элементом -->
-                                    <div 
-                                      v-if="elementIndex === 0"
-                                      class="h-2 bg-transparent hover:bg-orange-200 transition-colors rounded"
-                                      @dragover="onElementDragOver($event)"
-                                      @drop="onElementDrop($event, index, -1)"
-                                    ></div>
-                                    
-                                    <div 
-                                      v-for="(element, elementIndex) in block.data.elements" 
-                                      :key="element.id"
-                                      :draggable="true"
-                                      @dragstart="onElementDragStart($event, index, elementIndex)"
-                                      @dragend="onElementDragEnd($event)"
-                                      @dragover="onElementDragOver($event)"
-                                      @drop="onElementDrop($event, index, elementIndex)"
-                                      @click.stop="selectElement(index, elementIndex)"
-                                      :class="[
-                                        'cursor-move border-2 border-dashed border-transparent hover:border-orange-300 rounded p-2 transition relative z-10',
-                                        selectedElement?.blockIndex === index && selectedElement?.elementIndex === elementIndex 
-                                          ? 'border-orange-500 bg-orange-50' 
-                                          : ''
-                                      ]"
-                                    >
+
+                                    <template v-if="block.data.elements && block.data.elements.length > 0">
+                                      <div
+                                        class="h-2 bg-transparent hover:bg-orange-200 transition-colors rounded"
+                                        @dragover="onElementDragOver($event)"
+                                        @drop="onElementDrop($event, index, 0)"
+                                      ></div>
+
+                                      <template v-for="(element, elementIndex) in block.data.elements" :key="element.id">
+                                        <div
+                                          :draggable="true"
+                                          @dragstart="onElementDragStart($event, index, elementIndex)"
+                                          @dragend="onElementDragEnd($event)"
+                                          @dragover="onElementDragOver($event)"
+                                          @drop="onElementDrop($event, index, elementIndex)"
+                                          @click.stop="selectElement(index, elementIndex)"
+                                          :class="[
+                                            'cursor-move border-2 border-dashed border-transparent hover:border-orange-300 rounded p-2 transition relative z-10',
+                                            selectedElement?.blockIndex === index && selectedElement?.elementIndex === elementIndex
+                                              ? 'border-orange-500 bg-orange-50'
+                                              : ''
+                                          ]"
+                                        >
                                       <!-- Heading element -->
-                                      <component 
-                                        v-if="element.type === 'heading'" 
+                                      <component
+                                        v-if="element.type === 'heading'"
                                         :is="element.data.level || 'h2'"
                                         class="font-bold mb-2"
                                         :class="[
@@ -580,19 +590,27 @@
                                       <div v-else class="text-white text-sm bg-red-500 bg-opacity-50 p-2 rounded">
                                         Неизвестный тип элемента: {{ element.type }}
                                       </div>
-                                    </div>
-                                    
-                                    <!-- Drop zone после элемента -->
-                                    <div 
-                                      class="h-2 bg-transparent hover:bg-orange-200 transition-colors rounded"
-                                      @dragover="onElementDragOver($event)"
-                                      @drop="onElementDrop($event, index, elementIndex + 1)"
-                                    ></div>
-                                  </div>
-                                  
-                                  <!-- Fallback если нет элементов -->
-                                  <div v-else class="text-center text-white">
-                                    <p class="text-sm opacity-75">Добавьте элементы в Hero блок</p>
+                                        </div>
+
+                                        <!-- Drop zone после элемента -->
+                                        <div
+                                          class="h-2 bg-transparent hover:bg-orange-200 transition-colors rounded"
+                                          @dragover="onElementDragOver($event)"
+                                          @drop="onElementDrop($event, index, elementIndex + 1)"
+                                        ></div>
+                                      </template>
+                                    </template>
+                                    <template v-else>
+                                      <div
+                                        class="h-24 flex flex-col items-center justify-center border-2 border-dashed border-white/40 rounded-lg text-center text-white bg-white/5"
+                                        @dragover="onElementDragOver($event)"
+                                        @drop="onElementDrop($event, index, 0)"
+                                      >
+                                        <i class="fa-solid fa-plus mb-2"></i>
+                                        <p class="text-sm opacity-80">Перетащите элемент в этот блок</p>
+                                        <p class="text-xs opacity-60">Или выберите тип элемента в палитре справа</p>
+                                      </div>
+                                    </template>
                                   </div>
                                 </div>
                                 <div class="relative hidden md:block">
@@ -1249,40 +1267,21 @@
                  <i class="fa-solid fa-sliders mr-2 text-orange-500"></i>
                  Инспектор
                </h3>
-               
-               <div v-if="selectedBlockIndex >= 0">
-                 <div class="text-sm text-gray-500 mb-3">Блок: {{ pageBlocks[selectedBlockIndex]?.name }} ({{ pageBlocks[selectedBlockIndex]?.type }})</div>
-                 <div class="text-xs text-gray-400 mb-2">Debug: selectedBlockIndex={{ selectedBlockIndex }}, selectedElement={{ selectedElement }}</div>
 
-                 <!-- Инспектор поля блока (например, hero.heading) -->
-                 <div v-if="selectedElement && selectedElement.field && (selectedElement.elementIndex === undefined || selectedElement.elementIndex === null) && pageBlocks[selectedElement.blockIndex] && pageBlocks[selectedElement.blockIndex].data" class="space-y-4">
-                   <template v-if="['heading','subheading','description','buttonText'].includes(selectedElement.field)">
-                     <div>
-                       <label class="block text-xs font-medium text-gray-700 mb-1">{{ selectedElement.field }}</label>
-                       <component :is="selectedElement.field==='description' ? 'textarea' : 'input'"
-                                  v-model="pageBlocks[selectedElement.blockIndex].data[selectedElement.field]"
-                                  @input="syncBlocksToForm()"
-                                  :rows="selectedElement.field==='description' ? 3 : undefined"
-                                  type="text"
-                                  class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"/>
-                     </div>
-                   </template>
-                   <div v-else class="text-sm text-gray-500">Этот тип поля пока не поддержан в инспекторе</div>
-                   <div class="text-xs text-gray-500">Подсказка: клик по другому элементу или полю в превью переключит инспектор.</div>
+               <div v-if="selectedBlockIndex >= 0">
+                 <div class="text-sm text-gray-500 mb-3">
+                   Блок: {{ pageBlocks[selectedBlockIndex]?.name }} ({{ pageBlocks[selectedBlockIndex]?.type }})
                  </div>
 
-                 <!-- Инспектор элемента, если выбран -->
-                 <div v-else-if="selectedElement && (selectedElement.elementIndex !== undefined && selectedElement.elementIndex !== null) && pageBlocks[selectedElement.blockIndex] && pageBlocks[selectedElement.blockIndex].data && pageBlocks[selectedElement.blockIndex].data.elements && pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex]">
+                 <div v-if="selectedElement && (selectedElement.elementIndex !== undefined && selectedElement.elementIndex !== null) && pageBlocks[selectedElement.blockIndex] && pageBlocks[selectedElement.blockIndex].data && pageBlocks[selectedElement.blockIndex].data.elements && pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex]">
                    <div class="mb-3 text-sm font-medium text-gray-900">Элемент: {{ pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].type }}</div>
                    <div class="space-y-4">
-                     <!-- Общие поля для текстовых -->
                      <template v-if="['heading','subheading','paragraph','feature'].includes(pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].type)">
                        <div>
                          <label class="block text-xs font-medium text-gray-700 mb-1">Текст</label>
                          <input v-model="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].data.text" @input="syncBlocksToForm()" type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
                        </div>
                      </template>
-                     <!-- Заголовок: уровень -->
                      <template v-if="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].type === 'heading'">
                        <div>
                          <label class="block text-xs font-medium text-gray-700 mb-1">Уровень</label>
@@ -1293,7 +1292,6 @@
                          </select>
                        </div>
                      </template>
-                     <!-- Кнопка -->
                      <template v-if="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].type === 'button'">
                        <div>
                          <label class="block text-xs font-medium text-gray-700 mb-1">Текст кнопки</label>
@@ -1318,7 +1316,6 @@
                          <input v-model="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].data.href" @input="syncBlocksToForm()" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
                        </div>
                      </template>
-                     <!-- Изображение -->
                      <template v-if="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].type === 'image'">
                        <div>
                          <label class="block text-xs font-medium text-gray-700 mb-1">Ссылка на изображение</label>
@@ -1333,18 +1330,15 @@
                          <input v-model="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].data.height" @input="syncBlocksToForm()" type="text" placeholder="150px или auto" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
                        </div>
                      </template>
-                     
-                     <!-- Общие стили для всех элементов -->
+
                      <div class="border-t pt-4">
                        <h4 class="text-sm font-medium text-gray-700 mb-3">Стили</h4>
-                       
-                       <!-- Цвет текста -->
+
                        <div v-if="['heading','subheading','paragraph','feature','button'].includes(pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].type)">
                          <label class="block text-xs font-medium text-gray-700 mb-1">Цвет текста</label>
                          <input v-model="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].data.color" @input="syncBlocksToForm()" type="color" class="w-full h-8 border border-gray-200 rounded" />
                        </div>
-                       
-                       <!-- Размер шрифта -->
+
                        <div v-if="['heading','subheading','paragraph','feature'].includes(pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].type)">
                          <label class="block text-xs font-medium text-gray-700 mb-1">Размер шрифта</label>
                          <select v-model="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].data.fontSize" @change="syncBlocksToForm()" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
@@ -1357,8 +1351,7 @@
                            <option value="text-3xl">Гигантский (30px)</option>
                          </select>
                        </div>
-                       
-                       <!-- Выравнивание -->
+
                        <div>
                          <label class="block text-xs font-medium text-gray-700 mb-1">Выравнивание</label>
                          <select v-model="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].data.align" @change="syncBlocksToForm()" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
@@ -1368,8 +1361,7 @@
                            <option value="justify">По ширине</option>
                          </select>
                        </div>
-                       
-                       <!-- Отступы -->
+
                        <div>
                          <label class="block text-xs font-medium text-gray-700 mb-1">Отступ сверху</label>
                          <input v-model="pageBlocks[selectedElement.blockIndex].data.elements[selectedElement.elementIndex].data.marginTop" @input="syncBlocksToForm()" type="text" placeholder="0px, 1rem, 2em" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
@@ -1383,74 +1375,86 @@
                    <div class="mt-3 text-xs text-gray-500">Подсказка: клик по элементу в превью выделяет его для редактирования.</div>
                  </div>
 
-                 <!-- Инспектор блока Hero -->
-                 <div v-else-if="selectedBlockIndex >= 0 && pageBlocks[selectedBlockIndex]?.type === 'hero'" class="space-y-4">
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Заголовок</label>
-                     <input v-model="pageBlocks[selectedBlockIndex].data.heading" @input="syncBlocksToForm()" type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Подзаголовок</label>
-                     <input v-model="pageBlocks[selectedBlockIndex].data.subheading" @input="syncBlocksToForm()" type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Описание</label>
-                     <textarea v-model="pageBlocks[selectedBlockIndex].data.description" @input="syncBlocksToForm()" rows="2" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Текст кнопки</label>
-                     <input v-model="pageBlocks[selectedBlockIndex].data.buttonText" @input="syncBlocksToForm()" type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Стиль кнопки</label>
-                     <select v-model="pageBlocks[selectedBlockIndex].data.buttonStyle" @change="syncBlocksToForm()" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                       <option value="primary">primary</option>
-                       <option value="secondary">secondary</option>
-                     </select>
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Действие кнопки</label>
-                     <select v-model="pageBlocks[selectedBlockIndex].data.buttonAction" @change="syncBlocksToForm()" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                       <option value="scroll">scroll</option>
-                       <option value="link">link</option>
-                     </select>
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Фон (URL)</label>
-                     <input v-model="pageBlocks[selectedBlockIndex].data.backgroundImage" @input="syncBlocksToForm()" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                     <label class="inline-block mt-2 text-xs text-orange-600 cursor-pointer">
-                       <i class="fa-solid fa-image mr-1"></i>Загрузить файл
-                       <input type="file" accept="image/*" class="hidden" @change="onHeroBgFile($event, selectedBlockIndex)" />
-                     </label>
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Превью справа (URL)</label>
-                     <input v-model="pageBlocks[selectedBlockIndex].data.previewImage" @input="syncBlocksToForm()" type="text" placeholder="https://..." class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" />
-                     <label class="inline-block mt-2 text-xs text-orange-600 cursor-pointer">
-                       <i class="fa-solid fa-photo-film mr-1"></i>Загрузить файл
-                       <input type="file" accept="image/*" class="hidden" @change="onHeroPreviewFile($event, selectedBlockIndex)" />
-                     </label>
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Позиция изображения</label>
-                     <select v-model="pageBlocks[selectedBlockIndex].data.imageSide" @change="syncBlocksToForm()" class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                       <option value="right">right</option>
-                       <option value="left">left</option>
-                     </select>
-                   </div>
-                   <div class="flex items-center space-x-3">
-                     <label class="inline-flex items-center text-xs text-gray-700"><input type="checkbox" v-model="pageBlocks[selectedBlockIndex].data.showRightImage" @change="syncBlocksToForm()" class="mr-2"/>Показывать изображение</label>
-                     <label class="inline-flex items-center text-xs text-gray-700"><input type="checkbox" v-model="pageBlocks[selectedBlockIndex].data.waveEnabled" @change="syncBlocksToForm()" class="mr-2"/>Волна</label>
-                   </div>
-                   <div>
-                     <label class="block text-xs font-medium text-gray-700 mb-1">Цвет волны</label>
-                     <input type="color" v-model="pageBlocks[selectedBlockIndex].data.waveColor" @input="syncBlocksToForm()" class="h-9 w-20 p-0 border border-gray-200 rounded" />
+                 <div v-else>
+                   <template v-if="getInspectorSections(inspectorBlockType).length">
+                     <div class="space-y-6">
+                       <div
+                         v-for="section in getInspectorSections(inspectorBlockType)"
+                         :key="section.title"
+                         class="border-b border-gray-100 pb-5 last:pb-0 last:border-b-0"
+                       >
+                         <div class="flex items-start justify-between">
+                           <div>
+                             <h4 class="text-sm font-semibold text-gray-800">{{ section.title }}</h4>
+                             <p v-if="section.description" class="text-xs text-gray-500 mt-1">{{ section.description }}</p>
+                           </div>
+                           <span v-if="section.badge" class="text-[10px] uppercase tracking-wide bg-gray-100 text-gray-500 px-2 py-1 rounded-full">{{ section.badge }}</span>
+                         </div>
+                         <div class="space-y-4 mt-4">
+                           <template v-for="field in section.fields" :key="field.key">
+                             <div v-if="shouldShowField(inspectorBlockType, field)" class="space-y-1">
+                               <label class="block text-xs font-medium text-gray-700">{{ field.label }}</label>
+                               <template v-if="field.type === 'textarea'">
+                                 <textarea
+                                   v-model="resolveBlockFieldModel(inspectorBlockType, field)"
+                                   :rows="field.rows || 3"
+                                   class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm resize-none"
+                                   :placeholder="field.placeholder || ''"
+                                 ></textarea>
+                               </template>
+                               <template v-else-if="field.type === 'select'">
+                                 <select
+                                   v-model="resolveBlockFieldModel(inspectorBlockType, field)"
+                                   class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                                 >
+                                   <option v-for="option in field.options" :key="option.value" :value="option.value">{{ option.label }}</option>
+                                 </select>
+                               </template>
+                               <template v-else-if="field.type === 'checkbox'">
+                                 <label class="inline-flex items-center space-x-2 text-xs text-gray-600">
+                                   <input
+                                     type="checkbox"
+                                     class="rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                                     v-model="resolveBlockFieldModel(inspectorBlockType, field)"
+                                   />
+                                   <span>{{ field.help || 'Активно' }}</span>
+                                 </label>
+                               </template>
+                               <template v-else-if="field.type === 'color'">
+                                 <input
+                                   type="color"
+                                   class="w-16 h-10 border border-gray-300 rounded-md"
+                                   v-model="resolveBlockFieldModel(inspectorBlockType, field)"
+                                 />
+                               </template>
+                               <template v-else>
+                                 <input
+                                   :type="field.type === 'url' ? 'url' : field.type === 'number' ? 'number' : 'text'"
+                                   v-model="resolveBlockFieldModel(inspectorBlockType, field)"
+                                   class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                                   :placeholder="field.placeholder || ''"
+                                 />
+                               </template>
+                               <p v-if="field.help && field.type !== 'checkbox'" class="text-xs text-gray-500">{{ field.help }}</p>
+                             </div>
+                           </template>
+                         </div>
+                       </div>
+                     </div>
+                   </template>
+                   <div v-else class="bg-orange-50 border border-orange-200 text-orange-700 text-xs p-3 rounded-lg">
+                     <p class="font-medium">Советы по работе с конструктором</p>
+                     <ul class="list-disc list-inside mt-2 space-y-1">
+                       <li>Клик по тексту на холсте открывает inline-редактор</li>
+                       <li>Выберите элемент, чтобы менять его стили и параметры</li>
+                       <li>Используйте стрелки на превью для перестановки блоков</li>
+                     </ul>
                    </div>
                  </div>
-
-                 <div v-else class="text-sm text-gray-500">Выберите блок Hero, чтобы отредактировать параметры. Поддержка инспектора для других блоков будет добавлена далее.</div>
                </div>
-               <div v-else class="text-sm text-gray-500">Выберите блок на превью, чтобы редактировать его параметры.</div>
+               <div v-else class="text-sm text-gray-500">
+                 Выберите блок на холсте, чтобы увидеть его параметры.
+               </div>
              </div>
            </div>
 
@@ -1500,6 +1504,13 @@
       const draggedElement = ref(null);
       const hoveredBlock = ref(-1);
       const selectedElement = ref(null); // { blockIndex, elementIndex }
+      const inspectorBlockType = computed(() => {
+        if (selectedBlockIndex.value >= 0) {
+          return pageBlocks.value[selectedBlockIndex.value]?.type || '';
+        }
+        return '';
+      });
+      const canvasMode = ref('preview');
 
       const blocks = {
         hero: { name: 'Hero блок', icon: 'fa-solid fa-fire' },
@@ -1530,28 +1541,217 @@
         reviews: { name: 'Отзывы', icon: 'fa-solid fa-star' }
       };
 
+      const blockInspectorBlueprints = {
+        hero: {
+          sections: [
+            {
+              title: 'Контент',
+              description: 'Заголовки и текстовые элементы hero-блока',
+              fields: [
+                { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'БЫСТРО И ВКУСНО' },
+                { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'Попробуйте наши особые суши' },
+                { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Самые свежие роллы и нигири для любого настроения.' },
+                { key: 'buttonText', label: 'Текст кнопки', type: 'text', placeholder: 'Заказать сейчас' },
+                {
+                  key: 'buttonAction',
+                  label: 'Действие кнопки',
+                  type: 'select',
+                  default: 'scroll',
+                  options: [
+                    { value: 'scroll', label: 'Прокрутка к секции' },
+                    { value: 'link', label: 'Открыть ссылку' }
+                  ]
+                },
+                {
+                  key: 'buttonLink',
+                  label: 'Ссылка кнопки',
+                  type: 'url',
+                  placeholder: 'https://example.com',
+                  help: 'Используется, когда действие кнопки — ссылка',
+                  showWhen(data) {
+                    return (data?.buttonAction || 'scroll') === 'link';
+                  }
+                }
+              ]
+            },
+            {
+              title: 'Оформление',
+              description: 'Настройки внешнего вида hero-блока',
+              fields: [
+                {
+                  key: 'backgroundImage',
+                  label: 'Фоновое изображение',
+                  type: 'url',
+                  placeholder: 'https://images.unsplash.com/...',
+                  help: 'Можно также загрузить изображение прямо в превью блока'
+                },
+                {
+                  key: 'showRightImage',
+                  label: 'Показывать правую картинку',
+                  type: 'checkbox',
+                  default: true,
+                  help: 'Управляет отображением дополнительного изображения'
+                },
+                {
+                  key: 'imageSide',
+                  label: 'Расположение изображения',
+                  type: 'select',
+                  default: 'right',
+                  options: [
+                    { value: 'right', label: 'Справа' },
+                    { value: 'left', label: 'Слева' }
+                  ]
+                },
+                {
+                  key: 'buttonStyle',
+                  label: 'Стиль кнопки',
+                  type: 'select',
+                  default: 'primary',
+                  options: [
+                    { value: 'primary', label: 'Primary' },
+                    { value: 'secondary', label: 'Secondary' }
+                  ]
+                },
+                {
+                  key: 'waveEnabled',
+                  label: 'Показывать волну внизу',
+                  type: 'checkbox',
+                  default: true
+                },
+                {
+                  key: 'waveColor',
+                  label: 'Цвет волны',
+                  type: 'color',
+                  default: '#f9f4e5',
+                  showWhen(data) {
+                    return data?.waveEnabled !== false;
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        categories: {
+          sections: [
+            {
+              title: 'Контент',
+              fields: [
+                { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Категории и блюда' },
+                { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'которые вы нигде не найдете' },
+                { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Уникальные рецепты от наших шеф-поваров' }
+              ]
+            }
+          ]
+        },
+        menu: {
+          sections: [
+            {
+              title: 'Контент',
+              fields: [
+                { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Популярные блюда' },
+                { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'Попробуйте наши хиты' },
+                { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Самые любимые блюда наших клиентов' }
+              ]
+            }
+          ]
+        },
+        delivery: {
+          sections: [
+            {
+              title: 'Контент',
+              fields: [
+                { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Быстрая доставка' },
+                { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'Доставляем за 30 минут' },
+                { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Свежие суши и пицца прямо к вашей двери' },
+                {
+                  key: 'features',
+                  label: 'Преимущества (по одному на строку)',
+                  type: 'textarea',
+                  rows: 4,
+                  modelKey: 'deliveryFeaturesText',
+                  placeholder: 'Бесплатная доставка от 1500₽\nДоставка за 30 минут\nСвежие ингредиенты'
+                }
+              ]
+            }
+          ]
+        },
+        reviews: {
+          sections: [
+            {
+              title: 'Контент',
+              fields: [
+                { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Отзывы наших клиентов' },
+                { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'Что говорят о нас' },
+                { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Более 1000 довольных клиентов' }
+              ]
+            }
+          ]
+        },
+        map: {
+          sections: [
+            {
+              title: 'Контент',
+              fields: [
+                { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Мы рядом' },
+                { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'Загляните к нам' },
+                { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Укажите краткую информацию о заведении' },
+                { key: 'address', label: 'Адрес', type: 'text', placeholder: 'Москва, ул. Примерная, 10' },
+                {
+                  key: 'iframe',
+                  label: 'Код карты (iframe)',
+                  type: 'textarea',
+                  rows: 4,
+                  placeholder: '<iframe src="https://maps.google.com/..." />',
+                  help: 'Вставьте сюда iframe для встроенной карты'
+                }
+              ]
+            }
+          ]
+        }
+      };
+
+      const blockFieldModelCache = {};
+      const emptyFieldModel = computed({
+        get: () => '',
+        set: () => {}
+      });
+
       // Computed для работы с features доставки как с текстом
       const deliveryFeaturesText = computed({
         get() {
-          return form.value.home_blocks.delivery?.features?.join('\n') || '';
+          const raw = getBlockData('delivery', 'features');
+          if (Array.isArray(raw)) {
+            return raw.join('\n');
+          }
+          if (typeof raw === 'string') {
+            return raw;
+          }
+          return '';
         },
         set(value) {
-          if (!form.value.home_blocks.delivery) {
-            form.value.home_blocks.delivery = {};
-          }
-          form.value.home_blocks.delivery.features = value.split('\n').filter(f => f.trim());
+          const normalized = (value || '')
+            .split('\n')
+            .map(line => line.trim())
+            .filter(Boolean);
+          setBlockData('delivery', 'features', normalized);
         }
       });
 
       // Универсальная функция для работы с данными блоков
-      function getBlockData(blockType, field) {
+      function getBlockDataObject(blockType) {
         if (editMode.value === 'visual' && selectedBlockIndex.value >= 0) {
           const block = pageBlocks.value[selectedBlockIndex.value];
           if (block && block.type === blockType) {
-            return block.data?.[field] || '';
+            return block.data || {};
           }
         }
-        return form.value.home_blocks[blockType]?.[field] || '';
+        return form.value.home_blocks[blockType] || {};
+      }
+
+      function getBlockData(blockType, field) {
+        const data = getBlockDataObject(blockType);
+        const value = data ? data[field] : undefined;
+        return value === undefined || value === null ? '' : value;
       }
 
       function setBlockData(blockType, field, value) {
@@ -1560,11 +1760,85 @@
           if (block && block.type === blockType) {
             if (!block.data) block.data = {};
             block.data[field] = value;
+            syncBlocksToForm();
+            return;
           }
-        } else {
-          if (!form.value.home_blocks[blockType]) form.value.home_blocks[blockType] = {};
-          form.value.home_blocks[blockType][field] = value;
         }
+
+        if (!form.value.home_blocks[blockType]) {
+          form.value.home_blocks[blockType] = {};
+        }
+        form.value.home_blocks[blockType][field] = value;
+      }
+
+      function getInspectorSections(blockType) {
+        return blockInspectorBlueprints[blockType]?.sections || [];
+      }
+
+      const customFieldModels = {
+        deliveryFeaturesText
+      };
+
+      function shouldShowField(blockType, field) {
+        if (typeof field.showWhen !== 'function') {
+          return true;
+        }
+        try {
+          const data = getBlockDataObject(blockType);
+          return field.showWhen(data || {});
+        } catch (e) {
+          console.warn('showWhen evaluation error', e);
+          return true;
+        }
+      }
+
+      function resolveBlockFieldModel(blockType, field) {
+        if (!blockType) {
+          return emptyFieldModel;
+        }
+
+        if (!blockInspectorBlueprints[blockType]) {
+          return emptyFieldModel;
+        }
+
+        if (field.modelKey && customFieldModels[field.modelKey]) {
+          return customFieldModels[field.modelKey];
+        }
+
+        if (!blockFieldModelCache[blockType]) {
+          blockFieldModelCache[blockType] = {};
+        }
+
+        if (!blockFieldModelCache[blockType][field.key]) {
+          blockFieldModelCache[blockType][field.key] = computed({
+            get() {
+              const current = getBlockData(blockType, field.key);
+              if ((current === '' || current === undefined || current === null) && field.default !== undefined) {
+                return field.default;
+              }
+
+              if (field.type === 'checkbox') {
+                if (current === '') {
+                  return !!field.default;
+                }
+                return Boolean(current);
+              }
+
+              return current;
+            },
+            set(newValue) {
+              let normalized = newValue;
+              if (field.type === 'checkbox') {
+                normalized = !!newValue;
+              } else if (field.type === 'number') {
+                normalized = newValue === '' || newValue === null ? null : Number(newValue);
+              }
+              setBlockData(blockType, field.key, normalized);
+            }
+          });
+        }
+
+        return blockFieldModelCache[blockType][field.key];
       }
 
       // Computed свойства для безопасного доступа к полям блоков
@@ -1772,6 +2046,13 @@
             heading: "Отзывы наших клиентов",
             subheading: "Что говорят о нас",
             description: "Более 1000 довольных клиентов"
+          },
+          map: {
+            heading: "Мы рядом",
+            subheading: "Загляните к нам",
+            description: "Мы находимся в самом центре города",
+            address: "Москва, ул. Примерная, 10",
+            iframe: ""
           }
         };
         return defaults[blockType] || {};
@@ -1854,9 +2135,16 @@
       function removeBlock(index) {
         if (index >= 0 && index < pageBlocks.value.length) {
           pageBlocks.value.splice(index, 1);
-          if (selectedBlockIndex.value >= index) {
-            selectedBlockIndex.value = Math.max(0, selectedBlockIndex.value - 1);
+          if (pageBlocks.value.length === 0) {
+            selectedBlockIndex.value = -1;
+            selectedBlockType.value = '';
+          } else {
+            const nextIndex = Math.min(Math.max(selectedBlockIndex.value - (selectedBlockIndex.value >= index ? 1 : 0), 0), pageBlocks.value.length - 1);
+            selectedBlockIndex.value = nextIndex;
+            selectedBlockType.value = pageBlocks.value[nextIndex].type;
+            activeBlock.value = pageBlocks.value[nextIndex].type;
           }
+          selectedElement.value = null;
         }
       }
 
@@ -1866,6 +2154,7 @@
         if (index >= 0 && index < pageBlocks.value.length) {
           const block = pageBlocks.value[index];
           activeBlock.value = block.type;
+          selectedBlockType.value = block.type;
         }
       }
 
@@ -1874,6 +2163,8 @@
           const block = pageBlocks.value.splice(index, 1)[0];
           pageBlocks.value.splice(index - 1, 0, block);
           selectedBlockIndex.value = index - 1;
+          selectedBlockType.value = block.type;
+          activeBlock.value = block.type;
         }
       }
 
@@ -1882,6 +2173,8 @@
           const block = pageBlocks.value.splice(index, 1)[0];
           pageBlocks.value.splice(index + 1, 0, block);
           selectedBlockIndex.value = index + 1;
+          selectedBlockType.value = block.type;
+          activeBlock.value = block.type;
         }
       }
 
@@ -2007,6 +2300,28 @@
         };
         return widths[deviceView.value] || 1200;
       }
+
+      const canvasStyle = computed(() => {
+        if (canvasMode.value === 'fullscreen') {
+          return {
+            minHeight: '700px',
+            width: '100%',
+            maxWidth: getDeviceWidth() + 'px',
+            transform: 'none',
+            transformOrigin: 'top left',
+            margin: '0 auto',
+            padding: '24px 0'
+          };
+        }
+
+        return {
+          height: '600px',
+          transform: `scale(${zoomLevel.value})`,
+          transformOrigin: 'top left',
+          width: getDeviceWidth() + 'px',
+          margin: '0 auto'
+        };
+      });
 
       function selectBlockByType(blockType) {
         selectedBlockType.value = blockType;
@@ -2456,6 +2771,13 @@
               heading: "Отзывы наших клиентов",
               subheading: "Что говорят о нас",
               description: "Более 1000 довольных клиентов"
+            },
+            map: {
+              heading: "Мы рядом",
+              subheading: "Загляните к нам",
+              description: "Мы находимся в самом центре города",
+              address: "Москва, ул. Примерная, 10",
+              iframe: ''
             }
           };
           
@@ -2529,6 +2851,30 @@
       watch(() => pageBlocks.value, () => {
         if (editMode.value === 'visual') {
           syncBlocksToForm();
+        }
+
+        const blocksSnapshot = pageBlocks.value;
+        if (selectedBlockIndex.value >= blocksSnapshot.length) {
+          selectedBlockIndex.value = blocksSnapshot.length ? blocksSnapshot.length - 1 : -1;
+        }
+
+        if (selectedElement.value) {
+          const { blockIndex, elementIndex, field } = selectedElement.value;
+          const targetBlock = blocksSnapshot[blockIndex];
+
+          if (!targetBlock) {
+            selectedElement.value = null;
+            return;
+          }
+
+          if (elementIndex !== undefined && elementIndex !== null) {
+            const elements = targetBlock.data?.elements;
+            if (!Array.isArray(elements) || elementIndex < 0 || elementIndex >= elements.length) {
+              selectedElement.value = null;
+            }
+          } else if (field && !targetBlock.data) {
+            selectedElement.value = null;
+          }
         }
       }, { deep: true });
 
@@ -2622,12 +2968,22 @@
 
       function selectElement(blockIndex, elementIndex) {
         selectedElement.value = { blockIndex, elementIndex };
-        selectedBlockIndex.value = -1; // Очищаем выбранный блок
-        console.log('Element selected:', blockIndex, elementIndex);
+        selectedBlockIndex.value = blockIndex;
+        const block = pageBlocks.value[blockIndex];
+        if (block) {
+          selectedBlockType.value = block.type;
+          activeBlock.value = block.type;
+        }
       }
 
       function selectBlockField(blockIndex, field) {
+        selectedBlockIndex.value = blockIndex;
         selectedElement.value = { blockIndex, field };
+        const block = pageBlocks.value[blockIndex];
+        if (block) {
+          selectedBlockType.value = block.type;
+          activeBlock.value = block.type;
+        }
       }
 
       // Drag & Drop для элементов внутри блоков
@@ -2652,54 +3008,58 @@
       }
 
       function onElementDrop(event, targetBlockIndex, targetElementIndex) {
-        event.stopPropagation(); // Останавливаем всплытие к блоку
+        event.stopPropagation();
         event.preventDefault();
-        
+
         try {
           const dragData = JSON.parse(event.dataTransfer.getData('text/plain'));
-          console.log('Element drop:', dragData, 'target:', targetBlockIndex, targetElementIndex);
-          
-          // Проверяем, что это перетаскивание элемента, а не блока
-          if (!dragData.type || dragData.type !== 'element') {
-            console.log('Not an element drag');
+
+          if (!dragData || dragData.type !== 'element') {
             return;
           }
-          
-          const { blockIndex: sourceBlockIndex, elementIndex: sourceElementIndex } = dragData;
-          
-          if (sourceBlockIndex === targetBlockIndex && sourceElementIndex === targetElementIndex) {
-            console.log('Same position, ignoring');
-            return; // Не перетаскиваем элемент сам в себя
-          }
-          
-          const sourceBlock = pageBlocks.value[sourceBlockIndex];
-          const targetBlock = pageBlocks.value[targetBlockIndex];
-          
-          if (!sourceBlock || !targetBlock || !sourceBlock.data?.elements || !targetBlock.data?.elements) {
-            console.log('Invalid blocks or elements');
+
+          const sourceBlockIndex = dragData.blockIndex;
+          const sourceElementIndex = dragData.elementIndex;
+
+          const blocksSnapshot = pageBlocks.value;
+          const sourceBlock = blocksSnapshot[sourceBlockIndex];
+          const targetBlock = blocksSnapshot[targetBlockIndex];
+
+          if (!sourceBlock || !targetBlock) {
             return;
           }
-          
-          // Извлекаем элемент из источника
-          const element = sourceBlock.data.elements.splice(sourceElementIndex, 1)[0];
-          console.log('Moved element:', element);
-          
-          // Вставляем в целевое место
-          if (targetElementIndex === -1) {
-            // Добавляем в конец
-            targetBlock.data.elements.push(element);
-          } else {
-            // Вставляем в указанную позицию
-            targetBlock.data.elements.splice(targetElementIndex, 0, element);
+
+          if (!Array.isArray(sourceBlock.data?.elements)) {
+            sourceBlock.data.elements = [];
           }
-          
-          // Синхронизируем изменения
+          if (!Array.isArray(targetBlock.data?.elements)) {
+            targetBlock.data.elements = [];
+          }
+
+          if (sourceElementIndex < 0 || sourceElementIndex >= sourceBlock.data.elements.length) {
+            return;
+          }
+
+          const [movedElement] = sourceBlock.data.elements.splice(sourceElementIndex, 1);
+          if (!movedElement) {
+            return;
+          }
+
+          let insertIndex = typeof targetElementIndex === 'number' ? targetElementIndex : targetBlock.data.elements.length;
+
+          if (targetBlockIndex === sourceBlockIndex && sourceElementIndex < insertIndex) {
+            insertIndex -= 1;
+          }
+
+          insertIndex = Math.max(0, Math.min(insertIndex, targetBlock.data.elements.length));
+          targetBlock.data.elements.splice(insertIndex, 0, movedElement);
+
           syncBlocksToForm();
-          
-          // Обновляем выделение
-          selectedElement.value = { blockIndex: targetBlockIndex, elementIndex: targetElementIndex === -1 ? targetBlock.data.elements.length - 1 : targetElementIndex };
-          
-          console.log('Element moved successfully');
+
+          selectedBlockIndex.value = targetBlockIndex;
+          selectedBlockType.value = targetBlock.type;
+          activeBlock.value = targetBlock.type;
+          selectedElement.value = { blockIndex: targetBlockIndex, elementIndex: insertIndex };
         } catch (error) {
           console.error('Error during element drag & drop:', error);
         }
@@ -2724,6 +3084,8 @@
         showPreview,
         zoomLevel,
         deviceView,
+        canvasMode,
+        canvasStyle,
         selectedBlockType,
         editingElement,
         inlineEditValue,
@@ -2733,6 +3095,10 @@
         hoveredBlock,
         elementTypes,
         selectedElement,
+        inspectorBlockType,
+        getInspectorSections,
+        resolveBlockFieldModel,
+        shouldShowField,
         // Hero computed
         heroHeading,
         heroSubheading,
