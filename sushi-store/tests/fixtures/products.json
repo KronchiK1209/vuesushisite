@@ -1,0 +1,38 @@
+[
+  {
+    "id": "prod1",
+    "name": "Суши‑ролл Калифорния",
+    "description": "Классический ролл с крабом, авокадо и огурцом, покрытый икрой масаго.",
+    "price": 350,
+    "category": "Роллы",
+    "image": "https://images.unsplash.com/photo-1607301405418-780ee5e6dd10",
+    "hit": true
+  },
+  {
+    "id": "prod2",
+    "name": "Суши с лососем",
+    "description": "Нежное филе лосося на подушке из риса с васаби.",
+    "price": 200,
+    "category": "Суши",
+    "image": "https://images.unsplash.com/photo-1562158074-d49fbeffcc91",
+    "hit": false
+  },
+  {
+    "id": "prod3",
+    "name": "Сет «Классика»",
+    "description": "Набор из 8 роллов Калифорния и 6 суши с лососем.",
+    "price": 1200,
+    "category": "Сеты",
+    "image": "https://images.unsplash.com/photo-1553621042-f6e147245754",
+    "hit": true
+  },
+  {
+    "id": "prod4",
+    "name": "Ролл Филадельфия",
+    "description": "Ролл с лососем, сливочным сыром и огурцом.",
+    "price": 380,
+    "category": "Роллы",
+    "image": "https://images.unsplash.com/photo-1607301405418-780ee5e6dd10",
+    "hit": false
+  }
+]

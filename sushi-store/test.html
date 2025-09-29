@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; }
+        pre { background: #f8f9fa; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 API Test</h1>
+    
+    <div class="test">
+        <h3>1. Тест товаров (без авторизации)</h3>
+        <button onclick="testProducts()">Тестировать</button>
+        <div id="products-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>2. Тест категорий (без авторизации)</h3>
+        <button onclick="testCategories()">Тестировать</button>
+        <div id="categories-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>3. Тест логина</h3>
+        <button onclick="testLogin()">Тестировать</button>
+        <div id="login-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>4. Тест заказов (с авторизацией)</h3>
+        <button onclick="testOrders()">Тестировать</button>
+        <div id="orders-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>5. Тест главной страницы</h3>
+        <button onclick="testHomepage()">Тестировать</button>
+        <div id="homepage-result"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                const data = await response.text();
+                let jsonData;
+                try {
+                    jsonData = JSON.parse(data);
+                } catch (e) {
+                    jsonData = data;
+                }
+                
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    data: jsonData
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    status: 0,
+                    data: error.message
+                };
+            }
+        }
+        
+        function showResult(elementId, result) {
+            const element = document.getElementById(elementId);
+            element.className = result.ok ? 'success' : 'error';
+            element.innerHTML = `
+                <strong>Статус: ${result.status}</strong><br>
+                <pre>${JSON.stringify(result.data, null, 2)}</pre>
+            `;
+        }
+        
+        async function testProducts() {
+            const result = await makeRequest('/api/products');
+            showResult('products-result', result);
+        }
+        
+        async function testCategories() {
+            const result = await makeRequest('/api/categories');
+            showResult('categories-result', result);
+        }
+        
+        async function testLogin() {
+            const result = await makeRequest('/api/login', {
+                method: 'POST',
+                body: JSON.stringify({
+                    phone: '+7 (999) 123-45-67',
+                    password: 'admin123'
+                })
+            });
+            
+            if (result.ok && result.data.token) {
+                authToken = result.data.token;
+                result.data.token = result.data.token.substring(0, 50) + '...';
+            }
+            
+            showResult('login-result', result);
+        }
+        
+        async function testOrders() {
+            if (!authToken) {
+                showResult('orders-result', {
+                    ok: false,
+                    status: 401,
+                    data: 'Сначала выполните логин'
+                });
+                return;
+            }
+            
+            const result = await makeRequest('/api/orders', {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`
+                }
+            });
+            
+            showResult('orders-result', result);
+        }
+        
+        async function testHomepage() {
+            const result = await makeRequest('/');
+            showResult('homepage-result', {
+                ok: result.ok,
+                status: result.status,
+                data: result.ok ? 'Главная страница загружена успешно' : result.data
+            });
+        }
+    </script>
+</body>
+</html>
+
+

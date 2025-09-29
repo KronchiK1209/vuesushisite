@@ -1,0 +1,81 @@
+{
+  "name": "tochka-sushi-pizza",
+  "version": "1.0.0",
+  "description": "Точка суши и пиццы - Vue.js приложение для заказа суши и пиццы",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "dev": "cd server && node server.js",
+    "dev:pg": "cd server && node server-pg.js",
+    "migrate": "node server/scripts/migrate.js",
+    "db:setup": "psql -U postgres -d sushi_store -f server/database/schema.sql && psql -U postgres -d sushi_store -f server/database/seed.sql",
+    "start": "node server/server-pg.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.0",
+    "express-rate-limit": "^6.8.0",
+    "helmet": "^7.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "pg": "^8.11.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "@vue/test-utils": "^2.4.0",
+    "@vue/vue3-jest": "^29.2.0",
+    "axios": "^1.11.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "nodemon": "^3.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "vue"
+    ],
+    "transform": {
+      "^.+\\.vue$": "@vue/vue3-jest",
+      "^.+\\.js$": "babel-jest"
+    },
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/tests/e2e.test.js",
+      "/tests/components.test.js",
+      "/tests/integration.test.js"
+    ],
+    "collectCoverageFrom": [
+      "client/**/*.{js,vue}",
+      "!client/main.js",
+      "!**/node_modules/**"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ]
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ]
+  }
+}

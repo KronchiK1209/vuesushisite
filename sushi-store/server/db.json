@@ -1,0 +1,346 @@
+{
+  "categories": [
+    {
+      "id": "cat1",
+      "name": "Роллы",
+      "image": "https://images.unsplash.com/photo-1607301405418-780ee5e6dd10"
+    },
+    {
+      "id": "cat2",
+      "name": "Суши",
+      "image": "https://images.unsplash.com/photo-1562158074-d49fbeffcc91"
+    },
+    {
+      "id": "cat3",
+      "name": "Сеты",
+      "image": "https://images.unsplash.com/photo-1553621042-f6e147245754"
+    },
+    {
+      "id": "catnphducmfa80jjs",
+      "name": "Бургеры",
+      "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod1",
+      "name": "Суши‑ролл Калифорния",
+      "description": "Классический ролл с крабом, авокадо и огурцом, покрытый икрой масаго.",
+      "price": 899,
+      "image": "https://images.unsplash.com/photo-1607301405418-780ee5e6dd10",
+      "available": true,
+      "category": "Роллы",
+      "purchases": 5,
+      "hit": true
+    },
+    {
+      "id": "prod2",
+      "name": "Салмон Нигири",
+      "description": "Две нигири с нежным филе лосося на подушке из риса.",
+      "price": 599,
+      "image": "https://images.unsplash.com/photo-1562158074-d49fbeffcc91",
+      "available": true,
+      "category": "Суши",
+      "purchases": 0,
+      "hit": false
+    },
+    {
+      "id": "prod3",
+      "name": "Сет Ассорти",
+      "description": "Большой сет с разнообразными роллами и нигири для компании.",
+      "price": 2499,
+      "image": "https://images.unsplash.com/photo-1553621042-f6e147245754",
+      "available": true,
+      "category": "Сеты",
+      "purchases": 0,
+      "hit": true
+    }
+  ],
+  "news": [
+    {
+      "id": "news1",
+      "title": "Открытие нашего магазина!",
+      "date": "2025-09-01",
+      "content": "Мы рады объявить об открытии нашего нового интернет‑магазина доставки суши в Сан‑Хосе! Теперь вы можете заказать любимые роллы и нигири прямо на нашем сайте.",
+      "image": "https://images.unsplash.com/photo-1600891964599-f61ba0e24092"
+    },
+    {
+      "id": "news2",
+      "title": "Новое меню осени",
+      "date": "2025-09-03",
+      "content": "Представляем наше осеннее меню с сезонными ингредиентами и новыми вкусами. Попробуйте ограниченную серию роллов с тыквой и грибами шиитаке!",
+      "image": "https://images.unsplash.com/photo-1587910708269-051d160ee9b9"
+    }
+  ],
+  "orders": [
+    {
+      "id": "order9ok7ibmfa3lfp2",
+      "items": [
+        {
+          "id": "prod1",
+          "name": "Суши‑ролл Калифорния",
+          "price": 899,
+          "quantity": 2
+        }
+      ],
+      "persons": 1,
+      "extras": [
+        {
+          "name": "Соевый соус",
+          "price": 50
+        },
+        {
+          "name": "Имбирь",
+          "price": 50
+        },
+        {
+          "name": "Васаби",
+          "price": 50
+        }
+      ],
+      "extrasSelection": [
+        1,
+        0,
+        0
+      ],
+      "total": 1848,
+      "deliveryTime": "asap",
+      "scheduledTime": null,
+      "paid": false,
+      "customer": {
+        "name": "впыпвы",
+        "address": {
+          "city": "ывпвпы",
+          "street": "ыпввпы",
+          "apartment": "5",
+          "phone": "894234343434"
+        }
+      },
+      "date": "2025-09-07T19:40:45.878Z"
+    },
+    {
+      "id": "order2m92igmfa41nq1",
+      "items": [
+        {
+          "id": "prod1",
+          "name": "Суши‑ролл Калифорния",
+          "price": 899,
+          "quantity": 1
+        }
+      ],
+      "persons": 4,
+      "extras": [
+        {
+          "name": "Соевый соус",
+          "price": 50
+        },
+        {
+          "name": "Имбирь",
+          "price": 50
+        },
+        {
+          "name": "Васаби",
+          "price": 50
+        }
+      ],
+      "extrasSelection": [
+        1,
+        1,
+        1
+      ],
+      "total": 1049,
+      "deliveryTime": "asap",
+      "scheduledTime": null,
+      "paid": false,
+      "customer": {
+        "name": "Артем",
+        "address": {
+          "city": "Красноярск",
+          "street": "Верхняя",
+          "apartment": "5в",
+          "phone": "89082084364"
+        }
+      },
+      "date": "2025-09-07T19:53:22.777Z"
+    },
+    {
+      "id": "ordereytsvtmfa56pc6",
+      "items": [
+        {
+          "id": "prod1",
+          "name": "Суши‑ролл Калифорния",
+          "price": 899,
+          "quantity": 2
+        }
+      ],
+      "persons": 2,
+      "extras": [
+        {
+          "name": "Соевый соус",
+          "price": 50
+        },
+        {
+          "name": "Имбирь",
+          "price": 50
+        },
+        {
+          "name": "Васаби",
+          "price": 50
+        }
+      ],
+      "extrasSelection": [
+        1,
+        1,
+        1
+      ],
+      "total": 1948,
+      "deliveryTime": "scheduled",
+      "scheduledTime": "2025-09-24T07:30",
+      "customer": {
+        "name": "Петров Артем",
+        "address": {
+          "city": "Красноярск",
+          "street": "верхняя",
+          "apartment": "5в",
+          "phone": "89432434343"
+        }
+      },
+      "date": "2025-09-07T20:25:17.766Z",
+      "paid": false
+    }
+  ],
+  "reviews": [
+    {
+      "id": "revqf1qbomfa577f6",
+      "rating": 5,
+      "comment": "Всё супер, быстро, очень вкусно!",
+      "name": "Артем",
+      "phone": "",
+      "orderId": "ordereytsvtmfa56pc6",
+      "date": "2025-09-07T20:25:41.203Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "admin1",
+      "phone": "+7 (999) 123-45-67",
+      "password": "admin123",
+      "role": "admin"
+    }
+  ],
+  "seo": {
+    "site": {
+      "title": "Интернет‑магазин суши и пиццы | Доставка суши и пиццы | Sushi Store",
+      "description": "Лучший интернет-магазин суши и пиццы с быстрой доставкой. Свежие роллы, пицца, салаты и напитки. Закажите онлайн с доставкой на дом!",
+      "keywords": "суши, пицца, доставка еды, роллы, японская кухня, итальянская кухня, заказ еды онлайн, доставка на дом",
+      "author": "Sushi Store",
+      "language": "ru",
+      "robots": "index, follow",
+      "canonical": "https://sushi-store.com/",
+      "ogTitle": "Интернет‑магазин суши и пиццы | Доставка суши и пиццы",
+      "ogDescription": "Лучший интернет-магазин суши и пиццы с быстрой доставкой. Свежие роллы, пицца, салаты и напитки.",
+      "ogImage": "https://sushi-store.com/assets/logo.png",
+      "ogSiteName": "Sushi Store",
+      "ogLocale": "ru_RU",
+      "twitterCard": "summary_large_image",
+      "twitterTitle": "Интернет‑магазин суши и пиццы | Доставка суши и пиццы",
+      "twitterDescription": "Лучший интернет-магазин суши и пиццы с быстрой доставкой. Свежие роллы, пицца, салаты и напитки.",
+      "twitterImage": "https://sushi-store.com/assets/logo.png",
+      "structuredData": {
+        "name": "Sushi Store",
+        "description": "Интернет-магазин суши и пиццы с быстрой доставкой",
+        "url": "https://sushi-store.com/",
+        "telephone": "+7 (999) 123-45-67",
+        "address": {
+          "addressCountry": "RU",
+          "addressLocality": "Москва"
+        },
+        "servesCuisine": [
+          "Японская кухня",
+          "Итальянская кухня"
+        ],
+        "hasMenu": "https://sushi-store.com/",
+        "acceptsReservations": false,
+        "priceRange": "$$",
+        "paymentAccepted": [
+          "Cash",
+          "Credit Card"
+        ],
+        "deliveryAvailable": true,
+        "openingHours": "Mo-Su 10:00-23:00"
+      }
+    },
+    "pages": {
+      "home": {
+        "title": "Интернет‑магазин суши и пиццы | Доставка суши и пиццы | Sushi Store",
+        "description": "Лучший интернет-магазин суши и пиццы с быстрой доставкой. Свежие роллы, пицца, салаты и напитки. Закажите онлайн с доставкой на дом!",
+        "keywords": "суши, пицца, доставка еды, роллы, японская кухня, итальянская кухня, заказ еды онлайн, доставка на дом"
+      },
+      "cart": {
+        "title": "Корзина | Интернет‑магазин суши и пиццы | Sushi Store",
+        "description": "Оформите заказ в корзине. Быстрая доставка суши и пиццы по Москве.",
+        "keywords": "корзина, заказ суши, заказ пиццы, доставка еды"
+      },
+      "news": {
+        "title": "Новости | Интернет‑магазин суши и пиццы | Sushi Store",
+        "description": "Последние новости нашего интернет-магазина суши и пиццы. Акции, новинки меню и специальные предложения.",
+        "keywords": "новости, акции, новинки меню, специальные предложения, суши, пицца"
+      }
+    },
+    "sitemap": {
+      "enabled": true,
+      "priority": {
+        "home": 1,
+        "news": 0.8,
+        "products": 0.7,
+        "cart": 0.6
+      },
+      "changefreq": {
+        "home": "daily",
+        "news": "weekly",
+        "products": "weekly",
+        "cart": "monthly"
+      }
+    },
+    "robots": {
+      "enabled": true,
+      "userAgent": "*",
+      "allow": [
+        "/",
+        "/news",
+        "/cart"
+      ],
+      "disallow": [
+        "/admin",
+        "/api"
+      ],
+      "sitemap": "https://sushi-store.com/sitemap.xml"
+    }
+  },
+  "categoryBlocks": [
+    {
+      "id": "cat-block-1",
+      "name": "Роллы",
+      "description": "Большой выбор традиционных и авторских роллов",
+      "image": "https://images.unsplash.com/photo-1607301405418-780ee5e6dd10",
+      "order": 1,
+      "enabled": true
+    },
+    {
+      "id": "cat-block-2",
+      "name": "Суши",
+      "description": "Классические нигири с нежнейшей рыбой",
+      "image": "https://images.unsplash.com/photo-1562158074-d49fbeffcc91",
+      "order": 2,
+      "enabled": true
+    },
+    {
+      "id": "cat-block-3",
+      "name": "Сеты",
+      "description": "Сеты для дружеских компаний и семейных вечеров",
+      "image": "https://images.unsplash.com/photo-1553621042-f6e147245754",
+      "order": 3,
+      "enabled": true
+    }
+  ]
+}

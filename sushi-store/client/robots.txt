@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://sushi-store.com/sitemap.xml
+
+# Disallow admin pages
+Disallow: /admin/
+
+# Allow all other pages
+Allow: /cart
+Allow: /checkout
+Allow: /news
+Allow: /login
