@@ -870,7 +870,9 @@ window.HomeView = {
         }
         // Новый формат: линейная страница
         if (Array.isArray(blocks.page)) {
-          page.value = blocks.page.filter(b => b && b.type).map(block => {
+          page.value = blocks.page
+            .filter(b => b && b.type && !b.hidden)
+            .map(block => {
             // Добавляем элементы по умолчанию для Hero блока, если их нет
             if (block.type === 'hero' && (!block.data?.elements || !Array.isArray(block.data.elements) || block.data.elements.length === 0)) {
               const defaultElements = [
