@@ -497,9 +497,18 @@
         const modules = [
           '/modules/auth.js',
           '/modules/account.js',
+          '/modules/siteBuilder/elements.js',
+          '/modules/siteBuilder/blocks/hero.js',
+          '/modules/siteBuilder/blocks/categories.js',
+          '/modules/siteBuilder/blocks/menu.js',
+          '/modules/siteBuilder/blocks/delivery.js',
+          '/modules/siteBuilder/blocks/reviews.js',
+          '/modules/siteBuilder/blocks/map.js',
+          '/modules/siteBuilder/styles.js',
+          '/modules/siteBuilder/core.js',
           '/modules/adminSiteSettings.js',
           '/modules/admin.js',
-          '/modules/home.js', 
+          '/modules/home.js',
           '/modules/cartCheckout.js',
           '/modules/floatingCart.js'
         ];
@@ -508,7 +517,7 @@
         
         modules.forEach((src, index) => {
           const script = document.createElement('script');
-          script.src = src + '?v=13';
+          script.src = src + '?v=14';
           script.onload = () => {
             loadedCount++;
             console.log(`Модуль ${src} загружен`);

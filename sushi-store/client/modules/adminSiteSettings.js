@@ -1,628 +1,103 @@
 // Админ-модуль: Настройки сайта и визуальный конструктор главной страницы
 (function(){
-  const { ref, reactive, computed, watch, onMounted } = Vue;
+  const { ref, reactive, computed, watch, onMounted, onUnmounted, nextTick } = Vue;
 
-  const elementRegistry = {
-    heading: {
-      label: 'Заголовок',
-      icon: 'fa-solid fa-heading',
-      defaultData: () => ({
-        text: 'Новый заголовок',
-        level: 'h2',
-        fontSize: 'text-3xl',
-        color: '#111827',
-        align: 'left',
-        marginTop: '0px',
-        marginBottom: '16px'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст', type: 'text', placeholder: 'Введите заголовок' },
-        {
-          key: 'level',
-          label: 'Уровень',
-          type: 'select',
-          options: [
-            { value: 'h1', label: 'H1' },
-            { value: 'h2', label: 'H2' },
-            { value: 'h3', label: 'H3' }
-          ]
-        },
-        {
-          key: 'fontSize',
-          label: 'Размер',
-          type: 'select',
-          options: [
-            { value: 'text-2xl', label: 'Крупный (2xl)' },
-            { value: 'text-3xl', label: 'Очень крупный (3xl)' },
-            { value: 'text-4xl', label: 'Заголовок (4xl)' }
-          ]
-        },
-        {
-          key: 'color',
-          label: 'Цвет текста',
-          type: 'color'
-        },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
-      ]
-    },
-    subheading: {
-      label: 'Подзаголовок',
-      icon: 'fa-solid fa-text-height',
-      defaultData: () => ({
-        text: 'Новый подзаголовок',
-        fontSize: 'text-xl',
-        color: '#f97316',
-        align: 'left',
-        marginTop: '0px',
-        marginBottom: '12px'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст', type: 'text', placeholder: 'Введите подзаголовок' },
-        {
-          key: 'fontSize',
-          label: 'Размер',
-          type: 'select',
-          options: [
-            { value: 'text-lg', label: 'Крупный' },
-            { value: 'text-xl', label: 'Очень крупный' },
-            { value: 'text-2xl', label: 'Заголовочный' }
-          ]
-        },
-        {
-          key: 'color',
-          label: 'Цвет текста',
-          type: 'color'
-        },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '12px' }
-      ]
-    },
-    paragraph: {
-      label: 'Текст',
-      icon: 'fa-solid fa-paragraph',
-      defaultData: () => ({
-        text: 'Добавьте описание секции или товара',
-        fontSize: 'text-base',
-        color: '#4b5563',
-        align: 'left',
-        marginTop: '0px',
-        marginBottom: '16px'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст', type: 'textarea', rows: 3, placeholder: 'Расскажите подробнее' },
-        {
-          key: 'fontSize',
-          label: 'Размер',
-          type: 'select',
-          options: [
-            { value: 'text-sm', label: 'Маленький' },
-            { value: 'text-base', label: 'Стандартный' },
-            { value: 'text-lg', label: 'Крупный' }
-          ]
-        },
-        {
-          key: 'color',
-          label: 'Цвет текста',
-          type: 'color'
-        },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
-      ]
-    },
-    button: {
-      label: 'Кнопка',
-      icon: 'fa-solid fa-hand-pointer',
-      defaultData: () => ({
-        text: 'Новая кнопка',
-        style: 'primary',
-        action: 'scrollMenu',
-        href: '',
-        align: 'left',
-        marginTop: '0px',
-        marginBottom: '0px'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст кнопки', type: 'text', placeholder: 'Например, Заказать' },
-        {
-          key: 'style',
-          label: 'Стиль',
-          type: 'select',
-          options: [
-            { value: 'primary', label: 'Заливка' },
-            { value: 'secondary', label: 'Контур' }
-          ]
-        },
-        {
-          key: 'action',
-          label: 'Действие',
-          type: 'select',
-          options: [
-            { value: 'scrollMenu', label: 'Прокрутка к меню' },
-            { value: 'openCart', label: 'Открыть корзину' },
-            { value: 'link', label: 'Ссылка' }
-          ]
-        },
-        { key: 'href', label: 'Ссылка', type: 'text', placeholder: 'https://...' },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' }
-      ]
-    },
-    image: {
-      label: 'Изображение',
-      icon: 'fa-solid fa-image',
-      defaultData: () => ({
-        src: '',
-        alt: 'Изображение',
-        width: '320px',
-        height: 'auto',
-        align: 'left',
-        borderRadius: '16px',
-        marginTop: '0px',
-        marginBottom: '16px'
-      }),
-      fields: [
-        { key: 'src', label: 'URL изображения', type: 'text', placeholder: 'https://...' },
-        { key: 'alt', label: 'Alt текст', type: 'text', placeholder: 'Подпись' },
-        { key: 'width', label: 'Ширина', type: 'text', placeholder: '320px' },
-        { key: 'height', label: 'Высота', type: 'text', placeholder: 'auto' },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '16px' },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
-      ]
-    },
-    feature: {
-      label: 'Преимущество',
-      icon: 'fa-solid fa-star',
-      defaultData: () => ({
-        text: 'Новое преимущество',
-        icon: 'fa-solid fa-check',
-        color: '#111827',
-        fontSize: 'text-base',
-        marginTop: '0px',
-        marginBottom: '8px'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст', type: 'text', placeholder: 'Например, Бесплатная доставка' },
-        { key: 'icon', label: 'Иконка FontAwesome', type: 'text', placeholder: 'fa-solid fa-check' },
-        {
-          key: 'color',
-          label: 'Цвет текста',
-          type: 'color'
-        },
-        {
-          key: 'fontSize',
-          label: 'Размер',
-          type: 'select',
-          options: [
-            { value: 'text-sm', label: 'Маленький' },
-            { value: 'text-base', label: 'Стандартный' },
-            { value: 'text-lg', label: 'Крупный' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '8px' }
-      ]
-    },
-    spacer: {
-      label: 'Отступ',
-      icon: 'fa-solid fa-ruler-vertical',
-      defaultData: () => ({
-        height: '24px',
-        marginTop: '0px',
-        marginBottom: '0px'
-      }),
-      fields: [
-        { key: 'height', label: 'Высота', type: 'text', placeholder: '24px' },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' }
-      ]
-    }
-  };
+  const builder = window.SiteBuilder;
+  if (!builder) {
+    console.error('SiteBuilder core module is not loaded. AdminSiteSettingsView не может инициализироваться.');
+    return;
+  }
+  const { elementRegistry, blockRegistry, deepClone, generateId, normalizeElement, createBlockInstance } = builder;
 
-  const blockRegistry = {
-    hero: {
-      name: 'Hero-блок',
-      icon: 'fa-solid fa-fire',
-      defaultData: () => ({
-        heading: 'Быстро и вкусно',
-        subheading: 'Попробуйте наши фирменные суши',
-        description: 'Свежие роллы, пицца и десерты с доставкой за 30 минут.',
-        buttonText: 'Выбрать блюда',
-        buttonStyle: 'primary',
-        buttonAction: 'scrollMenu',
-        buttonLink: '',
-        backgroundImage: 'https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d',
-        previewImage: 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
-        imageSide: 'right',
-        showRightImage: true,
-        waveEnabled: true,
-        waveColor: '#f9f4e5',
-        overlayColor: 'rgba(17, 24, 39, 0.55)',
-        elements: [
-          {
-            type: 'heading',
-            data: {
-              text: 'Быстро и вкусно',
-              level: 'h1',
-              fontSize: 'text-5xl',
-              color: '#ffffff',
-              align: 'left',
-              marginTop: '0px',
-              marginBottom: '16px'
-            }
-          },
-          {
-            type: 'subheading',
-            data: {
-              text: 'Попробуйте фирменные роллы сегодня',
-              fontSize: 'text-2xl',
-              color: '#fbbf24',
-              align: 'left',
-              marginTop: '0px',
-              marginBottom: '12px'
-            }
-          },
-          {
-            type: 'paragraph',
-            data: {
-              text: 'Комбинируйте суши, пиццу и десерты. Мы доставим всё тёплым и свежим.',
-              fontSize: 'text-lg',
-              color: '#f9fafb',
-              align: 'left',
-              marginTop: '0px',
-              marginBottom: '20px'
-            }
-          },
-          {
-            type: 'button',
-            data: {
-              text: 'Собрать заказ',
-              style: 'primary',
-              action: 'scrollMenu',
-              align: 'left',
-              marginTop: '0px',
-              marginBottom: '0px'
-            }
-          }
-        ]
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Быстро и вкусно' },
-            { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'Попробуйте наши фирменные суши' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Коротко о предложении' }
-          ]
-        },
-        {
-          label: 'Кнопка',
-          fields: [
-            { key: 'buttonText', label: 'Текст кнопки', type: 'text', placeholder: 'Выбрать блюда' },
-            {
-              key: 'buttonStyle',
-              label: 'Стиль кнопки',
-              type: 'select',
-              options: [
-                { value: 'primary', label: 'Основная' },
-                { value: 'secondary', label: 'Вторичная' }
-              ]
-            },
-            {
-              key: 'buttonAction',
-              label: 'Действие',
-              type: 'select',
-              options: [
-                { value: 'scrollMenu', label: 'Прокрутка к меню' },
-                { value: 'openCart', label: 'Открыть корзину' },
-                { value: 'link', label: 'Перейти по ссылке' }
-              ]
-            },
-            { key: 'buttonLink', label: 'Ссылка (для действия "Ссылка")', type: 'text', placeholder: 'https://...' }
-          ]
-        },
-        {
-          label: 'Оформление',
-          fields: [
-            { key: 'backgroundImage', label: 'Фоновое изображение', type: 'image' },
-            { key: 'previewImage', label: 'Изображение справа', type: 'image' },
-            {
-              key: 'imageSide',
-              label: 'Расположение изображения',
-              type: 'select',
-              options: [
-                { value: 'left', label: 'Слева' },
-                { value: 'right', label: 'Справа' }
-              ]
-            },
-            { key: 'showRightImage', label: 'Показывать изображение', type: 'toggle' },
-            { key: 'waveEnabled', label: 'Декоративная волна', type: 'toggle' },
-            { key: 'waveColor', label: 'Цвет волны', type: 'color' },
-            { key: 'overlayColor', label: 'Цвет наложения', type: 'color' }
-          ]
-        }
-      ],
-      elements: ['heading', 'subheading', 'paragraph', 'button', 'image', 'feature', 'spacer']
-    },
-    categories: {
-      name: 'Категории',
-      icon: 'fa-solid fa-tags',
-      defaultData: () => ({
-        heading: 'Категории и блюда',
-        subheading: 'которые вы нигде не найдете',
-        description: 'Уникальные подборки от наших шефов',
-        backgroundColor: '#f9f4e5',
-        accentColor: '#f97316',
-        cardStyle: 'rounded'
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Категории и блюда' },
-            { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'которые вы нигде не найдете' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Опишите секцию' }
-          ]
-        },
-        {
-          label: 'Оформление',
-          fields: [
-            { key: 'backgroundColor', label: 'Фон блока', type: 'color' },
-            { key: 'accentColor', label: 'Акцентный цвет', type: 'color' },
-            {
-              key: 'cardStyle',
-              label: 'Стиль карточек',
-              type: 'select',
-              options: [
-                { value: 'rounded', label: 'Скруглённые' },
-                { value: 'flat', label: 'Плоские' },
-                { value: 'glass', label: 'Стекло' }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    menu: {
-      name: 'Меню',
-      icon: 'fa-solid fa-utensils',
-      defaultData: () => ({
-        heading: 'Популярные блюда',
-        description: 'Выберите категорию и сформируйте свой сет',
-        showSearch: true,
-        highlightHits: true
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Популярные блюда' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Выберите категорию и сформируйте свой сет' }
-          ]
-        },
-        {
-          label: 'Функции',
-          fields: [
-            { key: 'showSearch', label: 'Показывать поиск', type: 'toggle' },
-            { key: 'highlightHits', label: 'Подсвечивать хиты', type: 'toggle' }
-          ]
-        }
-      ]
-    },
-    delivery: {
-      name: 'Доставка',
-      icon: 'fa-solid fa-truck-fast',
-      defaultData: () => ({
-        heading: 'Быстрая доставка',
-        description: 'Привезём заказ за 30 минут или подарим ролл',
-        features: [
-          'Бесплатная доставка от 1500 ₽',
-          'Прозрачный трекинг курьера',
-          'Термосумки для горячих блюд'
-        ],
-        backgroundColor: '#fff7ed',
-        contactPhone: '+7 (900) 000-00-00',
-        minOrder: '1500'
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Быстрая доставка' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Расскажите об условиях доставки' }
-          ]
-        },
-        {
-          label: 'Преимущества',
-          fields: [
-            { key: 'features', label: 'Список преимуществ', type: 'list', placeholder: 'Каждое с новой строки' }
-          ]
-        },
-        {
-          label: 'Дополнительно',
-          fields: [
-            { key: 'contactPhone', label: 'Телефон курьера', type: 'text', placeholder: '+7 (900) 000-00-00' },
-            { key: 'minOrder', label: 'Минимальный заказ', type: 'text', placeholder: '1500' },
-            { key: 'backgroundColor', label: 'Цвет фона', type: 'color' }
-          ]
-        }
-      ]
-    },
-    reviews: {
-      name: 'Отзывы',
-      icon: 'fa-solid fa-comments',
-      defaultData: () => ({
-        heading: 'Отзывы наших гостей',
-        description: 'Более 1000 довольных клиентов в этом месяце',
-        autoPlay: true,
-        layout: 'grid'
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Отзывы наших гостей' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Более 1000 довольных клиентов' }
-          ]
-        },
-        {
-          label: 'Настройки',
-          fields: [
-            { key: 'autoPlay', label: 'Автопрокрутка', type: 'toggle' },
-            {
-              key: 'layout',
-              label: 'Макет',
-              type: 'select',
-              options: [
-                { value: 'grid', label: 'Сетка' },
-                { value: 'carousel', label: 'Карусель' }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    map: {
-      name: 'Карта и контакты',
-      icon: 'fa-solid fa-map-location-dot',
-      defaultData: () => ({
-        heading: 'Зоны доставки',
-        description: 'Нажмите на нужный район, чтобы узнать условия доставки',
-        iframeSrc: 'https://yandex.ru/map-widget/v1/?lang=ru_RU&scroll=true&source=constructor-api&um=constructor%3A1569f1da7d596921cd82db1f441ffc63d2a386db371645fede23dbc26dc86a74',
-        address: 'г. Санкт-Петербург, ул. Суши, 5',
-        workHours: 'Ежедневно 10:00 — 23:00',
-        phone: '+7 (812) 000-00-00'
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Зоны доставки' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Опишите как работает доставка' }
-          ]
-        },
-        {
-          label: 'Контакты',
-          fields: [
-            { key: 'address', label: 'Адрес', type: 'text', placeholder: 'г. Санкт-Петербург...' },
-            { key: 'phone', label: 'Телефон', type: 'text', placeholder: '+7 (...)' },
-            { key: 'workHours', label: 'Время работы', type: 'text', placeholder: '10:00 — 23:00' }
-          ]
-        },
-        {
-          label: 'Карта',
-          fields: [
-            { key: 'iframeSrc', label: 'Ссылка на карту (iframe)', type: 'textarea', rows: 2 }
-          ]
-        }
-      ]
-    }
-  };
-
-  const deepClone = (value) => JSON.parse(JSON.stringify(value));
-
-  function generateId(prefix) {
-    return `${prefix}_${Math.random().toString(36).slice(2, 8)}_${Date.now().toString(36)}`;
+  const styleHelpers = builder.styles || window.SiteBuilderStyles;
+  if (!styleHelpers) {
+    console.error('SiteBuilder style helpers module is not loaded. AdminSiteSettingsView не может инициализироваться.');
+    return;
   }
 
-  function normalizeElement(elementLike) {
-    if (!elementLike) {
-      return null;
-    }
-    const type = elementLike.type || 'paragraph';
-    const definition = elementRegistry[type];
-    if (!definition) {
-      return null;
-    }
-    const base = definition.defaultData ? definition.defaultData() : {};
-    const incoming = elementLike.data || {};
-    return {
-      id: elementLike.id || generateId('element'),
-      type,
-      data: { ...base, ...incoming }
-    };
-  }
+  const {
+    heroImageProps,
+    sectionBackgroundStyle,
+    sectionOverlayStyle,
+    blockButtonWrapperStyle,
+    blockButtonClass,
+    blockButtonStyle,
+    categoriesSectionStyle,
+    categoriesOverlayStyle,
+    categoriesHeaderStyle,
+    categoriesHeadingStyle,
+    categoriesSubheadingStyle,
+    categoriesDescriptionStyle,
+    categoriesGridStyle,
+    categoriesCardStyle,
+    categoriesIconWrapperStyle,
+    categoriesCardTitleStyle,
+    categoriesCardDescriptionStyle,
+    menuSectionStyle,
+    menuOverlayStyle,
+    menuHeaderStyle,
+    menuHeadingStyle,
+    menuDescriptionStyle,
+    menuFilterSurfaceStyle,
+    menuTabsWrapperStyle,
+    menuActiveTabStyle,
+    menuTabStyle,
+    menuGridStyle,
+    menuCardStyle,
+    menuCardImageStyle,
+    menuCardTitleStyle,
+    menuCardDescriptionStyle,
+    menuPriceStyle,
+    menuTagStyle,
+    deliverySectionStyle,
+    deliveryOverlayStyle,
+    deliveryTextColumnStyle,
+    deliveryHeadingStyle,
+    deliveryDescriptionStyle,
+    deliveryFeatureIconStyle,
+    deliveryFeatureTextStyle,
+    deliveryContactsStyle,
+    deliveryTrackingCardStyle,
+    deliveryTrackingBarStyle,
+    deliveryTrackingTitleStyle,
+    deliveryTrackingDescriptionStyle,
+    deliveryTrackingProgressStyle,
+    reviewsSectionStyle,
+    reviewsOverlayStyle,
+    reviewsHeaderStyle,
+    reviewsHeadingStyle,
+    reviewsDescriptionStyle,
+    reviewsGridStyle,
+    reviewsCardStyle,
+    reviewsAvatarStyle,
+    reviewsCardTitleStyle,
+    reviewsCardSubtitleStyle,
+    reviewsRatingStyle,
+    reviewsQuoteStyle,
+    mapSectionStyle,
+    mapOverlayStyle,
+    mapFrameStyle,
+    mapIframeStyle,
+    mapInfoCardStyle,
+    mapHeadingStyle,
+    mapDescriptionStyle,
+    mapContactRowStyle,
+    mapContactIconStyle,
+    heroWrapperStyle,
+    heroBackgroundStyle,
+    heroOverlayStyle,
+    heroContainerClasses,
+    heroContainerStyle,
+    heroContentColumnClasses,
+    heroContentStyle,
+    heroMediaWrapperClasses,
+    heroFeatureIconWrapperStyle,
+    asCssSize,
+    parseCssNumber,
+    clampNumber
+  } = styleHelpers;
 
-  function createBlockInstance(type, source = {}) {
-    const definition = blockRegistry[type];
-    if (!definition) {
-      return null;
-    }
-    const defaults = definition.defaultData ? definition.defaultData() : {};
-    const data = source.data || source || {};
-    const merged = { ...defaults, ...data };
-
-    if (definition.elements) {
-      const elements = Array.isArray(data.elements) ? data.elements : defaults.elements;
-      merged.elements = Array.isArray(elements)
-        ? elements.map(el => normalizeElement(el)).filter(Boolean)
-        : [];
-    }
-
-    return {
-      id: source.id || generateId('block'),
-      type,
-      name: definition.name,
-      icon: definition.icon,
-      data: merged,
-      meta: {
-        hidden: !!(source.hidden || (source.meta && source.meta.hidden))
-      }
-    };
-  }
-
-  window.AdminSiteSettingsView = {
+window.AdminSiteSettingsView = {
     name: 'AdminSiteSettingsView',
     template: /* html */`
       <div class="min-h-screen bg-gray-50 py-8">
@@ -886,13 +361,31 @@
               </div>
 
               <div
+                ref="canvasViewportRef"
                 class="relative border border-gray-200 rounded-2xl bg-gray-50"
                 :class="canvas.mode === 'full' ? 'overflow-auto max-h-[calc(100vh-320px)]' : 'overflow-hidden'"
+                @scroll="onCanvasScroll"
               >
                 <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle,_rgba(148,163,184,0.12)_1px,_transparent_1px)] bg-[length:16px_16px]" v-if="canvas.showGrid"></div>
                 <div
+                  v-if="canvas.showOverlays && selectionOverlay.visible"
+                  class="absolute z-20 pointer-events-none"
+                  :style="selectionOverlayStyle"
+                >
+                  <div class="absolute inset-0 border-2 border-orange-400 rounded-2xl shadow-[0_0_0_1px_rgba(255,255,255,0.35)]"></div>
+                  <div
+                    class="absolute left-0 bg-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow"
+                    :class="selectionOverlay.badgeBelow ? 'top-full mt-2' : '-top-8'"
+                  >
+                    {{ selectionOverlay.label }}
+                    <span class="uppercase tracking-wider text-white/70 ml-2">{{ selectionOverlay.type === 'element' ? 'Элемент' : 'Блок' }}</span>
+                  </div>
+                </div>
+                <div
                   class="relative origin-top transition-all duration-300 ease-out"
+                  ref="canvasInnerRef"
                   :style="canvasStyle"
+                  @click="handleCanvasClick"
                 >
                   <div class="bg-white min-h-[640px]" :style="{ backgroundColor: form.background_color || '#ffffff' }">
                     <div
@@ -918,11 +411,13 @@
                         </div>
 
                         <section
-                          @click.stop="selectBlock(block.id)"
+                          @click="handleBlockClick(block.id, $event)"
                           :class="[
                             blockWrapperClasses(block),
                             block.meta.hidden ? 'opacity-60' : 'opacity-100'
                           ]"
+                          :ref="el => registerBlockRef(block.id, el)"
+                          :data-block-id="block.id"
                         >
                           <div
                             v-if="canvas.showOverlays"
@@ -931,15 +426,17 @@
                           ></div>
 
                           <template v-if="block.type === 'hero'">
-                            <div class="relative overflow-hidden rounded-3xl text-white">
-                              <img
-                                :src="block.data.backgroundImage"
-                                alt="hero bg"
-                                class="absolute inset-0 w-full h-full object-cover"
-                              />
-                              <div class="absolute inset-0" :style="{ background: block.data.overlayColor || 'rgba(17,24,39,0.6)' }"></div>
-                              <div class="relative grid lg:grid-cols-2 gap-12 px-12 py-16">
-                                <div class="space-y-4">
+                            <div
+                              class="relative overflow-hidden rounded-3xl text-white shadow-xl"
+                              :style="heroWrapperStyle(block)"
+                            >
+                              <div class="absolute inset-0" :style="heroBackgroundStyle(block)"></div>
+                              <div class="absolute inset-0" :style="heroOverlayStyle(block)"></div>
+                              <div :class="heroContainerClasses(block)" :style="heroContainerStyle(block)">
+                                <div
+                                  :class="heroContentColumnClasses(block)"
+                                  :style="heroContentStyle(block)"
+                                >
                                   <div
                                     v-if="!block.data.elements || !block.data.elements.length"
                                     class="border border-dashed border-white/40 rounded-2xl px-4 py-6 text-sm text-white/70 text-center"
@@ -950,9 +447,10 @@
                                     <div
                                       v-for="(element, elementIndex) in block.data.elements"
                                       :key="element.id"
-                                      class="space-y-2"
+                                      :class="block.data.layout === 'freeform' ? '' : 'space-y-2'"
                                     >
                                       <div
+                                        v-if="block.data.layout !== 'freeform'"
                                         class="flex justify-center h-8 transition"
                                         @dragover.prevent="onHeroElementDragOver(block.id, elementIndex)"
                                         @dragenter.prevent="onHeroElementDragOver(block.id, elementIndex)"
@@ -968,24 +466,32 @@
                                         </div>
                                       </div>
                                       <div
-                                        :class="heroElementWrapperClasses(block.id, element)"
-                                        draggable="true"
+                                        :class="heroElementWrapperClasses(block, element)"
+                                        :style="heroElementWrapperStyle(block, element)"
+                                        :draggable="heroElementDraggable(block, element)"
                                         @dragstart="onHeroElementDragStart(block.id, element.id, $event)"
                                         @dragend="onHeroElementDragEnd"
-                                        @click.stop="selectElement(block.id, element.id)"
+                                        @pointerdown="onHeroElementPointerDown(block.id, element.id, $event)"
+                                        @click="handleElementClick(block.id, element.id, $event)"
+                                        :ref="el => registerElementRef(block.id, element.id, el)"
+                                        :data-element-id="element.id"
+                                        :data-block-id="block.id"
                                       >
                                         <div
                                           v-if="canvas.showOverlays"
                                           class="absolute inset-0 rounded-2xl border border-dashed border-white/30 pointer-events-none"
                                           :class="isElementSelected(element) && selectedBlockId === block.id ? 'border-orange-300' : ''"
                                         ></div>
-                                        <div class="absolute -left-5 top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col items-center space-y-1 text-white/70">
+                                        <div
+                                          v-if="heroElementDraggable(block, element)"
+                                          class="absolute -left-5 top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col items-center space-y-1 text-white/70"
+                                        >
                                           <span class="cursor-grab text-xs"><i class="fa-solid fa-grip-vertical"></i></span>
                                         </div>
                                         <div class="absolute top-2 right-2 text-[11px] uppercase tracking-wider text-white/80 bg-black/30 px-2 py-1 rounded-full">{{ elementRegistry[element.type]?.label || element.type }}</div>
                                         <component
                                           :is="renderHeroElement(element)"
-                                          v-bind="heroElementProps(element)"
+                                          v-bind="heroElementProps(block, element)"
                                         >
                                           <template v-if="element.type === 'button'">
                                             <span>{{ element.data.text }}</span>
@@ -999,12 +505,22 @@
                                               :style="heroImageProps(element).style"
                                             />
                                           </template>
+                                          <template v-else-if="element.type === 'feature'">
+                                            <span
+                                              class="inline-flex items-center justify-center h-12 w-12 text-lg"
+                                              :style="heroFeatureIconWrapperStyle(element)"
+                                            >
+                                              <i :class="element.data.icon || 'fa-solid fa-check'"></i>
+                                            </span>
+                                            <span>{{ element.data.text }}</span>
+                                          </template>
                                           <template v-else-if="element.type === 'spacer'"></template>
                                           <template v-else>{{ element.data.text }}</template>
                                         </component>
                                       </div>
                                     </div>
                                     <div
+                                      v-if="block.data.layout !== 'freeform'"
                                       class="flex justify-center h-8 transition mt-2"
                                       @dragover.prevent="onHeroElementDragOver(block.id, block.data.elements.length)"
                                       @dragenter.prevent="onHeroElementDragOver(block.id, block.data.elements.length)"
@@ -1021,8 +537,8 @@
                                     </div>
                                   </template>
                                 </div>
-                                <div class="hidden lg:flex items-center justify-center">
-                                  <div v-if="block.data.showRightImage" class="relative">
+                                <div v-if="block.data.showRightImage" :class="heroMediaWrapperClasses(block)">
+                                  <div class="relative">
                                     <img :src="block.data.previewImage" alt="preview" class="w-80 h-80 object-cover rounded-3xl shadow-2xl" />
                                     <div class="absolute inset-0 rounded-3xl ring-4 ring-white/20"></div>
                                   </div>
@@ -1035,77 +551,160 @@
                           </template>
 
                           <template v-else-if="block.type === 'categories'">
-                            <div class="py-14 px-10" :style="{ backgroundColor: block.data.backgroundColor || '#f9f4e5' }">
-                              <div class="text-center max-w-3xl mx-auto">
-                                <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                <p class="text-orange-600 font-semibold mt-1">{{ block.data.subheading }}</p>
-                                <p class="text-gray-600 mt-3">{{ block.data.description }}</p>
-                              </div>
-                              <div class="grid sm:grid-cols-2 gap-6 mt-10">
-                                <div v-for="n in 4" :key="n" class="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition">
-                                  <div class="w-20 h-20 rounded-full bg-orange-100 mx-auto mb-4"></div>
-                                  <h3 class="font-semibold text-lg text-gray-900 text-center">Категория {{ n }}</h3>
-                                  <p class="text-sm text-gray-500 text-center">Управляется в админке категорий</p>
+                            <div class="relative overflow-hidden" :style="categoriesSectionStyle(block)">
+                              <div
+                                v-if="categoriesOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="categoriesOverlayStyle(block)"
+                              ></div>
+                              <div class="relative space-y-10">
+                                <div :style="categoriesHeaderStyle(block)" class="space-y-3">
+                                  <h2 class="font-bold" :style="categoriesHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p class="font-semibold" :style="categoriesSubheadingStyle(block)">{{ block.data.subheading }}</p>
+                                  <p :style="categoriesDescriptionStyle(block)">{{ block.data.description }}</p>
+                                </div>
+                                <div class="grid" :style="categoriesGridStyle(block)">
+                                  <div v-for="n in 4" :key="n" :style="categoriesCardStyle(block)" class="transition">
+                                    <div :style="categoriesIconWrapperStyle(block)" class="mb-4">
+                                      <i class="fa-solid fa-bowl-food"></i>
+                                    </div>
+                                    <h3 class="font-semibold text-lg text-center" :style="categoriesCardTitleStyle(block)">
+                                      Категория {{ n }}
+                                    </h3>
+                                    <p class="mt-2 text-sm text-center" :style="categoriesCardDescriptionStyle(block)">
+                                      Управляется в разделе категорий
+                                    </p>
+                                  </div>
+                                </div>
+                                <div v-if="block.data.buttonVisible" :style="blockButtonWrapperStyle(block.data)">
+                                  <button
+                                    :class="blockButtonClass(block.data)"
+                                    :style="blockButtonStyle(block.data, { background: '#f97316', textColor: '#ffffff', secondaryBackground: '#ffffff', secondaryText: '#111827', shadow: block.data.buttonShadow || '0 16px 40px rgba(15,23,42,0.18)' })"
+                                  >
+                                    <span>{{ block.data.buttonText || 'Все категории' }}</span>
+                                    <i class="fa-solid fa-arrow-right-long" v-if="block.data.buttonStyle !== 'link'"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
                           </template>
 
                           <template v-else-if="block.type === 'menu'">
-                            <div class="py-16 px-10 bg-gradient-to-br from-orange-50 to-red-50">
-                              <div class="text-center max-w-2xl mx-auto">
-                                <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                <p class="text-gray-600 mt-3">{{ block.data.description }}</p>
-                              </div>
-                              <div class="grid md:grid-cols-3 gap-6 mt-12">
-                                <div v-for="n in 3" :key="n" class="bg-white rounded-2xl shadow p-5 space-y-4">
-                                  <div class="h-32 rounded-xl bg-gray-100"></div>
-                                  <div class="font-semibold text-gray-900">Популярное блюдо {{ n }}</div>
-                                  <p class="text-sm text-gray-500">Описание и цена подтягиваются из каталога</p>
-                                  <div class="flex items-center justify-between text-sm text-gray-600">
-                                    <span>450 ₽</span>
-                                    <span class="inline-flex items-center space-x-1 text-orange-600">
-                                      <i class="fa-solid fa-star"></i>
-                                      <span>Хит</span>
-                                    </span>
+                            <div class="relative overflow-hidden" :style="menuSectionStyle(block)">
+                              <div
+                                v-if="menuOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="menuOverlayStyle(block)"
+                              ></div>
+                              <div class="relative space-y-10">
+                                <div :style="menuHeaderStyle(block)" class="space-y-3">
+                                  <h2 class="font-bold" :style="menuHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p :style="menuDescriptionStyle(block)">{{ block.data.description }}</p>
+                                </div>
+                                <div
+                                  v-if="block.data.showSearch || block.data.showFilters || block.data.showCategoryTabs"
+                                  class="space-y-4"
+                                >
+                                  <div v-if="block.data.showSearch" class="flex items-center" :style="menuFilterSurfaceStyle(block)">
+                                    <i class="fa-solid fa-magnifying-glass opacity-70 mr-3"></i>
+                                    <span class="text-sm opacity-80">Поиск будет доступен посетителям</span>
                                   </div>
+                                  <div v-if="block.data.showCategoryTabs" class="flex flex-wrap gap-2" :style="menuTabsWrapperStyle(block)">
+                                    <span class="px-4 py-2 rounded-full text-sm font-medium" :style="menuActiveTabStyle(block)">
+                                      Суши
+                                    </span>
+                                    <span class="px-4 py-2 rounded-full text-sm" :style="menuTabStyle(block)">Роллы</span>
+                                    <span class="px-4 py-2 rounded-full text-sm" :style="menuTabStyle(block)">Сеты</span>
+                                  </div>
+                                  <div v-if="block.data.showFilters" class="flex items-center gap-2" :style="menuFilterSurfaceStyle(block)">
+                                    <i class="fa-solid fa-sliders opacity-70"></i>
+                                    <span class="text-sm opacity-80">Фильтры включены</span>
+                                  </div>
+                                </div>
+                                <div class="grid" :style="menuGridStyle(block)">
+                                  <div
+                                    v-for="n in Math.max(3, Number(block.data.cardsPerRow) || 3)"
+                                    :key="n"
+                                    :style="menuCardStyle(block)"
+                                    class="transition"
+                                  >
+                                    <div :style="menuCardImageStyle(block)">
+                                      <div class="w-full h-full flex items-center justify-center text-3xl text-orange-500">
+                                        🍣
+                                      </div>
+                                    </div>
+                                    <div class="mt-4 font-semibold" :style="menuCardTitleStyle(block)">
+                                      Популярное блюдо {{ n }}
+                                    </div>
+                                    <p class="mt-2 text-sm" :style="menuCardDescriptionStyle(block)">
+                                      Описание и цена берутся из каталога
+                                    </p>
+                                    <div class="mt-4 flex items-center justify-between text-sm">
+                                      <span :style="menuPriceStyle(block)">450 ₽</span>
+                                      <span
+                                        v-if="block.data.highlightHits"
+                                        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                                        :style="menuTagStyle(block)"
+                                      >
+                                        <i class="fa-solid fa-star"></i>
+                                        <span>Хит</span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div v-if="block.data.buttonVisible" :style="blockButtonWrapperStyle(block.data)">
+                                  <button
+                                    :class="blockButtonClass(block.data)"
+                                    :style="blockButtonStyle(block.data, { background: '#f97316', textColor: '#ffffff', secondaryBackground: '#ffffff', secondaryText: '#111827', shadow: block.data.buttonShadow || '0 16px 40px rgba(249,115,22,0.35)' })"
+                                  >
+                                    <span>{{ block.data.buttonText || 'Открыть меню' }}</span>
+                                    <i class="fa-solid fa-arrow-right-long" v-if="block.data.buttonStyle !== 'link'"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
                           </template>
 
                           <template v-else-if="block.type === 'delivery'">
-                            <div class="py-16 px-10" :style="{ backgroundColor: block.data.backgroundColor || '#fff7ed' }">
-                              <div class="grid lg:grid-cols-2 gap-10 items-start">
-                                <div class="space-y-4">
-                                  <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                  <p class="text-gray-600">{{ block.data.description }}</p>
+                            <div class="relative overflow-hidden" :style="deliverySectionStyle(block)">
+                              <div
+                                v-if="deliveryOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="deliveryOverlayStyle(block)"
+                              ></div>
+                              <div class="relative" :class="deliveryLayoutClass(block)">
+                                <div class="space-y-4" :style="deliveryTextColumnStyle(block)">
+                                  <h2 class="font-bold" :style="deliveryHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p :style="deliveryDescriptionStyle(block)">{{ block.data.description }}</p>
                                   <ul class="space-y-3">
-                                    <li
-                                      v-for="feature in block.data.features"
-                                      :key="feature"
-                                      class="flex items-start space-x-3"
-                                    >
-                                      <span class="mt-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white text-xs">
-                                        <i class="fa-solid fa-check"></i>
-                                      </span>
-                                      <span class="text-gray-700 text-sm">{{ feature }}</span>
+                                    <li v-for="feature in block.data.features" :key="feature" class="flex items-start gap-3">
+                                      <span :style="deliveryFeatureIconStyle(block)"><i class="fa-solid fa-check"></i></span>
+                                      <span :style="deliveryFeatureTextStyle(block)">{{ feature }}</span>
                                     </li>
                                   </ul>
-                                  <div class="flex items-center space-x-4 text-sm text-gray-600 pt-4">
-                                    <span class="inline-flex items-center space-x-2"><i class="fa-solid fa-phone"></i><span>{{ block.data.contactPhone }}</span></span>
-                                    <span class="inline-flex items-center space-x-2"><i class="fa-solid fa-box"></i><span>Мин. заказ {{ block.data.minOrder }} ₽</span></span>
+                                  <div class="flex flex-wrap gap-4 text-sm pt-4" :style="deliveryContactsStyle(block)">
+                                    <span class="inline-flex items-center gap-2"><i class="fa-solid fa-phone"></i><span>{{ block.data.contactPhone }}</span></span>
+                                    <span class="inline-flex items-center gap-2"><i class="fa-solid fa-box"></i><span>Мин. заказ {{ block.data.minOrder }} ₽</span></span>
+                                  </div>
+                                  <div v-if="block.data.buttonVisible" :style="blockButtonWrapperStyle(block.data)">
+                                    <button
+                                      :class="blockButtonClass(block.data)"
+                                      :style="blockButtonStyle(block.data, { background: '#111827', textColor: '#ffffff', secondaryBackground: '#ffffff', secondaryText: '#111827', shadow: block.data.buttonShadow || '0 16px 36px rgba(15,23,42,0.18)' })"
+                                    >
+                                      <span>{{ block.data.buttonText || 'Условия доставки' }}</span>
+                                      <i class="fa-solid fa-arrow-right-long" v-if="block.data.buttonStyle !== 'link'"></i>
+                                    </button>
                                   </div>
                                 </div>
-                                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                                  <div class="bg-gradient-to-r from-orange-400 to-red-500 h-12"></div>
+                                <div v-if="block.data.showTrackingCard" :style="deliveryTrackingCardStyle(block)">
+                                  <div :style="deliveryTrackingBarStyle(block)"></div>
                                   <div class="p-6 space-y-4">
-                                    <h3 class="font-semibold text-gray-900">Трекинг курьера</h3>
+                                    <h3 class="font-semibold" :style="deliveryTrackingTitleStyle(block)">{{ block.data.trackingTitle }}</h3>
                                     <div class="space-y-2">
                                       <div class="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
-                                        <div class="h-full bg-gradient-to-r from-orange-500 to-red-500 w-3/4"></div>
+                                        <div class="h-full" :style="deliveryTrackingProgressStyle(block)"></div>
                                       </div>
-                                      <p class="text-xs text-gray-500">Курьер уже рядом – доставит заказ в течение 10 минут</p>
+                                      <p class="text-xs" :style="deliveryTrackingDescriptionStyle(block)">{{ block.data.trackingDescription }}</p>
                                     </div>
                                   </div>
                                 </div>
@@ -1114,60 +713,81 @@
                           </template>
 
                           <template v-else-if="block.type === 'reviews'">
-                            <div class="py-16 px-10 bg-gradient-to-br from-orange-50 to-red-50">
-                              <div class="text-center max-w-2xl mx-auto">
-                                <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                <p class="text-gray-600 mt-3">{{ block.data.description }}</p>
-                              </div>
-                              <div class="grid md:grid-cols-3 gap-6 mt-12">
-                                <div v-for="n in 3" :key="n" class="bg-white rounded-2xl shadow p-6 space-y-3">
-                                  <div class="flex items-center space-x-3">
-                                    <div class="w-12 h-12 rounded-full bg-orange-100"></div>
-                                    <div>
-                                      <div class="font-semibold text-gray-900">Клиент {{ n }}</div>
-                                      <div class="text-xs text-gray-500">Постоянный клиент</div>
+                            <div class="relative overflow-hidden" :style="reviewsSectionStyle(block)">
+                              <div
+                                v-if="reviewsOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="reviewsOverlayStyle(block)"
+                              ></div>
+                              <div class="relative space-y-10">
+                                <div :style="reviewsHeaderStyle(block)" class="space-y-3">
+                                  <h2 class="font-bold" :style="reviewsHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p :style="reviewsDescriptionStyle(block)">{{ block.data.description }}</p>
+                                </div>
+                                <div class="grid" :style="reviewsGridStyle(block)">
+                                  <div v-for="n in 3" :key="n" :style="reviewsCardStyle(block)">
+                                    <div class="flex items-center gap-3">
+                                      <div :style="reviewsAvatarStyle(block)">К{{ n }}</div>
+                                      <div>
+                                        <div class="font-semibold" :style="reviewsCardTitleStyle(block)">Клиент {{ n }}</div>
+                                        <div class="text-xs" :style="reviewsCardSubtitleStyle(block)">Постоянный клиент</div>
+                                      </div>
                                     </div>
+                                    <div class="flex space-x-1 text-sm mt-3" :style="reviewsRatingStyle(block)">
+                                      <i v-for="star in 5" :key="star" class="fa-solid fa-star"></i>
+                                    </div>
+                                    <p class="mt-3 text-sm" :style="reviewsQuoteStyle(block)">
+                                      «Каждый заказ приезжает горячим. Любим за сервис и бонусы»
+                                    </p>
                                   </div>
-                                  <div class="flex space-x-1 text-orange-500 text-sm">
-                                    <i v-for="star in 5" :key="star" class="fa-solid fa-star"></i>
-                                  </div>
-                                  <p class="text-sm text-gray-600">«Каждый заказ приезжает горячим. Любим за сервис и бонусы»</p>
                                 </div>
                               </div>
                             </div>
                           </template>
 
                           <template v-else-if="block.type === 'map'">
-                            <div class="py-16 px-10 bg-white">
-                              <div class="grid lg:grid-cols-3 gap-8">
+                            <div class="relative overflow-hidden" :style="mapSectionStyle(block)">
+                              <div
+                                v-if="mapOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="mapOverlayStyle(block)"
+                              ></div>
+                              <div class="relative grid lg:grid-cols-3 gap-8">
                                 <div class="lg:col-span-2">
-                                  <div class="aspect-[3/2] rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+                                  <div :style="mapFrameStyle(block)">
                                     <iframe
                                       :src="block.data.iframeSrc"
-                                      width="100%"
-                                      height="100%"
-                                      style="border:0"
                                       allowfullscreen
                                       loading="lazy"
+                                      :style="mapIframeStyle(block)"
                                     ></iframe>
                                   </div>
                                 </div>
-                                <div class="space-y-4">
-                                  <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                  <p class="text-gray-600">{{ block.data.description }}</p>
-                                  <div class="space-y-3 text-sm text-gray-700">
-                                    <div class="flex items-center space-x-2">
-                                      <i class="fa-solid fa-location-dot text-orange-500"></i>
+                                <div class="space-y-4" :style="mapInfoCardStyle(block)">
+                                  <h2 class="font-bold" :style="mapHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p :style="mapDescriptionStyle(block)">{{ block.data.description }}</p>
+                                  <div class="space-y-3 text-sm">
+                                    <div class="flex items-center gap-2" :style="mapContactRowStyle(block)">
+                                      <i class="fa-solid fa-location-dot" :style="mapContactIconStyle(block)"></i>
                                       <span>{{ block.data.address }}</span>
                                     </div>
-                                    <div class="flex items-center space-x-2">
-                                      <i class="fa-solid fa-clock text-orange-500"></i>
+                                    <div class="flex items-center gap-2" :style="mapContactRowStyle(block)">
+                                      <i class="fa-solid fa-clock" :style="mapContactIconStyle(block)"></i>
                                       <span>{{ block.data.workHours }}</span>
                                     </div>
-                                    <div class="flex items-center space-x-2">
-                                      <i class="fa-solid fa-phone text-orange-500"></i>
+                                    <div class="flex items-center gap-2" :style="mapContactRowStyle(block)">
+                                      <i class="fa-solid fa-phone" :style="mapContactIconStyle(block)"></i>
                                       <span>{{ block.data.phone }}</span>
                                     </div>
+                                  </div>
+                                  <div v-if="block.data.buttonVisible" :style="blockButtonWrapperStyle(block.data)">
+                                    <button
+                                      :class="blockButtonClass(block.data)"
+                                      :style="blockButtonStyle(block.data, { background: '#f97316', textColor: '#ffffff', secondaryBackground: '#ffffff', secondaryText: '#111827', shadow: block.data.buttonShadow || '0 18px 40px rgba(249,115,22,0.35)' })"
+                                    >
+                                      <span>{{ block.data.buttonText || 'Позвонить нам' }}</span>
+                                      <i class="fa-solid fa-phone"></i>
+                                    </button>
                                   </div>
                                 </div>
                               </div>
@@ -1453,11 +1073,40 @@
         dropIndex: null,
         targetBlockId: null
       });
+      const freeformDrag = reactive({
+        active: false,
+        blockId: null,
+        elementId: null,
+        startX: 0,
+        startY: 0,
+        originX: 0,
+        originY: 0,
+        containerWidth: 0,
+        containerHeight: 0,
+        elementWidth: 0,
+        elementHeight: 0
+      });
+
+      const canvasViewportRef = ref(null);
+      const canvasInnerRef = ref(null);
+      const blockRefs = new Map();
+      const elementRefs = new Map();
+
+      const selectionOverlay = reactive({
+        visible: false,
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0,
+        label: '',
+        type: 'block',
+        badgeBelow: false
+      });
 
       const canvas = reactive({
         device: 'desktop',
-        zoom: 0.85,
-        mode: 'preview',
+        zoom: 1,
+        mode: 'full',
         showGrid: false,
         showOverlays: true
       });
@@ -1531,6 +1180,13 @@
 
       const currentElementDefinition = computed(() => currentElement.value ? (elementRegistry[currentElement.value.type] || { fields: [] }) : { fields: [] });
 
+      const selectionOverlayStyle = computed(() => ({
+        top: selectionOverlay.top + 'px',
+        left: selectionOverlay.left + 'px',
+        width: selectionOverlay.width + 'px',
+        height: selectionOverlay.height + 'px'
+      }));
+
       function blockWrapperClasses(block) {
         return [
           'relative transition-all duration-300 cursor-pointer rounded-3xl overflow-hidden',
@@ -1552,81 +1208,206 @@
           case 'spacer':
             return 'div';
           case 'feature':
-            return 'p';
+            return 'div';
           default:
             return 'div';
         }
       }
 
-      function heroElementProps(element) {
+      function heroElementProps(block, element) {
         const data = element.data || {};
         const classes = [];
         const style = {};
+        const events = {};
+        const freePositioned = elementUsesFreePosition(block, element);
 
         if (['heading', 'subheading', 'paragraph', 'feature'].includes(element.type)) {
           classes.push(data.fontSize || (element.type === 'heading' ? 'text-4xl' : element.type === 'subheading' ? 'text-xl' : 'text-base'));
-          if (element.type === 'heading' || element.type === 'feature') {
-            classes.push('font-bold');
-          } else {
-            classes.push('font-medium');
-          }
+          style.fontWeight = data.fontWeight || (element.type === 'heading' ? '700' : element.type === 'feature' ? '600' : '500');
+          if (data.fontFamily) style.fontFamily = data.fontFamily;
+          if (data.lineHeight) style.lineHeight = data.lineHeight;
+          if (data.letterSpacing) style.letterSpacing = asCssSize(data.letterSpacing, '0px');
+          if (data.textTransform && data.textTransform !== 'none') style.textTransform = data.textTransform;
+          if (data.maxWidth) style.maxWidth = asCssSize(data.maxWidth, '640px');
           if (data.align === 'center') classes.push('text-center');
           else if (data.align === 'right') classes.push('text-right');
           else classes.push('text-left');
           style.color = data.color || (element.type === 'subheading' ? '#fbbf24' : '#ffffff');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '16px';
+          style.marginTop = freePositioned ? '0px' : asCssSize(data.marginTop, '0px');
+          const marginFallback = element.type === 'subheading' ? '12px' : element.type === 'feature' ? '8px' : '16px';
+          style.marginBottom = freePositioned ? '0px' : asCssSize(data.marginBottom, marginFallback);
+          if (data.backgroundColor) {
+            style.backgroundColor = data.backgroundColor;
+            style.display = element.type === 'feature' ? 'inline-flex' : 'inline-block';
+            style.padding = `${asCssSize(data.paddingY, '0px')} ${asCssSize(data.paddingX, '0px')}`;
+            style.borderRadius = asCssSize(data.borderRadius, '0px');
+          }
+          if (data.textShadow) {
+            style.textShadow = data.textShadow;
+          }
+          if (element.type === 'feature') {
+            classes.push('flex items-center space-x-3');
+          }
         }
 
         if (element.type === 'button') {
-          classes.push('px-6 py-3 rounded-full font-semibold inline-flex items-center transition shadow');
-          if (data.style === 'secondary') {
-            classes.push('bg-transparent border-2 border-white text-white hover:bg-white hover:text-red-600');
-          } else {
-            classes.push('bg-white text-red-600 hover:bg-gray-100');
+          classes.push('inline-flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/40');
+          if (!freePositioned) {
+            if (data.align === 'center') classes.push('mx-auto');
+            else if (data.align === 'right') classes.push('ml-auto');
           }
-          if (data.align === 'center') classes.push('mx-auto');
-          else if (data.align === 'right') classes.push('ml-auto');
-          else classes.push('mr-auto');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '0px';
+          style.marginTop = freePositioned ? '0px' : asCssSize(data.marginTop, '0px');
+          style.marginBottom = freePositioned ? '0px' : asCssSize(data.marginBottom, '0px');
+          style.paddingLeft = asCssSize(data.paddingX, '28px');
+          style.paddingRight = asCssSize(data.paddingX, '28px');
+          style.paddingTop = asCssSize(data.paddingY, '14px');
+          style.paddingBottom = asCssSize(data.paddingY, '14px');
+          style.borderRadius = asCssSize(data.borderRadius, '9999px');
+          style.borderWidth = asCssSize(data.borderWidth, data.style === 'secondary' ? '2px' : '0px');
+          style.borderStyle = 'solid';
+          style.borderColor = data.borderColor || '#ffffff';
+          style.backgroundColor = data.backgroundColor || (data.style === 'secondary' ? 'transparent' : '#ffffff');
+          style.color = data.textColor || (data.style === 'secondary' ? '#ffffff' : '#dc2626');
+          style.boxShadow = data.boxShadow || '0 15px 40px rgba(255,255,255,0.18)';
+          style.fontSize = asCssSize(data.fontSize, '16px');
+          style.fontFamily = data.fontFamily || 'inherit';
+          style.fontWeight = data.fontWeight || '600';
+          style.transition = 'all 0.25s ease';
+          if (data.width) {
+            style.width = asCssSize(data.width, 'auto');
+          }
+
+          const hoverBackground = data.hoverBackgroundColor || (data.style === 'secondary' ? '#ffffff' : '#f3f4f6');
+          const hoverColor = data.hoverTextColor || (data.style === 'secondary' ? (data.textColor || '#1f2937') : '#b91c1c');
+          events.onMouseenter = (event) => {
+            event.target.dataset.prevBg = event.target.style.backgroundColor;
+            event.target.dataset.prevColor = event.target.style.color;
+            event.target.style.backgroundColor = hoverBackground;
+            event.target.style.color = hoverColor;
+          };
+          events.onMouseleave = (event) => {
+            if (event.target.dataset.prevBg) {
+              event.target.style.backgroundColor = event.target.dataset.prevBg;
+            }
+            if (event.target.dataset.prevColor) {
+              event.target.style.color = event.target.dataset.prevColor;
+            }
+          };
         }
 
         if (element.type === 'image') {
-          if (data.align === 'center') classes.push('text-center');
-          else if (data.align === 'right') classes.push('text-right');
-          else classes.push('text-left');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '16px';
+          if (!freePositioned) {
+            if (data.align === 'center') classes.push('text-center');
+            else if (data.align === 'right') classes.push('text-right');
+            else classes.push('text-left');
+          }
+          style.marginTop = freePositioned ? '0px' : asCssSize(data.marginTop, '0px');
+          style.marginBottom = freePositioned ? '0px' : asCssSize(data.marginBottom, '16px');
+          if (!freePositioned) {
+            if (data.align === 'center') {
+              style.display = 'flex';
+              style.justifyContent = 'center';
+            } else if (data.align === 'right') {
+              style.display = 'flex';
+              style.justifyContent = 'flex-end';
+            }
+          }
         }
 
         if (element.type === 'spacer') {
-          style.height = data.height || '24px';
+          style.height = asCssSize(data.height, '24px');
           classes.push('w-full');
+          if (freePositioned) {
+            style.marginTop = '0px';
+            style.marginBottom = '0px';
+          }
         }
 
         if (element.type === 'feature') {
-          classes.push('flex items-center space-x-2');
+          classes.push('flex items-center space-x-3');
         }
 
         return {
           class: classes.join(' '),
-          style
+          style,
+          ...events
         };
       }
 
-      function heroImageProps(element) {
-        const data = element.data || {};
-        return {
-          src: data.src || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
-          alt: data.alt || 'Изображение',
-          style: {
-            width: data.width || '320px',
-            height: data.height || 'auto',
-            borderRadius: data.borderRadius || '16px'
-          }
-        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      function deliveryLayoutClass(block) {
+        const layout = block?.data?.layout || 'two-column';
+        if (layout === 'stacked') {
+          return 'flex flex-col gap-10';
+        }
+        return 'grid lg:grid-cols-2 gap-10 items-start';
       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       function setDevice(device) {
         canvas.device = device;
@@ -1790,11 +1571,19 @@
       }
 
       function heroDropIsActive(blockId, index) {
-        return Boolean(heroDrag.elementId) && heroDrag.targetBlockId === blockId && heroDrag.dropIndex === index;
+        if (!heroDrag.elementId) {
+          return false;
+        }
+        const block = getBlockById(blockId);
+        if (!block || isFreeformBlock(block)) {
+          return false;
+        }
+        return heroDrag.targetBlockId === blockId && heroDrag.dropIndex === index;
       }
 
       function heroDropWrapperClass(blockId, index) {
-        if (!heroDrag.elementId) {
+        const block = getBlockById(blockId);
+        if (!heroDrag.elementId || isFreeformBlock(block)) {
           return 'opacity-0 pointer-events-auto';
         }
         return heroDropIsActive(blockId, index)
@@ -1808,17 +1597,275 @@
           : 'border-white/40 text-white/70 bg-black/20';
       }
 
-      function heroElementWrapperClasses(blockId, element) {
-        const classes = ['relative group rounded-2xl px-2 py-1 transition hover:bg-white/10 hover:bg-opacity-30'];
-        if (selectedBlockId.value === blockId && isElementSelected(element)) {
-          classes.push('ring-2 ring-orange-300 bg-white/10 shadow-lg');
+      function heroElementWrapperClasses(block, element) {
+        const classes = ['relative group transition'];
+        const isSelected = selectedBlockId.value === block?.id && isElementSelected(element);
+        if (isSelected) {
+          classes.push('ring-2 ring-orange-300 shadow-lg backdrop-blur-sm');
         } else {
-          classes.push('ring-1 ring-transparent hover:ring-white/40');
+          classes.push('ring-1 ring-transparent');
+        }
+        if (elementUsesFreePosition(block, element)) {
+          classes.push('cursor-move select-none pointer-events-auto');
+        } else {
+          classes.push('rounded-2xl px-2 py-1 hover:bg-white/10 hover:bg-opacity-30 hover:ring-white/40');
         }
         return classes.join(' ');
       }
 
+      function heroElementWrapperStyle(block, element) {
+        const style = {};
+        if (!block || !element) {
+          return style;
+        }
+        const data = element.data || {};
+        if (elementUsesFreePosition(block, element)) {
+          style.position = 'absolute';
+          style.left = asCssSize(data.positionX, '0px');
+          style.top = asCssSize(data.positionY, '0px');
+          style.zIndex = parseCssNumber(data.zIndex, 10);
+          style.userSelect = 'none';
+          if (data.width) {
+            style.width = asCssSize(data.width, 'auto');
+          }
+          if (data.maxWidth) {
+            style.maxWidth = asCssSize(data.maxWidth, 'auto');
+          }
+        } else {
+          style.position = 'relative';
+        }
+        return style;
+      }
+
+      function heroElementDraggable(block, element) {
+        if (!block || !element) {
+          return false;
+        }
+        if (isFreeformBlock(block)) {
+          return false;
+        }
+        return element.data?.positionMode !== 'free';
+      }
+
+      function handleElementClick(blockId, elementId, event = null) {
+        if (event) {
+          event.stopPropagation();
+        }
+        selectBlock(blockId);
+        currentElementId.value = elementId;
+        elementPaletteOpen.value = false;
+        nextTick(scheduleSelectionOverlay);
+      }
+
+      function handleBlockClick(blockId, event = null) {
+        if (event && event.target && event.target.closest('[data-element-id]')) {
+          return;
+        }
+        selectBlock(blockId);
+        nextTick(scheduleSelectionOverlay);
+      }
+
+      function handleCanvasClick(event) {
+        if (event.target && event.target.closest('[data-block-id]')) {
+          return;
+        }
+        selectedBlockId.value = null;
+        currentElementId.value = null;
+        elementPaletteOpen.value = false;
+        selectionOverlay.visible = false;
+      }
+
+      function onHeroElementPointerDown(blockId, elementId, event) {
+        if (!event || event.button !== 0) {
+          return;
+        }
+        const block = getBlockById(blockId);
+        const element = block?.data?.elements?.find(el => el.id === elementId) || null;
+        if (!block || !element || !elementUsesFreePosition(block, element)) {
+          return;
+        }
+        const wrapper = elementRefs.get(getElementKey(blockId, elementId));
+        if (!wrapper) {
+          return;
+        }
+        const container = wrapper.offsetParent;
+        if (!container) {
+          return;
+        }
+        freeformDrag.active = true;
+        freeformDrag.blockId = blockId;
+        freeformDrag.elementId = elementId;
+        freeformDrag.startX = event.clientX;
+        freeformDrag.startY = event.clientY;
+        freeformDrag.originX = parseCssNumber(element.data.positionX, wrapper.offsetLeft);
+        freeformDrag.originY = parseCssNumber(element.data.positionY, wrapper.offsetTop);
+        freeformDrag.containerWidth = container.clientWidth;
+        freeformDrag.containerHeight = container.clientHeight;
+        freeformDrag.elementWidth = wrapper.clientWidth;
+        freeformDrag.elementHeight = wrapper.clientHeight;
+        selectBlock(blockId);
+        currentElementId.value = elementId;
+        elementPaletteOpen.value = false;
+        window.addEventListener('pointermove', onFreeformPointerMove);
+        window.addEventListener('pointerup', onFreeformPointerUp);
+        event.stopPropagation();
+        event.preventDefault();
+      }
+
+      function onFreeformPointerMove(event) {
+        if (!freeformDrag.active) {
+          return;
+        }
+        const block = getBlockById(freeformDrag.blockId);
+        const element = block?.data?.elements?.find(el => el.id === freeformDrag.elementId) || null;
+        if (!block || !element || !elementUsesFreePosition(block, element)) {
+          onFreeformPointerUp();
+          return;
+        }
+        const zoom = canvas.mode === 'full' ? 1 : canvas.zoom;
+        const deltaX = (event.clientX - freeformDrag.startX) / zoom;
+        const deltaY = (event.clientY - freeformDrag.startY) / zoom;
+        const maxX = Math.max(0, freeformDrag.containerWidth - freeformDrag.elementWidth);
+        const maxY = Math.max(0, freeformDrag.containerHeight - freeformDrag.elementHeight);
+        const nextX = clampNumber(freeformDrag.originX + deltaX, 0, maxX || 0);
+        const nextY = clampNumber(freeformDrag.originY + deltaY, 0, maxY || 0);
+        element.data.positionX = `${Math.round(nextX)}px`;
+        element.data.positionY = `${Math.round(nextY)}px`;
+        scheduleSelectionOverlay();
+      }
+
+      function onFreeformPointerUp() {
+        if (!freeformDrag.active) {
+          return;
+        }
+        freeformDrag.active = false;
+        freeformDrag.blockId = null;
+        freeformDrag.elementId = null;
+        window.removeEventListener('pointermove', onFreeformPointerMove);
+        window.removeEventListener('pointerup', onFreeformPointerUp);
+        nextTick(scheduleSelectionOverlay);
+      }
+
+
+
+
+      function getElementKey(blockId, elementId) {
+        return `${blockId}:${elementId}`;
+      }
+
+      function registerBlockRef(blockId, el) {
+        if (el) {
+          blockRefs.set(blockId, el);
+        } else {
+          blockRefs.delete(blockId);
+        }
+        scheduleSelectionOverlay();
+      }
+
+      function registerElementRef(blockId, elementId, el) {
+        const key = getElementKey(blockId, elementId);
+        if (el) {
+          elementRefs.set(key, el);
+        } else {
+          elementRefs.delete(key);
+        }
+        scheduleSelectionOverlay();
+      }
+
+      function getBlockById(blockId) {
+        return pageBlocks.value.find(block => block.id === blockId) || null;
+      }
+
+      function isFreeformBlock(block) {
+        return Boolean(block?.data?.layout === 'freeform');
+      }
+
+      function elementUsesFreePosition(block, element) {
+        return isFreeformBlock(block) && element?.data?.positionMode === 'free';
+      }
+
+      let overlayRaf = null;
+
+      function scheduleSelectionOverlay() {
+        if (overlayRaf) {
+          cancelAnimationFrame(overlayRaf);
+        }
+        overlayRaf = requestAnimationFrame(() => {
+          overlayRaf = null;
+          updateSelectionOverlay();
+        });
+      }
+
+      function updateSelectionOverlay() {
+        if (!canvas.showOverlays) {
+          selectionOverlay.visible = false;
+          return;
+        }
+        const viewportEl = canvasViewportRef.value;
+        if (!viewportEl) {
+          selectionOverlay.visible = false;
+          return;
+        }
+        let targetEl = null;
+        if (currentElementId.value && selectedBlockId.value) {
+          targetEl = elementRefs.get(getElementKey(selectedBlockId.value, currentElementId.value)) || null;
+        }
+        if (!targetEl && selectedBlockId.value) {
+          targetEl = blockRefs.get(selectedBlockId.value) || null;
+        }
+        if (!targetEl) {
+          selectionOverlay.visible = false;
+          return;
+        }
+
+        const viewportRect = viewportEl.getBoundingClientRect();
+        const targetRect = targetEl.getBoundingClientRect();
+        const top = targetRect.top - viewportRect.top + viewportEl.scrollTop;
+        const left = targetRect.left - viewportRect.left + viewportEl.scrollLeft;
+
+        selectionOverlay.top = top;
+        selectionOverlay.left = left;
+        selectionOverlay.width = targetRect.width;
+        selectionOverlay.height = targetRect.height;
+        selectionOverlay.visible = true;
+        selectionOverlay.type = currentElementId.value ? 'element' : 'block';
+        selectionOverlay.label = currentElementId.value
+          ? (elementRegistry[currentElement.value?.type]?.label || currentElement.value?.type || 'Элемент')
+          : (selectedBlock.value?.name || selectedBlock.value?.type || 'Блок');
+        selectionOverlay.badgeBelow = top < 32;
+      }
+
+      function onCanvasScroll() {
+        if (!canvas.showOverlays) return;
+        scheduleSelectionOverlay();
+      }
+
+
+
+
+
+
+
+
+
+
+      function handleWindowResize() {
+        scheduleSelectionOverlay();
+      }
+
+      function handleDocumentScroll() {
+        scheduleSelectionOverlay();
+      }
+
       function onHeroElementDragStart(blockId, elementId, event = null) {
+        const block = getBlockById(blockId);
+        const element = block?.data?.elements?.find(el => el.id === elementId) || null;
+        if (!block || !element || isFreeformBlock(block) || element.data?.positionMode === 'free') {
+          if (event?.preventDefault) {
+            event.preventDefault();
+          }
+          return;
+        }
         heroDrag.sourceBlockId = blockId;
         heroDrag.elementId = elementId;
         heroDrag.dropIndex = null;
@@ -1838,12 +1885,16 @@
 
       function onHeroElementDragOver(blockId, index) {
         if (!heroDrag.elementId) return;
+        const block = getBlockById(blockId);
+        if (isFreeformBlock(block)) return;
         heroDrag.targetBlockId = blockId;
         heroDrag.dropIndex = index;
       }
 
       function onHeroElementDragLeave(blockId, index) {
         if (!heroDrag.elementId) return;
+        const block = getBlockById(blockId);
+        if (isFreeformBlock(block)) return;
         if (heroDrag.targetBlockId === blockId && heroDrag.dropIndex === index) {
           heroDrag.dropIndex = null;
         }
@@ -1853,7 +1904,7 @@
         if (!heroDrag.elementId) return;
         const sourceBlock = pageBlocks.value.find(b => b.id === heroDrag.sourceBlockId);
         const targetBlock = pageBlocks.value.find(b => b.id === blockId);
-        if (!sourceBlock || !targetBlock || targetBlock.type !== 'hero') {
+        if (!sourceBlock || !targetBlock || targetBlock.type !== 'hero' || isFreeformBlock(targetBlock)) {
           onHeroElementDragEnd();
           return;
         }
@@ -1862,6 +1913,11 @@
         const targetElements = Array.isArray(targetBlock.data.elements) ? targetBlock.data.elements : [];
         const sourceIndex = sourceElements.findIndex(el => el.id === heroDrag.elementId);
         if (sourceIndex === -1) {
+          onHeroElementDragEnd();
+          return;
+        }
+
+        if (sourceElements[sourceIndex]?.data?.positionMode === 'free') {
           onHeroElementDragEnd();
           return;
         }
@@ -1878,6 +1934,7 @@
         selectedBlockId.value = targetBlock.id;
         currentElementId.value = element.id;
         onHeroElementDragEnd();
+        scheduleSelectionOverlay();
       }
 
       function selectElement(blockId, elementId) {
@@ -2069,11 +2126,13 @@
         if (!blocks.length) {
           selectedBlockId.value = null;
           currentElementId.value = null;
+          scheduleSelectionOverlay();
           return;
         }
         if (!blocks.some(block => block.id === selectedBlockId.value)) {
           selectedBlockId.value = blocks[0].id;
         }
+        nextTick(scheduleSelectionOverlay);
       }, { deep: true });
 
       watch(selectedBlockId, (nextId, prevId) => {
@@ -2087,10 +2146,45 @@
         if (!has) {
           currentElementId.value = block.data.elements[0].id;
         }
+        nextTick(scheduleSelectionOverlay);
+      });
+
+      watch(currentElementId, () => {
+        nextTick(scheduleSelectionOverlay);
+      });
+
+      watch(() => canvas.zoom, () => {
+        scheduleSelectionOverlay();
+      });
+
+      watch(() => canvas.mode, () => {
+        nextTick(scheduleSelectionOverlay);
+      });
+
+      watch(() => canvas.showOverlays, (value) => {
+        if (value) {
+          scheduleSelectionOverlay();
+        } else {
+          selectionOverlay.visible = false;
+        }
+      });
+
+      watch(() => canvas.device, () => {
+        nextTick(scheduleSelectionOverlay);
       });
 
       onMounted(async () => {
+        window.addEventListener('resize', handleWindowResize);
+        document.addEventListener('scroll', handleDocumentScroll, true);
         await loadSettings();
+        nextTick(scheduleSelectionOverlay);
+      });
+
+      onUnmounted(() => {
+        window.removeEventListener('resize', handleWindowResize);
+        document.removeEventListener('scroll', handleDocumentScroll, true);
+        window.removeEventListener('pointermove', onFreeformPointerMove);
+        window.removeEventListener('pointerup', onFreeformPointerUp);
       });
 
       return {
@@ -2104,6 +2198,8 @@
         canvas,
         canvasWidth,
         canvasStyle,
+        canvasViewportRef,
+        canvasInnerRef,
         dropIndex,
         selectedBlockId,
         selectedBlock,
@@ -2114,6 +2210,8 @@
         currentElement,
         currentElementDefinition,
         elementRegistry,
+        selectionOverlay,
+        selectionOverlayStyle,
         saveSettings,
         loadSettings,
         addBlock,
@@ -2137,13 +2235,19 @@
         heroElementProps,
         heroImageProps,
         heroElementWrapperClasses,
+        heroElementWrapperStyle,
+        heroElementDraggable,
         heroDropWrapperClass,
         heroDropLabelClass,
         onHeroElementDragStart,
         onHeroElementDragEnd,
+        onHeroElementPointerDown,
         onHeroElementDragOver,
         onHeroElementDragLeave,
         onHeroElementDrop,
+        handleBlockClick,
+        handleElementClick,
+        handleCanvasClick,
         selectElement,
         isElementSelected,
         addElement,
@@ -2155,7 +2259,86 @@
         onBlockFileSelected,
         onFileSelected,
         getElementFieldValue,
-        updateElementField
+        updateElementField,
+        registerBlockRef,
+        registerElementRef,
+        onCanvasScroll,
+        heroWrapperStyle,
+        heroBackgroundStyle,
+        heroOverlayStyle,
+        heroContainerClasses,
+        heroContainerStyle,
+        heroContentColumnClasses,
+        heroContentStyle,
+        heroMediaWrapperClasses,
+        heroFeatureIconWrapperStyle,
+        sectionBackgroundStyle,
+        sectionOverlayStyle,
+        blockButtonWrapperStyle,
+        blockButtonClass,
+        blockButtonStyle,
+        categoriesSectionStyle,
+        categoriesOverlayStyle,
+        categoriesHeaderStyle,
+        categoriesHeadingStyle,
+        categoriesSubheadingStyle,
+        categoriesDescriptionStyle,
+        categoriesGridStyle,
+        categoriesCardStyle,
+        categoriesIconWrapperStyle,
+        categoriesCardTitleStyle,
+        categoriesCardDescriptionStyle,
+        menuSectionStyle,
+        menuOverlayStyle,
+        menuHeaderStyle,
+        menuHeadingStyle,
+        menuDescriptionStyle,
+        menuFilterSurfaceStyle,
+        menuTabsWrapperStyle,
+        menuActiveTabStyle,
+        menuTabStyle,
+        menuGridStyle,
+        menuCardStyle,
+        menuCardImageStyle,
+        menuCardTitleStyle,
+        menuCardDescriptionStyle,
+        menuPriceStyle,
+        menuTagStyle,
+        deliverySectionStyle,
+        deliveryOverlayStyle,
+        deliveryLayoutClass,
+        deliveryTextColumnStyle,
+        deliveryHeadingStyle,
+        deliveryDescriptionStyle,
+        deliveryFeatureIconStyle,
+        deliveryFeatureTextStyle,
+        deliveryContactsStyle,
+        deliveryTrackingCardStyle,
+        deliveryTrackingBarStyle,
+        deliveryTrackingTitleStyle,
+        deliveryTrackingDescriptionStyle,
+        deliveryTrackingProgressStyle,
+        reviewsSectionStyle,
+        reviewsOverlayStyle,
+        reviewsHeaderStyle,
+        reviewsHeadingStyle,
+        reviewsDescriptionStyle,
+        reviewsGridStyle,
+        reviewsCardStyle,
+        reviewsAvatarStyle,
+        reviewsCardTitleStyle,
+        reviewsCardSubtitleStyle,
+        reviewsRatingStyle,
+        reviewsQuoteStyle,
+        mapSectionStyle,
+        mapOverlayStyle,
+        mapFrameStyle,
+        mapIframeStyle,
+        mapInfoCardStyle,
+        mapHeadingStyle,
+        mapDescriptionStyle,
+        mapContactRowStyle,
+        mapContactIconStyle
       };
     }
   };
