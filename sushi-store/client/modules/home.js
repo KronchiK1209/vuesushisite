@@ -7,285 +7,713 @@ window.HomeView = {
   /* NOTE: Template is large; for maintainability we keep behavior identical */
   template: /* html */`
     <div>
-      <template v-if="page && page.length > 0">
-        <template v-for="(block, idx) in page" :key="block.id || (block.type + '-' + idx)">
+      <template v-if="activeBlocks.length > 0">
+        <template v-for="(block, idx) in activeBlocks" :key="block.id || (block.type + '-' + idx)">
           <!-- hero -->
-          <section v-if="block.type === 'hero'" :style="{ backgroundColor: siteBackgroundColor }" class="relative text-white overflow-hidden">
-            <img :src="block.data?.backgroundImage || heroBackgroundImage" class="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none" alt="" />
-            <div class="max-w-7xl mx-auto px-4 py-16 lg:py-24 grid md:grid-cols-2 gap-12 items-center relative z-10">
-              <div>
-                <!-- Динамические элементы Hero -->
-                <div v-if="block.data.elements && block.data.elements.length > 0" class="space-y-4">
-                  <div v-for="(element, elementIndex) in block.data.elements" :key="element.id">
-                    <!-- Heading element -->
-                    <component 
-                      v-if="element.type === 'heading'" 
-                      :is="element.data.level || 'h2'"
-                      class="font-bold"
-                      :class="[
-                        element.data.fontSize || 'text-3xl',
-                        element.data.align === 'center' ? 'text-center' : 
-                        element.data.align === 'right' ? 'text-right' : 'text-left'
-                      ]"
-                      :style="{
-                        color: element.data.color || '#ffffff',
-                        marginTop: element.data.marginTop || '0px',
-                        marginBottom: element.data.marginBottom || '16px'
-                      }"
-                    >
-                      {{ element.data.text || 'Новый заголовок' }}
-                    </component>
-
-                    <!-- Subheading element -->
-                    <h3 
-                      v-else-if="element.type === 'subheading'" 
-                      class=""
-                      :class="[
-                        element.data.fontSize || 'text-xl',
-                        element.data.align === 'center' ? 'text-center' : 
-                        element.data.align === 'right' ? 'text-right' : 'text-left'
-                      ]"
-                      :style="{
-                        color: element.data.color || '#fbbf24',
-                        marginTop: element.data.marginTop || '0px',
-                        marginBottom: element.data.marginBottom || '12px'
-                      }"
-                    >
-                      {{ element.data.text || 'Новый подзаголовок' }}
-                    </h3>
-
-                    <!-- Paragraph element -->
-                    <p 
-                      v-else-if="element.type === 'paragraph'" 
-                      class=""
-                      :class="[
-                        element.data.fontSize || 'text-base',
-                        element.data.align === 'center' ? 'text-center' : 
-                        element.data.align === 'right' ? 'text-right' : 'text-left'
-                      ]"
-                      :style="{
-                        color: element.data.color || '#ffffff',
-                        marginTop: element.data.marginTop || '0px',
-                        marginBottom: element.data.marginBottom || '16px'
-                      }"
-                    >
-                      {{ element.data.text || 'Новый абзац текста' }}
-                    </p>
-
-                    <!-- Button element -->
-                    <button 
-                      v-else-if="element.type === 'button'"
-                      @click="scrollToMenu"
-                      :class="[
-                        'px-6 py-3 rounded-full font-semibold transition flex items-center space-x-2',
-                        element.data.style === 'secondary' 
-                          ? 'bg-transparent border-2 border-white text-white hover:bg-white hover:text-red-600' 
-                          : 'bg-white text-red-600 hover:bg-gray-100',
-                        element.data.align === 'center' ? 'mx-auto' : 
-                        element.data.align === 'right' ? 'ml-auto' : 'mr-auto'
-                      ]"
-                      :style="{
-                        marginTop: element.data.marginTop || '0px',
-                        marginBottom: element.data.marginBottom || '0px'
-                      }"
-                    >
-                      <span>{{ element.data.text || 'Новая кнопка' }}</span>
-                      <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-
-                    <!-- Image element -->
-                    <div 
-                      v-else-if="element.type === 'image'" 
-                      class=""
-                      :class="[
-                        element.data.align === 'center' ? 'text-center' : 
-                        element.data.align === 'right' ? 'text-right' : 'text-left'
-                      ]"
-                      :style="{
-                        marginTop: element.data.marginTop || '0px',
-                        marginBottom: element.data.marginBottom || '16px'
-                      }"
-                    >
-                      <img 
-                        :src="element.data.src || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10'" 
-                        alt="Element image" 
-                        class="object-cover rounded-lg"
+          <section
+            v-if="block.type === 'hero'"
+            class="relative overflow-hidden text-white"
+            :style="{ backgroundColor: block.data?.backgroundColor || siteBackgroundColor }"
+          >
+            <img
+              :src="block.data?.backgroundImage || heroBackgroundImage"
+              class="absolute inset-0 w-full h-full object-cover opacity-30"
+              alt=""
+            />
+            <div
+              class="absolute inset-0"
+              :style="{ background: block.data?.overlayColor || 'rgba(17, 24, 39, 0.55)' }"
+            ></div>
+            <div class="relative max-w-7xl mx-auto px-4 py-16 lg:py-24">
+              <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div :class="block.data?.imageSide === 'left' ? 'md:order-2' : 'md:order-1'">
+                  <div v-if="block.data.elements && block.data.elements.length" class="space-y-4">
+                    <div v-for="element in block.data.elements" :key="element.id">
+                      <component
+                        v-if="element.type === 'heading'"
+                        :is="element.data.level || 'h2'"
+                        class="font-bold"
+                        :class="[
+                          element.data.fontSize || 'text-4xl',
+                          element.data.align === 'center' ? 'text-center' :
+                          element.data.align === 'right' ? 'text-right' : 'text-left'
+                        ]"
                         :style="{
-                          width: element.data.width || '200px',
-                          height: element.data.height || '150px'
+                          color: element.data.color || '#ffffff',
+                          marginTop: element.data.marginTop || '0px',
+                          marginBottom: element.data.marginBottom || '16px'
                         }"
-                      />
+                      >
+                        {{ element.data.text || 'Новый заголовок' }}
+                      </component>
+                      <p
+                        v-else-if="element.type === 'subheading'"
+                        :class="[
+                          element.data.fontSize || 'text-xl',
+                          'font-semibold',
+                          element.data.align === 'center' ? 'text-center' :
+                          element.data.align === 'right' ? 'text-right' : 'text-left'
+                        ]"
+                        :style="{
+                          color: element.data.color || '#fbbf24',
+                          marginTop: element.data.marginTop || '0px',
+                          marginBottom: element.data.marginBottom || '12px'
+                        }"
+                      >
+                        {{ element.data.text || 'Новый подзаголовок' }}
+                      </p>
+                      <p
+                        v-else-if="element.type === 'paragraph'"
+                        :class="[
+                          element.data.fontSize || 'text-base',
+                          'leading-relaxed',
+                          element.data.align === 'center' ? 'text-center' :
+                          element.data.align === 'right' ? 'text-right' : 'text-left'
+                        ]"
+                        :style="{
+                          color: element.data.color || '#f9fafb',
+                          marginTop: element.data.marginTop || '0px',
+                          marginBottom: element.data.marginBottom || '16px'
+                        }"
+                      >
+                        {{ element.data.text || 'Новый абзац текста' }}
+                      </p>
+                      <button
+                        v-else-if="element.type === 'button'"
+                        type="button"
+                        @click="handleHeroElementAction(element.data)"
+                        :class="[
+                          'px-6 py-3 rounded-full font-semibold transition flex items-center space-x-2 shadow-lg',
+                          element.data.style === 'secondary'
+                            ? 'bg-transparent border-2 border-white text-white hover:bg-white hover:text-red-600'
+                            : 'bg-white text-red-600 hover:bg-gray-100',
+                          element.data.align === 'center' ? 'mx-auto' :
+                          element.data.align === 'right' ? 'ml-auto' : 'mr-auto'
+                        ]"
+                        :style="{
+                          marginTop: element.data.marginTop || '0px',
+                          marginBottom: element.data.marginBottom || '0px'
+                        }"
+                      >
+                        <span>{{ element.data.text || 'Новая кнопка' }}</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                      </button>
+                      <div
+                        v-else-if="element.type === 'image'"
+                        :class="[
+                          element.data.align === 'center' ? 'text-center' :
+                          element.data.align === 'right' ? 'text-right' : 'text-left'
+                        ]"
+                        :style="{
+                          marginTop: element.data.marginTop || '0px',
+                          marginBottom: element.data.marginBottom || '16px'
+                        }"
+                      >
+                        <img
+                          :src="element.data.src || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10'"
+                          :alt="element.data.alt || 'Изображение'"
+                          class="object-cover"
+                          :style="{
+                            width: element.data.width || '320px',
+                            height: element.data.height || 'auto',
+                            borderRadius: element.data.borderRadius || '16px'
+                          }"
+                        />
+                      </div>
+                      <div
+                        v-else-if="element.type === 'feature'"
+                        class="flex items-center space-x-3"
+                        :class="[
+                          element.data.align === 'center' ? 'justify-center' :
+                          element.data.align === 'right' ? 'justify-end' : 'justify-start'
+                        ]"
+                        :style="{
+                          marginTop: element.data.marginTop || '0px',
+                          marginBottom: element.data.marginBottom || '8px'
+                        }"
+                      >
+                        <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/15">
+                          <i :class="element.data.icon || 'fa-solid fa-check'" class="text-lg"></i>
+                        </span>
+                        <span
+                          :class="element.data.fontSize || 'text-base'"
+                          :style="{ color: element.data.color || '#f9fafb' }"
+                        >
+                          {{ element.data.text || 'Новое преимущество' }}
+                        </span>
+                      </div>
+                      <div
+                        v-else-if="element.type === 'spacer'"
+                        :style="{
+                          height: element.data.height || '24px',
+                          marginTop: element.data.marginTop || '0px',
+                          marginBottom: element.data.marginBottom || '0px'
+                        }"
+                      ></div>
                     </div>
                   </div>
+
+                  <div v-else class="text-center text-white">
+                    <p class="text-yellow-200 uppercase tracking-wider mb-3">
+                      {{ (block.data?.heading ?? heroText.heading) || 'Быстро и вкусно' }}
+                    </p>
+                    <h1 class="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+                      {{ (block.data?.subheading ?? heroText.subheading) || 'Попробуйте наши особые суши' }}
+                    </h1>
+                    <p class="text-lg mb-6 max-w-md mx-auto">
+                      {{ (block.data?.description ?? heroText.description) || 'Самые свежие роллы и нигири для любого настроения. Заказывайте онлайн или забирайте сами.' }}
+                    </p>
+                    <button
+                      type="button"
+                      @click="scrollToMenu"
+                      class="bg-white text-red-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition flex items-center space-x-2 mx-auto"
+                    >
+                      <span>{{ (block.data?.buttonText ?? heroText.buttonText) || 'Начать заказ' }}</span>
+                      <i class="fa-solid fa-arrow-down"></i>
+                    </button>
+                  </div>
                 </div>
-                
-                <!-- Fallback если нет элементов -->
-                <div v-else class="text-center text-white">
-                  <p class="text-yellow-200 uppercase tracking-wider mb-3">{{ (block.data?.heading ?? heroText.heading) || 'Быстро и вкусно' }}</p>
-                  <h1 class="text-4xl lg:text-5xl font-bold mb-4 leading-tight">{{ (block.data?.subheading ?? heroText.subheading) || 'Попробуйте наши особые суши' }}</h1>
-                  <p class="text-lg mb-6 max-w-md">{{ (block.data?.description ?? heroText.description) || 'Самые свежие роллы и нигири для любого настроения. Заказывайте онлайн или забирайте сами.' }}</p>
-                  <button @click="scrollToMenu" class="bg-white text-red-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition flex items-center space-x-2">
-                    <span>{{ (block.data?.buttonText ?? heroText.buttonText) || 'Начать заказ' }}</span>
-                    <i class="fa-solid fa-arrow-down"></i>
-                  </button>
+                <div
+                  v-if="block.data?.showRightImage !== false"
+                  :class="[
+                    'relative hidden md:flex md:items-center md:justify-center',
+                    block.data?.imageSide === 'left' ? 'md:order-1' : 'md:order-2'
+                  ]"
+                >
+                  <div class="relative">
+                    <img
+                      :src="heroPreviewImage(block)"
+                      alt="Превью блюда"
+                      class="w-80 h-80 object-cover rounded-3xl shadow-2xl"
+                    />
+                    <div class="absolute inset-0 rounded-3xl ring-4 ring-white/20"></div>
+                  </div>
                 </div>
-              </div>
-              <div class="relative hidden md:block">
-                <transition name="pixel-fade" mode="out-in">
-                  <img :key="currentSlideIndex" :src="(currentSlide && currentSlide.image) || heroImage || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10'" alt="Слайд" class="w-full h-80 object-cover rounded-lg shadow-lg" />
-                </transition>
               </div>
             </div>
-            <svg class="absolute bottom-0 left-0 w-full h-20 md:h-24 lg:h-32" preserveAspectRatio="none" viewBox="0 0 1440 100">
-              <path fill="#f9f4e5" d="M0 50 Q 360 80 720 50 T 1440 50 V100 H0 Z"></path>
+            <svg
+              v-if="block.data?.waveEnabled !== false"
+              class="absolute bottom-0 left-0 w-full h-20 md:h-24 lg:h-32"
+              preserveAspectRatio="none"
+              viewBox="0 0 1440 100"
+            >
+              <path :fill="block.data?.waveColor || '#f9f4e5'" d="M0 50 Q 360 80 720 50 T 1440 50 V100 H0 Z"></path>
             </svg>
           </section>
-
           <!-- categories -->
-          <section v-else-if="block.type === 'categories'" class="py-12" style="background-color:#f9f4e5;">
-            <h2 class="text-3xl font-bold mb-8 text-center text-black">
-              <span class="text-orange-600">{{ (block.data?.heading ?? categoriesText.heading) || 'Категории' }}</span>
-              и
-              <span class="text-red-600">{{ (block.data?.subheading ?? categoriesText.subheading) || 'блюда' }}</span>,
-              {{ (block.data?.description ?? categoriesText.description) || 'которых вы не найдёте нигде' }}
-            </h2>
-            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-              <div v-for="(cat, index) in categoryBlocks" :key="cat.id" class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 animate-fadeIn" :style="{ animationDelay: (index * 0.2) + 's' }">
-                <div class="w-32 h-32 rounded-full overflow-hidden relative group">
-                  <img :src="cat.image || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10'" alt="" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" loading="lazy" />
-                  <div class="absolute inset-0 bg-gradient-to-t from-orange-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <section
+            v-else-if="block.type === 'categories'"
+            class="py-12"
+            :style="{ backgroundColor: block.data?.backgroundColor || '#f9f4e5' }"
+          >
+            <div class="max-w-5xl mx-auto px-4 text-center">
+              <p
+                class="text-sm font-semibold uppercase tracking-widest"
+                :style="{ color: block.data?.accentColor || '#f97316' }"
+              >
+                {{ block.data?.subheading || categoriesText.subheading || 'категории' }}
+              </p>
+              <h2
+                class="text-3xl md:text-4xl font-bold mt-2"
+                :style="{ color: block.data?.headingColor || '#111827' }"
+              >
+                {{ block.data?.heading || categoriesText.heading || 'Категории и блюда' }}
+              </h2>
+              <p
+                class="mt-4 max-w-2xl mx-auto"
+                :style="{ color: block.data?.descriptionColor || '#4b5563' }"
+              >
+                {{ block.data?.description || categoriesText.description || 'Уникальные подборки от наших шефов' }}
+              </p>
+            </div>
+            <div class="max-w-6xl mx-auto mt-10 px-4">
+              <div
+                v-if="categoryBlocks.length"
+                class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+              >
+                <div
+                  v-for="(cat, index) in categoryBlocks"
+                  :key="cat.id"
+                  :class="categoryCardClasses(block)"
+                  :style="categoryCardStyle(block, index)"
+                >
+                  <div class="w-28 h-28 rounded-full overflow-hidden relative group">
+                    <img
+                      :src="cat.image || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10'"
+                      :alt="cat.name"
+                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      loading="lazy"
+                    />
+                    <div
+                      class="absolute inset-0 transition-opacity duration-300 group-hover:opacity-100"
+                      :style="{ background: (block.data?.accentColor || '#f97316') + '1a', opacity: 0 }"
+                    ></div>
+                  </div>
+                  <h3
+                    class="mt-4 font-semibold text-xl"
+                    :style="{ color: block.data?.accentColor || '#f97316' }"
+                  >
+                    {{ cat.name }}
+                  </h3>
+                  <p
+                    class="mt-2 text-sm"
+                    :style="{ color: block.data?.cardTextColor || '#4b5563' }"
+                  >
+                    {{ cat.description || 'Описание категории редактируется в админке' }}
+                  </p>
+                  <div
+                    class="mt-4 h-1 w-12 rounded-full mx-auto transition-all duration-300"
+                    :style="{ backgroundColor: block.data?.accentColor || '#f97316' }"
+                  ></div>
                 </div>
-                <h3 class="mt-4 font-semibold text-xl text-red-700 group-hover:text-orange-600 transition-colors duration-300">{{ cat.name }}</h3>
-                <p class="mt-2 text-sm text-gray-700">{{ cat.description }}</p>
-                <div class="mt-2 w-12 h-1 bg-gradient-to-r from-yellow-400 to-red-400 rounded-full group-hover:w-16 transition-all duration-300"></div>
+              </div>
+              <div v-else class="text-center text-sm text-gray-500 py-16">
+                Нет активных блоков категорий. Добавьте их в разделе «Категории» админ-панели.
               </div>
             </div>
           </section>
-
           <!-- menu -->
-          <section v-else-if="block.type === 'menu'" class="py-16 bg-gradient-to-br from-orange-50 to-red-50">
+          <section
+            v-else-if="block.type === 'menu'"
+            class="py-16"
+            :style="{ background: block.data?.backgroundGradient || 'linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%)' }"
+          >
             <div class="max-w-7xl mx-auto px-4">
               <div class="text-center mb-12">
                 <div class="inline-flex items-center space-x-2 mb-4">
-                  <div class="w-8 h-1 bg-orange-500 rounded-full"></div>
-                  <h2 ref="menuSection" class="text-4xl font-bold text-gray-900">Наше меню</h2>
-                  <div class="w-8 h-1 bg-red-500 rounded-full"></div>
+                  <div
+                    class="w-8 h-1 rounded-full"
+                    :style="{ backgroundColor: block.data?.accentColor || '#f97316' }"
+                  ></div>
+                  <h2 ref="menuSection" class="text-4xl font-bold" :style="{ color: block.data?.headingColor || '#1f2937' }">
+                    {{ block.data?.heading || menuText.heading || 'Наше меню' }}
+                  </h2>
+                  <div
+                    class="w-8 h-1 rounded-full"
+                    :style="{ backgroundColor: block.data?.accentColor ? block.data.accentColor : '#ef4444' }"
+                  ></div>
                 </div>
-                <p class="text-gray-600 text-lg max-w-2xl mx-auto">{{ (block.data?.description ?? menuText.subheading) || 'Выберите категорию и наслаждайтесь нашими изысканными блюдами' }}</p>
+                <p
+                  class="text-lg max-w-2xl mx-auto"
+                  :style="{ color: block.data?.descriptionColor || '#4b5563' }"
+                >
+                  {{ block.data?.description || menuText.description || 'Выберите категорию и сформируйте свой сет' }}
+                </p>
               </div>
-              <!-- sidebar + grid остаются неизменными ниже -->
               <div class="grid lg:grid-cols-4 gap-8">
                 <div class="lg:col-span-1">
-                  <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
-                    <div class="mb-6">
-                      <label class="block text-sm font-semibold text-gray-700 mb-2"><i class="fa-solid fa-search mr-2 text-orange-500"></i>Поиск по меню</label>
-                      <div class="relative"><input v-model="searchQuery" type="text" placeholder="Введите название блюда..." class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition" /><i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i></div>
+                  <div
+                    class="rounded-2xl shadow-lg p-6 sticky top-8 space-y-6"
+                    :style="{ backgroundColor: block.data?.cardBackground || '#ffffff', color: block.data?.cardTextColor || '#1f2937' }"
+                  >
+                    <div v-if="shouldShowMenuSearch(block)">
+                      <label class="block text-sm font-semibold mb-2" :style="{ color: block.data?.cardTextColor || '#1f2937' }">
+                        <i class="fa-solid fa-search mr-2" :style="{ color: block.data?.accentColor || '#f97316' }"></i>
+                        Поиск по меню
+                      </label>
+                      <div class="relative">
+                        <input
+                          v-model="searchQuery"
+                          type="text"
+                          placeholder="Введите название блюда..."
+                          class="w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition"
+                          :style="{
+                            borderColor: (block.data?.accentColor || '#f97316') + '33',
+                            boxShadow: '0 0 0 0 rgba(0,0,0,0)',
+                            color: block.data?.cardTextColor || '#1f2937'
+                          }"
+                        />
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2" :style="{ color: (block.data?.accentColor || '#f97316') + '80' }"></i>
+                      </div>
                     </div>
                     <div>
-                      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center"><i class="fa-solid fa-tags mr-2 text-orange-500"></i>Категории</h3>
+                      <h3 class="text-lg font-semibold mb-4 flex items-center" :style="{ color: block.data?.cardTextColor || '#1f2937' }">
+                        <i class="fa-solid fa-tags mr-2" :style="{ color: block.data?.accentColor || '#f97316' }"></i>
+                        Категории
+                      </h3>
                       <div class="space-y-2">
-                        <button @click="selectedVertical = 'Хиты'" :class="['w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-between group', selectedVertical === 'Хиты' ? 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white shadow-lg transform scale-105' : 'bg-gradient-to-r from-yellow-50 to-orange-50 text-orange-700 hover:from-yellow-100 hover:to-orange-100 hover:shadow-md']"><span class="font-medium flex items-center"><i class="fa-solid fa-star mr-2 text-yellow-500"></i>Хиты</span><i v-if="selectedVertical === 'Хиты'" class="fa-solid fa-check text-sm"></i><i v-else class="fa-solid fa-arrow-right text-sm opacity-0 group-hover:opacity-100 transition"></i></button>
-                        <button v-for="cat in verticalCategories" :key="cat" @click="selectedVertical = cat" :class="['w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-between group', selectedVertical === cat ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg transform scale-105' : 'bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-700 hover:shadow-md']"><span class="font-medium">{{ cat }}</span><i v-if="selectedVertical === cat" class="fa-solid fa-check text-sm"></i><i v-else class="fa-solid fa-arrow-right text-sm opacity-0 group-hover:opacity-100 transition"></i></button>
+                        <button
+                          @click="selectedVertical = 'Хиты'"
+                          class="w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-between"
+                          :style="selectedVertical === 'Хиты'
+                            ? { background: block.data?.badgeBackground || 'linear-gradient(135deg, #fbbf24 0%, #f97316 100%)', color: block.data?.badgeTextColor || '#ffffff', boxShadow: '0 12px 24px -12px rgba(249, 115, 22, 0.6)', transform: 'scale(1.03)' }
+                            : { backgroundColor: (block.data?.accentColor || '#f97316') + '15', color: block.data?.accentColor || '#f97316' }
+                          "
+                        >
+                          <span class="font-medium flex items-center">
+                            <i class="fa-solid fa-star mr-2"></i>
+                            Хиты
+                          </span>
+                          <i v-if="selectedVertical === 'Хиты'" class="fa-solid fa-check text-sm"></i>
+                          <i v-else class="fa-solid fa-arrow-right text-sm opacity-60"></i>
+                        </button>
+                        <button
+                          v-for="cat in verticalCategories"
+                          :key="cat"
+                          @click="selectedVertical = cat"
+                          class="w-full text-left px-4 py-3 rounded-xl transition-all duration-200 flex items-center justify-between"
+                          :style="selectedVertical === cat
+                            ? { background: block.data?.accentColor || 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)', color: '#ffffff', boxShadow: '0 12px 24px -12px rgba(249, 115, 22, 0.6)', transform: 'scale(1.03)' }
+                            : { backgroundColor: '#ffffff', color: block.data?.cardTextColor || '#1f2937', border: `1px solid ${(block.data?.accentColor || '#f97316') + '33'}` }
+                          "
+                        >
+                          <span class="font-medium">{{ cat }}</span>
+                          <i v-if="selectedVertical === cat" class="fa-solid fa-check text-sm"></i>
+                          <i v-else class="fa-solid fa-arrow-right text-sm opacity-60"></i>
+                        </button>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="lg:col-span-3">
-                  <div class="mb-6"><h3 class="text-2xl font-bold text-gray-900 mb-2 flex items-center"><i v-if="selectedVertical === 'Хиты'" class="fa-solid fa-star text-yellow-500 mr-3"></i>{{ selectedVertical }}</h3><p class="text-gray-600">{{ selectedVerticalProducts?.length || 0 }} {{ selectedVertical === 'Хиты' ? 'хитов продаж' : 'блюд в этой категории' }}</p></div>
+                  <div class="mb-6">
+                    <h3 class="text-2xl font-bold mb-2 flex items-center" :style="{ color: block.data?.headingColor || '#1f2937' }">
+                      <i
+                        v-if="selectedVertical === 'Хиты' && (block.data?.highlightHits ?? true)"
+                        class="fa-solid fa-star mr-3"
+                        :style="{ color: block.data?.accentColor || '#f97316' }"
+                      ></i>
+                      {{ selectedVertical }}
+                    </h3>
+                    <p :style="{ color: block.data?.descriptionColor || '#6b7280' }">
+                      {{ (selectedVerticalProducts?.length || 0) }}
+                      {{ selectedVertical === 'Хиты' ? 'хитов продаж' : 'блюд в этой категории' }}
+                    </p>
+                  </div>
                   <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                     <transition-group name="fade" tag="div" class="contents">
-                      <div v-for="product in (selectedVerticalProducts || [])" :key="product.id" class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer flex flex-col h-full" @click="openProductModal(product)">
-                        <div class="relative h-48 overflow-hidden"><img :src="product.image" :alt="product.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" /><div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div><div class="absolute top-4 right-4 flex flex-col space-y-2"><div v-if="product.hit" class="bg-yellow-500/90 backdrop-blur-sm rounded-full p-2 shadow-lg"><i class="fa-solid fa-star text-white text-sm"></i></div><div class="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1"><span class="text-orange-600 font-bold text-sm">{{ formatPrice(product.price) }}</span></div></div></div>
-                        <div class="p-6 flex flex-col flex-grow"><h4 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition">{{ product.name }}</h4><p class="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">{{ product.description }}</p><button @click.stop.prevent="add(product)" class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg flex items-center justify-center space-x-2 mt-auto"><i class="fa-solid fa-plus"></i><span>Заказать</span></button></div>
+                      <div
+                        v-for="product in (selectedVerticalProducts || [])"
+                        :key="product.id"
+                        class="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer flex flex-col h-full"
+                        :style="{ backgroundColor: block.data?.cardBackground || '#ffffff', color: block.data?.cardTextColor || '#1f2937' }"
+                        @click="openProductModal(product)"
+                      >
+                        <div class="relative h-48 overflow-hidden">
+                          <img
+                            :src="product.image"
+                            :alt="product.name"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                          <div class="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent"></div>
+                          <div class="absolute top-4 right-4 flex flex-col space-y-2 items-end">
+                            <div
+                              v-if="(block.data?.highlightHits ?? true) && product.hit"
+                              class="backdrop-blur-sm rounded-full px-3 py-1 shadow"
+                              :style="{ backgroundColor: block.data?.badgeBackground || 'rgba(251, 191, 36, 0.9)', color: block.data?.badgeTextColor || '#ffffff' }"
+                            >
+                              <i class="fa-solid fa-star mr-1"></i>
+                              <span>Хит</span>
+                            </div>
+                            <div class="backdrop-blur-sm rounded-full px-3 py-1 shadow" :style="{ backgroundColor: '#ffffffcc' }">
+                              <span :style="{ color: block.data?.accentColor || '#f97316' }" class="font-bold text-sm">{{ formatPrice(product.price) }}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="p-6 flex flex-col flex-grow">
+                          <h4 class="text-xl font-bold mb-2 group-hover:text-orange-500 transition" :style="{ color: block.data?.cardTextColor || '#1f2937' }">
+                            {{ product.name }}
+                          </h4>
+                          <p class="text-sm mb-4 line-clamp-2 flex-grow" :style="{ color: block.data?.descriptionColor || '#6b7280' }">
+                            {{ product.description }}
+                          </p>
+                          <button
+                            @click.stop.prevent="add(product)"
+                            class="w-full px-6 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg flex items-center justify-center space-x-2 mt-auto"
+                            :style="{ background: block.data?.accentColor ? `linear-gradient(135deg, ${block.data.accentColor} 0%, ${block.data.accentColor}cc 100%)` : 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)', color: '#ffffff' }"
+                          >
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Заказать</span>
+                          </button>
+                        </div>
                       </div>
                     </transition-group>
                   </div>
-                  <div v-if="(selectedVerticalProducts || []).length === 0" class="text-center py-12"><i class="fa-solid fa-search text-4xl text-gray-300 mb-4"></i><h3 class="text-xl font-semibold text-gray-500 mb-2">Товары не найдены</h3><p class="text-gray-400">Попробуйте изменить поисковый запрос или выбрать другую категорию</p></div>
+                  <div
+                    v-if="(selectedVerticalProducts || []).length === 0"
+                    class="text-center py-12"
+                  >
+                    <i class="fa-solid fa-search text-4xl mb-4" :style="{ color: (block.data?.accentColor || '#f97316') + '40' }"></i>
+                    <h3 class="text-xl font-semibold mb-2" :style="{ color: block.data?.headingColor || '#1f2937' }">Товары не найдены</h3>
+                    <p :style="{ color: block.data?.descriptionColor || '#6b7280' }">Попробуйте изменить поисковый запрос или выбрать другую категорию</p>
+                  </div>
                 </div>
               </div>
             </div>
           </section>
-
           <!-- map -->
-          <section v-else-if="block.type === 'map'" class="py-16 bg-gradient-to-br from-orange-50 to-red-50">
-            <div class="max-w-7xl mx-auto px-4">
-              <div class="text-center mb-10"><div class="inline-flex items-center space-x-2 mb-3"><div class="w-8 h-1 bg-orange-500 rounded-full"></div><h2 class="text-3xl font-bold text-gray-900">{{ block.data?.heading || 'Зоны доставки' }}</h2><div class="w-8 h-1 bg-red-500 rounded-full"></div></div><p class="text-gray-600 max-w-2xl mx-auto">{{ block.data?.description || 'Схема доставки и самовывоза. Нажимайте на зоны для подробностей.' }}</p></div>
-              <div class="grid lg:grid-cols-3 gap-8 items-start">
-                <div class="lg:col-span-2"><div class="w-full rounded-2xl shadow-lg overflow-hidden bg-white"><iframe :src="block.data?.iframeSrc || mapIframeSrc" frameborder="0" allowfullscreen="true" width="100%" height="720" style="display:block"></iframe></div></div>
-                <div class="bg-white rounded-2xl shadow-lg p-6"><h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center"><i class="fa-solid fa-truck-fast text-orange-500 mr-2"></i>Условия доставки</h3><div class="mb-5"><h4 class="text-sm font-semibold text-gray-700 mb-2">Обозначения зон на карте</h4><ul class="space-y-2 text-sm"><li class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span><span class="text-gray-700">Синяя — бесплатно от 1500 ₽</span></li><li class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span><span class="text-gray-700">Красная — бесплатно от 1000 ₽</span></li><li class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span><span class="text-gray-700">Золотая — бесплатно от 1300 ₽</span></li><li class="flex items-center"><span class="w-3 h-3 rounded-full bg-purple-500 mr-2"></span><span class="text-gray-700">Сиреневая — бесплатно от 2000 ₽</span></li></ul></div></div>
-              </div>
-            </div>
-          </section>
-
-          <!-- reviews -->
-          <section v-else-if="block.type === 'reviews'" class="py-16 bg-gradient-to-br from-orange-50 to-red-50">
-            <div class="max-w-7xl mx-auto px-4">
-              <div class="text-center mb-10"><div class="inline-flex items-center space-x-2 mb-3"><div class="w-8 h-1 bg-orange-500 rounded-full"></div><h2 class="text-3xl font-bold text-gray-900">{{ (block.data?.heading ?? reviewsText.heading) || 'Отзывы клиентов' }}</h2><div class="w-8 h-1 bg-red-500 rounded-full"></div></div><p class="text-gray-600 max-w-2xl mx-auto">{{ (block.data?.description ?? reviewsText.description) || 'Мы гордимся каждым словом — спасибо за доверие!' }}</p></div>
-              <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                <div v-for="t in visibleTestimonials" :key="t.name + t.quote + (t.createdAt || '')" class="bg-white rounded-2xl shadow-lg p-6 flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <div class="flex items-center mb-4"><div class="w-12 h-12 rounded-full overflow-hidden mr-3 ring-2 ring-orange-200"><img :src="t.image" alt="" class="w-full h-full object-cover" loading="lazy" /></div><div><h3 class="font-semibold text-gray-900">{{ t.name }}</h3><p class="text-xs text-gray-500">{{ t.role }}</p></div></div>
-                  <div class="text-orange-400 flex space-x-1 mb-2"><i v-for="n in 5" :key="n" :class="['fa', n <= t.rating ? 'fa-solid fa-star' : 'fa-regular fa-star']"></i></div>
-                  <p class="text-gray-700 flex-grow">{{ t.quote }}</p>
-                  <div class="mt-4 flex items-center justify-between text-sm text-gray-500"><span v-if="t.createdAt"><i class="fa-solid fa-calendar mr-1"></i>{{ new Date(t.createdAt).toLocaleDateString('ru-RU') }}</span><span class="inline-flex items-center px-2 py-1 rounded-full bg-gradient-to-r from-orange-100 to-red-100 text-orange-700">Проверенный отзыв</span></div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <!-- delivery -->
-          <section v-else-if="block.type === 'delivery'" class="py-16 bg-gradient-to-br from-orange-50 to-red-50">
+          <section
+            v-else-if="block.type === 'map'"
+            class="py-16"
+            :style="{ backgroundColor: block.data?.backgroundColor || '#ffffff' }"
+          >
             <div class="max-w-7xl mx-auto px-4">
               <div class="text-center mb-10">
                 <div class="inline-flex items-center space-x-2 mb-3">
-                  <div class="w-8 h-1 bg-orange-500 rounded-full"></div>
-                  <h2 class="text-3xl font-bold text-gray-900">{{ (block.data?.heading ?? deliveryText.heading) || 'Быстрая доставка' }}</h2>
-                  <div class="w-8 h-1 bg-red-500 rounded-full"></div>
+                  <div class="w-8 h-1 rounded-full" :style="{ backgroundColor: block.data?.accentColor || '#f97316' }"></div>
+                  <h2 class="text-3xl font-bold" :style="{ color: block.data?.headingColor || '#1f2937' }">
+                    {{ block.data?.heading || 'Зоны доставки' }}
+                  </h2>
+                  <div class="w-8 h-1 rounded-full" :style="{ backgroundColor: block.data?.accentColor ? block.data.accentColor : '#ef4444' }"></div>
                 </div>
-                <p class="text-gray-600 max-w-2xl mx-auto">{{ (block.data?.description ?? deliveryText.description) || 'Доставляем свежие суши и пиццу прямо к вашей двери за 30 минут' }}</p>
+                <p class="max-w-2xl mx-auto" :style="{ color: block.data?.descriptionColor || '#4b5563' }">
+                  {{ block.data?.description || 'Схема доставки и самовывоза. Нажимайте на зоны для подробностей.' }}
+                </p>
               </div>
               <div class="grid lg:grid-cols-3 gap-8 items-start">
                 <div class="lg:col-span-2">
-                  <div class="w-full rounded-2xl shadow-lg overflow-hidden bg-white">
-                    <iframe :src="block.data?.iframeSrc || mapIframeSrc" frameborder="0" allowfullscreen="true" width="100%" height="720" style="display:block"></iframe>
+                  <div class="w-full rounded-2xl shadow-lg overflow-hidden" :style="{ backgroundColor: block.data?.cardBackground || '#ffffff' }">
+                    <iframe
+                      :src="block.data?.iframeSrc || mapIframeSrc"
+                      frameborder="0"
+                      allowfullscreen="true"
+                      width="100%"
+                      height="720"
+                      style="display:block"
+                    ></iframe>
                   </div>
                 </div>
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                  <h3 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-                    <i class="fa-solid fa-truck-fast text-orange-500 mr-2"></i>
-                    Условия доставки
-                  </h3>
-                  <div class="mb-5">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-2">Обозначения зон на карте</h4>
-                    <ul class="space-y-2 text-sm">
-                      <li class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
-                        <span class="text-gray-700">Синяя — бесплатно от 1500 ₽</span>
+                <div
+                  class="rounded-2xl shadow-lg p-6 space-y-5"
+                  :style="{ backgroundColor: block.data?.cardBackground || '#ffffff', color: block.data?.cardTextColor || '#374151' }"
+                >
+                  <div>
+                    <h3 class="text-xl font-semibold mb-3 flex items-center" :style="{ color: block.data?.headingColor || '#1f2937' }">
+                      <i class="fa-solid fa-location-dot mr-2" :style="{ color: block.data?.accentColor || '#f97316' }"></i>
+                      Контакты
+                    </h3>
+                    <ul class="space-y-3 text-sm">
+                      <li class="flex items-start space-x-2">
+                        <i class="fa-solid fa-map-pin mt-1" :style="{ color: block.data?.accentColor || '#f97316' }"></i>
+                        <span>{{ block.data?.address || 'г. Санкт-Петербург, ул. Суши, 5' }}</span>
                       </li>
-                      <li class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span>
-                        <span class="text-gray-700">Красная — бесплатно от 1000 ₽</span>
+                      <li class="flex items-start space-x-2">
+                        <i class="fa-solid fa-clock mt-1" :style="{ color: block.data?.accentColor || '#f97316' }"></i>
+                        <span>{{ block.data?.workHours || 'Ежедневно 10:00 — 23:00' }}</span>
                       </li>
-                      <li class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span>
-                        <span class="text-gray-700">Золотая — бесплатно от 1300 ₽</span>
-                      </li>
-                      <li class="flex items-center">
-                        <span class="w-3 h-3 rounded-full bg-purple-500 mr-2"></span>
-                        <span class="text-gray-700">Сиреневая — бесплатно от 2000 ₽</span>
+                      <li class="flex items-start space-x-2">
+                        <i class="fa-solid fa-phone mt-1" :style="{ color: block.data?.accentColor || '#f97316' }"></i>
+                        <a :href="'tel:' + (block.data?.phone || '+7 (812) 000-00-00')" :style="{ color: block.data?.cardTextColor || '#374151' }" class="hover:opacity-80">
+                          {{ block.data?.phone || '+7 (812) 000-00-00' }}
+                        </a>
                       </li>
                     </ul>
                   </div>
-                  <div class="space-y-3">
-                    <div v-for="feature in (block.data?.features ?? deliveryText.features ?? ['Бесплатная доставка от 1500₽', 'Доставка за 30 минут', 'Свежие ингредиенты', 'Горячие блюда'])" :key="feature" class="flex items-center text-gray-700">
-                      <i class="fa-solid fa-check text-green-500 mr-2"></i>
-                      <span class="text-sm">{{ feature }}</span>
+                  <div>
+                    <h4 class="text-sm font-semibold mb-2" :style="{ color: block.data?.headingColor || '#1f2937' }">
+                      Обозначения зон на карте
+                    </h4>
+                    <ul class="space-y-2 text-sm" :style="{ color: block.data?.cardTextColor || '#374151' }">
+                      <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span><span>Синяя — бесплатно от 1500 ₽</span></li>
+                      <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span><span>Красная — бесплатно от 1000 ₽</span></li>
+                      <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span><span>Золотая — бесплатно от 1300 ₽</span></li>
+                      <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-purple-500 mr-2"></span><span>Сиреневая — бесплатно от 2000 ₽</span></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <!-- reviews -->
+          <section
+            v-else-if="block.type === 'reviews'"
+            class="py-16"
+            :style="{ background: block.data?.backgroundGradient || 'linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%)' }"
+          >
+            <div class="max-w-7xl mx-auto px-4">
+              <div class="text-center mb-10">
+                <div class="inline-flex items-center space-x-2 mb-3">
+                  <div class="w-8 h-1 rounded-full" :style="{ backgroundColor: block.data?.accentColor || '#f97316' }"></div>
+                  <h2 class="text-3xl font-bold" :style="{ color: block.data?.headingColor || '#1f2937' }">
+                    {{ block.data?.heading || reviewsText.heading || 'Отзывы клиентов' }}
+                  </h2>
+                  <div class="w-8 h-1 rounded-full" :style="{ backgroundColor: block.data?.accentColor ? block.data.accentColor : '#ef4444' }"></div>
+                </div>
+                <p class="max-w-2xl mx-auto" :style="{ color: block.data?.descriptionColor || '#4b5563' }">
+                  {{ block.data?.description || reviewsText.description || 'Мы гордимся каждым словом — спасибо за доверие!' }}
+                </p>
+              </div>
+              <div v-if="reviewsLayout === 'grid'" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div
+                  v-for="t in gridTestimonials"
+                  :key="t.name + t.quote + (t.createdAt || '')"
+                  class="rounded-2xl shadow-lg p-6 flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                  :style="{ backgroundColor: block.data?.cardBackground || '#ffffff', color: block.data?.cardTextColor || '#374151' }"
+                >
+                  <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 rounded-full overflow-hidden mr-3" :style="{ border: `2px solid ${(block.data?.accentColor || '#f97316') + '40'}` }">
+                      <img :src="t.image" alt="" class="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                    <div>
+                      <h3 class="font-semibold" :style="{ color: block.data?.cardTextColor || '#1f2937' }">{{ t.name }}</h3>
+                      <p class="text-xs" :style="{ color: block.data?.descriptionColor || '#6b7280' }">{{ t.role }}</p>
                     </div>
                   </div>
-                  <div class="mt-6 p-4 bg-gradient-to-r from-orange-100 to-red-100 rounded-lg">
-                    <div class="text-center">
-                      <div class="text-2xl font-bold text-orange-700 mb-1">30 мин</div>
-                      <div class="text-sm text-orange-600">Среднее время доставки</div>
+                  <div class="flex space-x-1 mb-2" :style="{ color: block.data?.accentColor || '#f97316' }">
+                    <i v-for="n in 5" :key="n" :class="['fa', n <= t.rating ? 'fa-solid fa-star' : 'fa-regular fa-star']"></i>
+                  </div>
+                  <p class="flex-grow" :style="{ color: block.data?.cardTextColor || '#374151' }">{{ t.quote }}</p>
+                  <div class="mt-4 flex items-center justify-between text-sm" :style="{ color: block.data?.descriptionColor || '#6b7280' }">
+                    <span v-if="t.createdAt">
+                      <i class="fa-solid fa-calendar mr-1"></i>{{ new Date(t.createdAt).toLocaleDateString('ru-RU') }}
+                    </span>
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                      :style="{ backgroundColor: block.data?.badgeBackground || 'rgba(251, 146, 60, 0.18)', color: block.data?.accentColor || '#f97316' }"
+                    >
+                      Проверенный отзыв
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="space-y-6">
+                <div class="flex items-center justify-between text-sm" :style="{ color: block.data?.descriptionColor || '#6b7280' }">
+                  <div>Показаны {{ visibleTestimonials.length }} из {{ computedTestimonials.length }} отзывов</div>
+                  <button
+                    type="button"
+                    class="inline-flex items-center space-x-2 px-3 py-2 rounded-lg border transition"
+                    :style="{ borderColor: (block.data?.accentColor || '#f97316') + '40', color: block.data?.accentColor || '#f97316' }"
+                    @click="toggleReviewAuto()"
+                  >
+                    <i :class="isReviewAuto ? 'fa-solid fa-pause' : 'fa-solid fa-play'"></i>
+                    <span>{{ isReviewAuto ? 'Пауза автопрокрутки' : 'Включить автопрокрутку' }}</span>
+                  </button>
+                </div>
+                <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  <div
+                    v-for="t in visibleTestimonials"
+                    :key="t.name + t.quote + (t.createdAt || '')"
+                    class="rounded-2xl shadow-lg p-6 flex flex-col hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    :style="{ backgroundColor: block.data?.cardBackground || '#ffffff', color: block.data?.cardTextColor || '#374151' }"
+                  >
+                    <div class="flex items-center mb-4">
+                      <div class="w-12 h-12 rounded-full overflow-hidden mr-3" :style="{ border: `2px solid ${(block.data?.accentColor || '#f97316') + '40'}` }">
+                        <img :src="t.image" alt="" class="w-full h-full object-cover" loading="lazy" />
+                      </div>
+                      <div>
+                        <h3 class="font-semibold" :style="{ color: block.data?.cardTextColor || '#1f2937' }">{{ t.name }}</h3>
+                        <p class="text-xs" :style="{ color: block.data?.descriptionColor || '#6b7280' }">{{ t.role }}</p>
+                      </div>
                     </div>
+                    <div class="flex space-x-1 mb-2" :style="{ color: block.data?.accentColor || '#f97316' }">
+                      <i v-for="n in 5" :key="n" :class="['fa', n <= t.rating ? 'fa-solid fa-star' : 'fa-regular fa-star']"></i>
+                    </div>
+                    <p class="flex-grow" :style="{ color: block.data?.cardTextColor || '#374151' }">{{ t.quote }}</p>
+                    <div class="mt-4 flex items-center justify-between text-sm" :style="{ color: block.data?.descriptionColor || '#6b7280' }">
+                      <span v-if="t.createdAt">
+                        <i class="fa-solid fa-calendar mr-1"></i>{{ new Date(t.createdAt).toLocaleDateString('ru-RU') }}
+                      </span>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                        :style="{ backgroundColor: block.data?.badgeBackground || 'rgba(251, 146, 60, 0.18)', color: block.data?.accentColor || '#f97316' }"
+                      >
+                        Проверенный отзыв
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center justify-center space-x-4">
+                  <button
+                    type="button"
+                    @click="prevReview"
+                    class="px-4 py-2 rounded-full border transition"
+                    :style="{ borderColor: (block.data?.accentColor || '#f97316') + '40', color: block.data?.accentColor || '#f97316' }"
+                  >
+                    <i class="fa-solid fa-arrow-left"></i>
+                  </button>
+                  <button
+                    type="button"
+                    @click="nextReview"
+                    class="px-4 py-2 rounded-full border transition"
+                    :style="{ borderColor: (block.data?.accentColor || '#f97316') + '40', color: block.data?.accentColor || '#f97316' }"
+                  >
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+          <!-- delivery -->
+          <section
+            v-else-if="block.type === 'delivery'"
+            class="py-16"
+            :style="{ background: block.data?.backgroundColor || 'linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%)' }"
+          >
+            <div class="max-w-7xl mx-auto px-4">
+              <div class="text-center mb-10">
+                <div class="inline-flex items-center space-x-2 mb-3">
+                  <div class="w-8 h-1 rounded-full" :style="{ backgroundColor: block.data?.accentColor || '#f97316' }"></div>
+                  <h2 class="text-3xl font-bold" :style="{ color: block.data?.headingColor || '#1f2937' }">
+                    {{ block.data?.heading || deliveryText.heading || 'Быстрая доставка' }}
+                  </h2>
+                  <div class="w-8 h-1 rounded-full" :style="{ backgroundColor: block.data?.accentColor ? block.data.accentColor : '#ef4444' }"></div>
+                </div>
+                <p class="max-w-2xl mx-auto" :style="{ color: block.data?.descriptionColor || '#4b5563' }">
+                  {{ block.data?.description || deliveryText.description || 'Доставляем свежие суши и пиццу прямо к вашей двери за 30 минут' }}
+                </p>
+              </div>
+              <div class="grid lg:grid-cols-3 gap-8 items-start">
+                <div class="lg:col-span-2">
+                  <div class="w-full rounded-2xl shadow-lg overflow-hidden" :style="{ backgroundColor: block.data?.panelBackground || '#ffffff' }">
+                    <iframe
+                      :src="block.data?.iframeSrc || mapIframeSrc"
+                      frameborder="0"
+                      allowfullscreen="true"
+                      width="100%"
+                      height="720"
+                      style="display:block"
+                    ></iframe>
+                  </div>
+                </div>
+                <div class="rounded-2xl shadow-lg p-6 space-y-6" :style="{ backgroundColor: block.data?.panelBackground || '#ffffff', color: block.data?.panelTextColor || '#374151' }">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold flex items-center" :style="{ color: block.data?.headingColor || '#1f2937' }">
+                      <i class="fa-solid fa-truck-fast mr-2" :style="{ color: block.data?.accentColor || '#f97316' }"></i>
+                      Условия доставки
+                    </h3>
+                    <span
+                      class="text-sm font-semibold px-3 py-1 rounded-full"
+                      :style="{ backgroundColor: block.data?.badgeBackground || 'rgba(249, 115, 22, 0.12)', color: block.data?.badgeTextColor || '#ea580c' }"
+                    >
+                      От {{ block.data?.minOrder || '1500' }} ₽
+                    </span>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-semibold mb-2" :style="{ color: block.data?.headingColor || '#1f2937' }">Преимущества</h4>
+                    <ul class="space-y-3 text-sm" :style="{ color: block.data?.descriptionColor || '#4b5563' }">
+                      <li
+                        v-for="feature in (Array.isArray(block.data?.features) ? block.data.features : deliveryText.features || [])"
+                        :key="feature"
+                        class="flex items-center"
+                      >
+                        <span class="mr-2 inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-xs"
+                          :style="{ backgroundColor: block.data?.accentColor || '#22c55e' }"
+                        >
+                          <i class="fa-solid fa-check"></i>
+                        </span>
+                        <span>{{ feature }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-semibold mb-2" :style="{ color: block.data?.headingColor || '#1f2937' }">Обозначения зон на карте</h4>
+                    <ul class="space-y-2 text-sm" :style="{ color: block.data?.panelTextColor || '#374151' }">
+                      <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-2"></span><span class="text-gray-700">Синяя — бесплатно от 1500 ₽</span></li>
+                      <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-500 mr-2"></span><span class="text-gray-700">Красная — бесплатно от 1000 ₽</span></li>
+                      <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></span><span class="text-gray-700">Золотая — бесплатно от 1300 ₽</span></li>
+                      <li class="flex items-center"><span class="w-3 h-3 rounded-full bg-purple-500 mr-2"></span><span class="text-gray-700">Сиреневая — бесплатно от 2000 ₽</span></li>
+                    </ul>
+                  </div>
+                  <div class="p-4 rounded-lg text-center space-y-2"
+                    :style="{ background: block.data?.ctaBackground || 'linear-gradient(135deg, #fed7aa 0%, #fecaca 100%)', color: block.data?.ctaTextColor || '#9a3412' }"
+                  >
+                    <div class="text-sm">Свяжитесь с нами</div>
+                    <a
+                      :href="'tel:' + (block.data?.contactPhone || '+7 (900) 000-00-00')"
+                      class="text-2xl font-bold hover:opacity-80 transition"
+                      :style="{ color: block.data?.ctaTextColor || '#9a3412' }"
+                    >
+                      {{ block.data?.contactPhone || '+7 (900) 000-00-00' }}
+                    </a>
+                    <div class="text-xs" :style="{ color: (block.data?.ctaTextColor || '#9a3412') + 'cc' }">Круглосуточная поддержка клиентов</div>
                   </div>
                 </div>
               </div>
@@ -294,7 +722,7 @@ window.HomeView = {
         </template>
         
         <!-- Фиксированный блок доставки, если не настроен в конструкторе -->
-        <section v-if="!page.some(block => block.type === 'delivery')" class="py-16 bg-gradient-to-br from-orange-50 to-red-50">
+        <section v-if="!hasBlock('delivery')" class="py-16 bg-gradient-to-br from-orange-50 to-red-50">
           <div class="max-w-7xl mx-auto px-4">
             <div class="text-center mb-10">
               <div class="inline-flex items-center space-x-2 mb-3">
@@ -816,7 +1244,6 @@ window.HomeView = {
     const reviewsText = ref({});
     const heroBackgroundImage = ref('./banner.png');
     const siteBackgroundColor = ref('#dc2626');
-    console.log('Hero background image path:', heroBackgroundImage.value);
     
     // Функция для проверки и загрузки изображения
     function checkAndLoadImage(imagePath) {
@@ -835,8 +1262,276 @@ window.HomeView = {
       });
     }
     // Конфиг страницы конструктора
+    const defaultMapIframeSrc = 'https://yandex.ru/map-widget/v1/?lang=ru_RU&scroll=true&source=constructor-api&um=constructor%3A1569f1da7d596921cd82db1f441ffc63d2a386db371645fede23dbc26dc86a74';
+    const mapIframeSrc = defaultMapIframeSrc;
+
+    const elementDefaults = {
+      heading: () => ({
+        text: 'Быстро и вкусно',
+        level: 'h1',
+        fontSize: 'text-5xl',
+        color: '#ffffff',
+        align: 'left',
+        marginTop: '0px',
+        marginBottom: '16px'
+      }),
+      subheading: () => ({
+        text: 'Попробуйте фирменные роллы сегодня',
+        fontSize: 'text-2xl',
+        color: '#fbbf24',
+        align: 'left',
+        marginTop: '0px',
+        marginBottom: '12px'
+      }),
+      paragraph: () => ({
+        text: 'Комбинируйте суши, пиццу и десерты. Мы доставим всё тёплым и свежим.',
+        fontSize: 'text-lg',
+        color: '#f9fafb',
+        align: 'left',
+        marginTop: '0px',
+        marginBottom: '20px'
+      }),
+      button: () => ({
+        text: 'Собрать заказ',
+        style: 'primary',
+        action: 'scrollMenu',
+        href: '',
+        align: 'left',
+        marginTop: '0px',
+        marginBottom: '0px'
+      }),
+      image: () => ({
+        src: 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
+        alt: 'Изображение',
+        width: '320px',
+        height: 'auto',
+        align: 'left',
+        borderRadius: '16px',
+        marginTop: '0px',
+        marginBottom: '16px'
+      }),
+      feature: () => ({
+        text: 'Бесплатная доставка от 1500 ₽',
+        icon: 'fa-solid fa-check',
+        color: '#f9fafb',
+        fontSize: 'text-base',
+        align: 'left',
+        marginTop: '0px',
+        marginBottom: '8px'
+      }),
+      spacer: () => ({
+        height: '24px',
+        marginTop: '0px',
+        marginBottom: '0px'
+      })
+    };
+
+    const blockDefaults = {
+      hero: () => ({
+        heading: 'Быстро и вкусно',
+        subheading: 'Попробуйте наши фирменные суши',
+        description: 'Свежие роллы, пицца и десерты с доставкой за 30 минут.',
+        buttonText: 'Выбрать блюда',
+        buttonStyle: 'primary',
+        buttonAction: 'scrollMenu',
+        buttonLink: '',
+        backgroundColor: '#111827',
+        backgroundImage: 'https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d',
+        previewImage: 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
+        imageSide: 'right',
+        showRightImage: true,
+        waveEnabled: true,
+        waveColor: '#f9f4e5',
+        overlayColor: 'rgba(17, 24, 39, 0.55)',
+        elements: [
+          { type: 'heading', data: elementDefaults.heading() },
+          { type: 'subheading', data: elementDefaults.subheading() },
+          { type: 'paragraph', data: elementDefaults.paragraph() },
+          { type: 'button', data: elementDefaults.button() }
+        ]
+      }),
+      categories: () => ({
+        heading: 'Категории и блюда',
+        subheading: 'которые вы нигде не найдёте',
+        description: 'Уникальные подборки от наших шефов',
+        backgroundColor: '#f9f4e5',
+        accentColor: '#f97316',
+        headingColor: '#111827',
+        descriptionColor: '#4b5563',
+        cardStyle: 'rounded',
+        cardBackground: '#ffffff',
+        cardTextColor: '#1f2937',
+        cardBorderColor: '#f97316'
+      }),
+      menu: () => ({
+        heading: 'Наше меню',
+        description: 'Выберите категорию и сформируйте свой сет',
+        showSearch: true,
+        highlightHits: true,
+        accentColor: '#f97316',
+        headingColor: '#1f2937',
+        descriptionColor: '#4b5563',
+        backgroundGradient: 'linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%)',
+        cardBackground: '#ffffff',
+        cardTextColor: '#1f2937',
+        badgeBackground: 'rgba(251, 191, 36, 0.9)',
+        badgeTextColor: '#ffffff'
+      }),
+      delivery: () => ({
+        heading: 'Быстрая доставка',
+        description: 'Привезём заказ за 30 минут или подарим ролл',
+        features: [
+          'Бесплатная доставка от 1500 ₽',
+          'Прозрачный трекинг курьера',
+          'Термосумки для горячих блюд'
+        ],
+        backgroundColor: 'linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%)',
+        accentColor: '#f97316',
+        headingColor: '#1f2937',
+        descriptionColor: '#4b5563',
+        panelBackground: '#ffffff',
+        panelTextColor: '#374151',
+        badgeBackground: 'rgba(249, 115, 22, 0.12)',
+        badgeTextColor: '#ea580c',
+        ctaBackground: 'linear-gradient(135deg, #fed7aa 0%, #fecaca 100%)',
+        ctaTextColor: '#9a3412',
+        contactPhone: '+7 (900) 000-00-00',
+        minOrder: '1500',
+        iframeSrc: defaultMapIframeSrc
+      }),
+      reviews: () => ({
+        heading: 'Отзывы наших гостей',
+        description: 'Более 1000 довольных клиентов в этом месяце',
+        autoPlay: true,
+        layout: 'grid',
+        backgroundGradient: 'linear-gradient(135deg, #fff7ed 0%, #ffe4e6 100%)',
+        headingColor: '#1f2937',
+        descriptionColor: '#4b5563',
+        cardBackground: '#ffffff',
+        cardTextColor: '#374151',
+        accentColor: '#f97316',
+        badgeBackground: 'rgba(251, 146, 60, 0.18)'
+      }),
+      map: () => ({
+        heading: 'Зоны доставки',
+        description: 'Нажмите на нужный район, чтобы узнать условия доставки',
+        iframeSrc: defaultMapIframeSrc,
+        address: 'г. Санкт-Петербург, ул. Суши, 5',
+        workHours: 'Ежедневно 10:00 — 23:00',
+        phone: '+7 (812) 000-00-00',
+        backgroundColor: '#ffffff',
+        headingColor: '#1f2937',
+        descriptionColor: '#4b5563',
+        cardBackground: '#ffffff',
+        cardTextColor: '#374151',
+        accentColor: '#f97316'
+      })
+    };
+
+    function generateId(prefix) {
+      return `${prefix}_${Math.random().toString(36).slice(2, 8)}_${Date.now().toString(36)}`;
+    }
+
+    function normalizeElement(elementLike) {
+      if (!elementLike || !elementLike.type) {
+        return null;
+      }
+      const factory = elementDefaults[elementLike.type] || elementDefaults.paragraph;
+      const base = factory ? factory() : {};
+      const incoming = elementLike.data || {};
+      return {
+        id: elementLike.id || generateId('element'),
+        type: elementLike.type,
+        data: { ...base, ...incoming }
+      };
+    }
+
+    function normalizeBlockEntry(entry) {
+      if (!entry || !entry.type) {
+        return null;
+      }
+      const defaultsFactory = blockDefaults[entry.type];
+      const defaults = defaultsFactory ? defaultsFactory() : {};
+      const incomingData = entry.data || {};
+      const merged = { ...defaults, ...incomingData };
+
+      if (entry.type === 'hero') {
+        const baseElements = Array.isArray(incomingData.elements) ? incomingData.elements : defaults.elements || [];
+        const normalized = (baseElements.length ? baseElements : defaults.elements || [])
+          .map(el => normalizeElement(el))
+          .filter(Boolean);
+        merged.elements = normalized;
+      }
+
+      if (entry.type === 'delivery') {
+        const features = merged.features;
+        merged.features = Array.isArray(features)
+          ? features
+          : typeof features === 'string'
+            ? features.split(/\r?\n/).map(item => item.trim()).filter(Boolean)
+            : defaults.features || [];
+      }
+
+      if (entry.type === 'menu') {
+        merged.showSearch = merged.showSearch !== false;
+        merged.highlightHits = merged.highlightHits !== false;
+      }
+
+      if (entry.type === 'reviews') {
+        merged.layout = merged.layout || 'grid';
+        merged.autoPlay = merged.autoPlay !== false;
+      }
+
+      return {
+        id: entry.id || generateId('block'),
+        type: entry.type,
+        data: merged,
+        meta: {
+          hidden: !!(entry.hidden || (entry.meta && entry.meta.hidden))
+        }
+      };
+    }
+
     const page = ref([]);
-    const mapIframeSrc = 'https://yandex.ru/map-widget/v1/?lang=ru_RU&scroll=true&source=constructor-api&um=constructor%3A1569f1da7d596921cd82db1f441ffc63d2a386db371645fede23dbc26dc86a74';
+    const activeBlocks = computed(() => page.value.filter(block => !block.meta?.hidden));
+
+    function hasBlock(type) {
+      return activeBlocks.value.some(block => block.type === type);
+    }
+
+    function categoryCardClasses(block) {
+      const style = block?.data?.cardStyle || 'rounded';
+      const base = 'flex flex-col items-center text-center p-6 transition-all duration-300 animate-fadeIn';
+      if (style === 'flat') {
+        return `${base} border rounded-xl hover:-translate-y-2 hover:shadow-lg`;
+      }
+      if (style === 'glass') {
+        return `${base} backdrop-blur rounded-3xl shadow-lg border border-white/40 hover:-translate-y-2 hover:shadow-xl`;
+      }
+      return `${base} rounded-2xl shadow hover:-translate-y-2 hover:shadow-xl`;
+    }
+
+    function categoryCardStyle(block, index) {
+      const style = {
+        animationDelay: `${index * 0.15}s`,
+        backgroundColor: block?.data?.cardBackground || '#ffffff',
+        color: block?.data?.cardTextColor || '#1f2937'
+      };
+      const cardStyle = block?.data?.cardStyle || 'rounded';
+      if (cardStyle === 'flat') {
+        style.borderColor = block?.data?.cardBorderColor || block?.data?.accentColor || '#f97316';
+      }
+      if (cardStyle === 'glass') {
+        style.backgroundColor = block?.data?.cardBackground
+          ? `${block.data.cardBackground}CC`
+          : 'rgba(255,255,255,0.8)';
+      }
+      return style;
+    }
+
+    function shouldShowMenuSearch(block) {
+      return block?.data?.showSearch !== false;
+    }
 
     async function fetchSEOData() {
       try { const response = await axios.get('/api/seo'); seoData.value = response.data; } catch (e) { console.error('Ошибка загрузки SEO данных:', e); }
@@ -847,99 +1542,41 @@ window.HomeView = {
         const response = await axios.get('/api/site-settings');
         const data = response.data || {};
         const blocks = data.home_blocks || {};
-        
-        heroText.value = blocks.hero || {};
-        categoriesText.value = blocks.categories || {};
-        menuText.value = blocks.menu || {};
-        deliveryText.value = blocks.delivery || {};
-        reviewsText.value = blocks.reviews || {};
-        
-        // Загружаем цвет фона сайта
+
         if (data.background_color) {
           siteBackgroundColor.value = data.background_color;
         }
-        
-        if (blocks.hero?.backgroundImage) {
-          // Проверяем и загружаем изображение из админки
-          const validImagePath = await checkAndLoadImage(blocks.hero.backgroundImage);
-          heroBackgroundImage.value = validImagePath;
-        } else {
-          // Используем дефолтный баннер
-          const validImagePath = await checkAndLoadImage('./banner.png');
-          heroBackgroundImage.value = validImagePath;
-        }
-        // Новый формат: линейная страница
-        if (Array.isArray(blocks.page)) {
-          page.value = blocks.page.filter(b => b && b.type).map(block => {
-            // Добавляем элементы по умолчанию для Hero блока, если их нет
-            if (block.type === 'hero' && (!block.data?.elements || !Array.isArray(block.data.elements) || block.data.elements.length === 0)) {
-              const defaultElements = [
-                {
-                  id: 'hero-heading-1',
-                  type: 'heading',
-                  data: {
-                    text: block.data?.heading || 'Быстро и вкусно',
-                    level: 'h1',
-                    color: '#ffffff',
-                    fontSize: 'text-4xl',
-                    align: 'left',
-                    marginTop: '0px',
-                    marginBottom: '16px'
-                  }
-                },
-                {
-                  id: 'hero-subheading-1',
-                  type: 'subheading',
-                  data: {
-                    text: block.data?.subheading || 'Попробуйте наши особые суши',
-                    color: '#fbbf24',
-                    fontSize: 'text-xl',
-                    align: 'left',
-                    marginTop: '0px',
-                    marginBottom: '12px'
-                  }
-                },
-                {
-                  id: 'hero-paragraph-1',
-                  type: 'paragraph',
-                  data: {
-                    text: block.data?.description || 'Самые свежие роллы и нигири для любого настроения. Заказывайте онлайн или забирайте сами.',
-                    color: '#ffffff',
-                    fontSize: 'text-base',
-                    align: 'left',
-                    marginTop: '0px',
-                    marginBottom: '16px'
-                  }
-                },
-                {
-                  id: 'hero-button-1',
-                  type: 'button',
-                  data: {
-                    text: block.data?.buttonText || 'Заказать сейчас',
-                    style: 'primary',
-                    action: 'scroll',
-                    color: '#ffffff',
-                    fontSize: 'text-base',
-                    align: 'left',
-                    marginTop: '0px',
-                    marginBottom: '0px'
-                  }
-                }
-              ];
-              
-              return {
-                ...block,
-                data: {
-                  ...block.data,
-                  elements: defaultElements
-                }
-              };
-            }
-            return block;
-          });
-        } else {
-          page.value = [];
-        }
+
+        const linear = Array.isArray(blocks.page) ? blocks.page : [];
+        const legacyEntries = !linear.length
+          ? Object.keys(blocks)
+              .filter(type => type !== 'page')
+              .map(type => ({ type, data: blocks[type] }))
+          : linear;
+
+        const normalized = legacyEntries
+          .map(entry => normalizeBlockEntry(entry))
+          .filter(Boolean);
+
+        page.value = normalized;
+
+        const heroBlock = normalized.find(block => block.type === 'hero');
+        const categoriesBlock = normalized.find(block => block.type === 'categories');
+        const menuBlock = normalized.find(block => block.type === 'menu');
+        const deliveryBlock = normalized.find(block => block.type === 'delivery');
+        const reviewsBlock = normalized.find(block => block.type === 'reviews');
+
+        heroText.value = heroBlock ? { ...heroBlock.data } : blockDefaults.hero();
+        categoriesText.value = categoriesBlock ? { ...categoriesBlock.data } : blockDefaults.categories();
+        menuText.value = menuBlock ? { ...menuBlock.data } : blockDefaults.menu();
+        deliveryText.value = deliveryBlock ? { ...deliveryBlock.data } : blockDefaults.delivery();
+        reviewsText.value = reviewsBlock ? { ...reviewsBlock.data } : blockDefaults.reviews();
+
+        const heroBackground = heroBlock?.data?.backgroundImage
+          || (blocks.hero && blocks.hero.backgroundImage)
+          || heroText.value.backgroundImage
+          || './banner.png';
+        heroBackgroundImage.value = await checkAndLoadImage(heroBackground);
       } catch (e) {
         console.error('Ошибка загрузки настроек сайта:', e);
       }
@@ -1005,12 +1642,41 @@ window.HomeView = {
     const heroImage = computed(() => { const setProduct = products.value.find(p => p.category_name === 'Сеты'); return setProduct ? setProduct.image : ''; });
     const currentSlide = computed(() => heroSlides.value[currentSlideIndex.value] || {});
     onMounted(() => { setInterval(() => { if (heroSlides.value.length > 0) { currentSlideIndex.value = (currentSlideIndex.value + 1) % heroSlides.value.length; } }, 7000); });
+
+    function heroPreviewImage(block) {
+      return block?.data?.previewImage
+        || currentSlide.value?.image
+        || heroImage.value
+        || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10';
+    }
+
     function scrollToMenu() { if (menuSection.value) { menuSection.value.scrollIntoView({ behavior: 'smooth' }); } }
     function openProductModal(product) { selectedProduct.value = product; showProductModal.value = true; }
     function closeProductModal() { showProductModal.value = false; selectedProduct.value = {}; }
     function addToCartFromModal() { if (window.addToCart) window.addToCart(selectedProduct.value); closeProductModal(); }
     function addToCartAndGoToCheckout() { if (window.addToCart) window.addToCart(selectedProduct.value); closeProductModal(); router.push('/checkout'); }
     function goCart() { router.push('/cart'); }
+
+    function handleHeroElementAction(elementData = {}) {
+      const action = elementData.action || elementData.buttonAction || 'scrollMenu';
+      if (action === 'scrollMenu') {
+        scrollToMenu();
+        return;
+      }
+      if (action === 'openCart') {
+        goCart();
+        return;
+      }
+      if (action === 'link') {
+        const href = elementData.href || '';
+        if (!href) return;
+        if (/^https?:\/\//i.test(href)) {
+          window.open(href, '_blank');
+        } else {
+          router.push(href);
+        }
+      }
+    }
     async function fetchCategoryBlocks() {
       try {
         const response = await axios.get('/api/category-blocks');
@@ -1041,6 +1707,13 @@ window.HomeView = {
       }));
     });
 
+    const gridTestimonials = computed(() => computedTestimonials.value.slice(0, 6));
+
+    const reviewsLayout = computed(() => {
+      const block = activeBlocks.value.find(item => item.type === 'reviews');
+      return block ? block.data.layout || 'grid' : 'grid';
+    });
+
     // Карусель отзывов: показываем 1/2/3 карточки, авто‑прокрутка, пауза по наведению
     const reviewIndex = ref(0);
     const isReviewAuto = ref(true);
@@ -1054,6 +1727,13 @@ window.HomeView = {
         out.push(arr[(reviewIndex.value + i) % arr.length]);
       }
       return out;
+    });
+
+    const reviewsAutoplayEnabled = computed(() => {
+      const block = activeBlocks.value.find(item => item.type === 'reviews');
+      if (!block) return false;
+      if ((block.data.layout || 'grid') !== 'carousel') return false;
+      return block.data.autoPlay !== false;
     });
     function nextReview() {
       const len = computedTestimonials.value.length;
@@ -1074,7 +1754,23 @@ window.HomeView = {
       isReviewAuto.value = false;
       if (reviewAutoTimer) { clearInterval(reviewAutoTimer); reviewAutoTimer = null; }
     }
-    onMounted(() => { startReviewAuto(); window.addEventListener('resize', onResizeReviews); });
+    function toggleReviewAuto() {
+      if (isReviewAuto.value) {
+        stopReviewAuto();
+      } else {
+        startReviewAuto();
+      }
+    }
+
+    watch(reviewsAutoplayEnabled, (enabled) => {
+      if (enabled) {
+        startReviewAuto();
+      } else {
+        stopReviewAuto();
+      }
+    }, { immediate: true });
+
+    onMounted(() => { window.addEventListener('resize', onResizeReviews); });
     onUnmounted(() => { stopReviewAuto(); window.removeEventListener('resize', onResizeReviews); });
     function onResizeReviews() { /* триггерим пересчёт */ reviewIndex.value = reviewIndex.value; }
     const popularProducts = computed(() => { const arr = products.value.slice().filter(p => p.available !== false); arr.sort((a, b) => { const ap = a.purchases || 0; const bp = b.purchases || 0; return bp - ap; }); return arr.slice(0, 3); });
@@ -1108,7 +1804,79 @@ window.HomeView = {
     const cartCount = computed(() => (cartState.items || []).reduce((s, it) => s + (it.quantity || 0), 0));
     const cartTotal = computed(() => formatPrice((cartState.items || []).reduce((s, it) => s + (it.price || 0) * (it.quantity || 0), 0)));
     
-    return { products, loading, add, formatPrice, searchQuery, categories, categoriesData, categoryBlocks, statsCards, computedTestimonials, visibleTestimonials, nextReview, prevReview, startReviewAuto, stopReviewAuto, isReviewAuto, popularProducts, bestsellerContainer, scrollBestseller, heroImage, menuSection, scrollToMenu, verticalCategories, selectedVertical, selectedVerticalItem, selectedVerticalProducts, statsCardsMenu, allStatsCards, infiniteStatsCards, carouselPosition, isDragging, isAutoRotating, toggleAutoRotate, onMouseDown, onMouseMove, onMouseUp, onMouseLeave, createFoodRain, startFoodRain, currentSlide, currentSlideIndex, showProductModal, selectedProduct, openProductModal, closeProductModal, addToCartFromModal, addToCartAndGoToCheckout, cartCount, cartTotal, goCart, FloatingCartComp, heroText, categoriesText, menuText, deliveryText, reviewsText, heroBackgroundImage, siteBackgroundColor, page, mapIframeSrc };
+    return {
+      products,
+      loading,
+      add,
+      formatPrice,
+      searchQuery,
+      categories,
+      categoriesData,
+      categoryBlocks,
+      statsCards,
+      computedTestimonials,
+      gridTestimonials,
+      reviewsLayout,
+      reviewsAutoplayEnabled,
+      visibleTestimonials,
+      nextReview,
+      prevReview,
+      startReviewAuto,
+      stopReviewAuto,
+      toggleReviewAuto,
+      isReviewAuto,
+      popularProducts,
+      bestsellerContainer,
+      scrollBestseller,
+      heroImage,
+      heroPreviewImage,
+      menuSection,
+      scrollToMenu,
+      verticalCategories,
+      selectedVertical,
+      selectedVerticalItem,
+      selectedVerticalProducts,
+      statsCardsMenu,
+      allStatsCards,
+      infiniteStatsCards,
+      carouselPosition,
+      isDragging,
+      isAutoRotating,
+      toggleAutoRotate,
+      onMouseDown,
+      onMouseMove,
+      onMouseUp,
+      onMouseLeave,
+      createFoodRain,
+      startFoodRain,
+      currentSlide,
+      currentSlideIndex,
+      showProductModal,
+      selectedProduct,
+      openProductModal,
+      closeProductModal,
+      addToCartFromModal,
+      addToCartAndGoToCheckout,
+      cartCount,
+      cartTotal,
+      goCart,
+      handleHeroElementAction,
+      FloatingCartComp,
+      heroText,
+      categoriesText,
+      menuText,
+      deliveryText,
+      reviewsText,
+      heroBackgroundImage,
+      siteBackgroundColor,
+      activeBlocks,
+      hasBlock,
+      categoryCardClasses,
+      categoryCardStyle,
+      shouldShowMenuSearch,
+      page,
+      mapIframeSrc
+    };
   }
 };
 
