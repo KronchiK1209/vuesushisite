@@ -2,986 +2,102 @@
 (function(){
   const { ref, reactive, computed, watch, onMounted, onUnmounted, nextTick } = Vue;
 
-  const elementRegistry = {
-    heading: {
-      label: 'Заголовок',
-      icon: 'fa-solid fa-heading',
-      defaultData: () => ({
-        text: 'Новый заголовок',
-        level: 'h2',
-        fontSize: 'text-3xl',
-        color: '#111827',
-        align: 'left',
-        marginTop: '0px',
-        marginBottom: '16px',
-        fontFamily: '',
-        fontWeight: '700',
-        lineHeight: '1.2',
-        letterSpacing: '0px',
-        textTransform: 'none',
-        backgroundColor: '',
-        paddingX: '0px',
-        paddingY: '0px',
-        borderRadius: '0px',
-        textShadow: '',
-        positionMode: 'flow',
-        positionX: '0px',
-        positionY: '0px',
-        zIndex: '10',
-        maxWidth: '640px'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст', type: 'text', placeholder: 'Введите заголовок' },
-        {
-          key: 'level',
-          label: 'Уровень',
-          type: 'select',
-          options: [
-            { value: 'h1', label: 'H1' },
-            { value: 'h2', label: 'H2' },
-            { value: 'h3', label: 'H3' }
-          ]
-        },
-        {
-          key: 'fontSize',
-          label: 'Размер',
-          type: 'select',
-          options: [
-            { value: 'text-2xl', label: 'Крупный (2xl)' },
-            { value: 'text-3xl', label: 'Очень крупный (3xl)' },
-            { value: 'text-4xl', label: 'Заголовок (4xl)' }
-          ]
-        },
-        {
-          key: 'fontWeight',
-          label: 'Начертание',
-          type: 'select',
-          options: [
-            { value: '400', label: 'Обычный' },
-            { value: '500', label: 'Средний' },
-            { value: '600', label: 'Полужирный' },
-            { value: '700', label: 'Жирный' },
-            { value: '800', label: 'Экстра жирный' }
-          ]
-        },
-        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Manrope"' },
-        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.2' },
-        { key: 'letterSpacing', label: 'Интервал между буквами', type: 'text', placeholder: '0px' },
-        {
-          key: 'textTransform',
-          label: 'Регистр',
-          type: 'select',
-          options: [
-            { value: 'none', label: 'Обычный' },
-            { value: 'uppercase', label: 'Верхний' },
-            { value: 'lowercase', label: 'Нижний' },
-            { value: 'capitalize', label: 'Каждое слово' }
-          ]
-        },
-        {
-          key: 'color',
-          label: 'Цвет текста',
-          type: 'color'
-        },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
-        { key: 'backgroundColor', label: 'Фон текста', type: 'color' },
-        { key: 'paddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '0px' },
-        { key: 'paddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '0px' },
-        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '0px' },
-        { key: 'textShadow', label: 'Тень текста', type: 'text', placeholder: '0 10px 30px rgba(15,23,42,0.35)' },
-        {
-          key: 'positionMode',
-          label: 'Расположение',
-          type: 'select',
-          options: [
-            { value: 'flow', label: 'В потоке' },
-            { value: 'free', label: 'Свободное' }
-          ]
-        },
-        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
-        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
-        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '10' },
-        { key: 'maxWidth', label: 'Макс. ширина', type: 'text', placeholder: '640px' }
-      ]
-    },
-    subheading: {
-      label: 'Подзаголовок',
-      icon: 'fa-solid fa-text-height',
-      defaultData: () => ({
-        text: 'Новый подзаголовок',
-        fontSize: 'text-xl',
-        color: '#f97316',
-        align: 'left',
-        marginTop: '0px',
-        marginBottom: '12px',
-        fontFamily: '',
-        fontWeight: '600',
-        lineHeight: '1.4',
-        letterSpacing: '0px',
-        textTransform: 'none',
-        backgroundColor: '',
-        paddingX: '0px',
-        paddingY: '0px',
-        borderRadius: '0px',
-        textShadow: '',
-        positionMode: 'flow',
-        positionX: '0px',
-        positionY: '0px',
-        zIndex: '10',
-        maxWidth: '640px'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст', type: 'text', placeholder: 'Введите подзаголовок' },
-        {
-          key: 'fontSize',
-          label: 'Размер',
-          type: 'select',
-          options: [
-            { value: 'text-lg', label: 'Крупный' },
-            { value: 'text-xl', label: 'Очень крупный' },
-            { value: 'text-2xl', label: 'Заголовочный' }
-          ]
-        },
-        {
-          key: 'fontWeight',
-          label: 'Начертание',
-          type: 'select',
-          options: [
-            { value: '400', label: 'Обычный' },
-            { value: '500', label: 'Средний' },
-            { value: '600', label: 'Полужирный' },
-            { value: '700', label: 'Жирный' }
-          ]
-        },
-        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Inter"' },
-        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.4' },
-        { key: 'letterSpacing', label: 'Интервал между буквами', type: 'text', placeholder: '0px' },
-        {
-          key: 'textTransform',
-          label: 'Регистр',
-          type: 'select',
-          options: [
-            { value: 'none', label: 'Обычный' },
-            { value: 'uppercase', label: 'Верхний' },
-            { value: 'lowercase', label: 'Нижний' },
-            { value: 'capitalize', label: 'Каждое слово' }
-          ]
-        },
-        {
-          key: 'color',
-          label: 'Цвет текста',
-          type: 'color'
-        },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '12px' },
-        { key: 'backgroundColor', label: 'Фон текста', type: 'color' },
-        { key: 'paddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '0px' },
-        { key: 'paddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '0px' },
-        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '0px' },
-        { key: 'textShadow', label: 'Тень текста', type: 'text', placeholder: '0 6px 20px rgba(15,23,42,0.25)' },
-        {
-          key: 'positionMode',
-          label: 'Расположение',
-          type: 'select',
-          options: [
-            { value: 'flow', label: 'В потоке' },
-            { value: 'free', label: 'Свободное' }
-          ]
-        },
-        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
-        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
-        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '10' },
-        { key: 'maxWidth', label: 'Макс. ширина', type: 'text', placeholder: '640px' }
-      ]
-    },
-    paragraph: {
-      label: 'Текст',
-      icon: 'fa-solid fa-paragraph',
-      defaultData: () => ({
-        text: 'Добавьте описание секции или товара',
-        fontSize: 'text-base',
-        color: '#4b5563',
-        align: 'left',
-        marginTop: '0px',
-        marginBottom: '16px',
-        fontFamily: '',
-        fontWeight: '400',
-        lineHeight: '1.6',
-        letterSpacing: '0px',
-        textTransform: 'none',
-        maxWidth: '640px',
-        backgroundColor: '',
-        paddingX: '0px',
-        paddingY: '0px',
-        borderRadius: '0px',
-        textShadow: '',
-        positionMode: 'flow',
-        positionX: '0px',
-        positionY: '0px',
-        zIndex: '10'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст', type: 'textarea', rows: 3, placeholder: 'Расскажите подробнее' },
-        {
-          key: 'fontSize',
-          label: 'Размер',
-          type: 'select',
-          options: [
-            { value: 'text-sm', label: 'Маленький' },
-            { value: 'text-base', label: 'Стандартный' },
-            { value: 'text-lg', label: 'Крупный' }
-          ]
-        },
-        {
-          key: 'fontWeight',
-          label: 'Начертание',
-          type: 'select',
-          options: [
-            { value: '300', label: 'Светлый' },
-            { value: '400', label: 'Обычный' },
-            { value: '500', label: 'Средний' },
-            { value: '600', label: 'Полужирный' }
-          ]
-        },
-        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Rubik"' },
-        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.6' },
-        { key: 'letterSpacing', label: 'Интервал между буквами', type: 'text', placeholder: '0px' },
-        {
-          key: 'textTransform',
-          label: 'Регистр',
-          type: 'select',
-          options: [
-            { value: 'none', label: 'Обычный' },
-            { value: 'uppercase', label: 'Верхний' },
-            { value: 'lowercase', label: 'Нижний' },
-            { value: 'capitalize', label: 'Каждое слово' }
-          ]
-        },
-        { key: 'maxWidth', label: 'Максимальная ширина', type: 'text', placeholder: '640px' },
-        {
-          key: 'color',
-          label: 'Цвет текста',
-          type: 'color'
-        },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
-        { key: 'backgroundColor', label: 'Фон текста', type: 'color' },
-        { key: 'paddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '0px' },
-        { key: 'paddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '0px' },
-        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '0px' },
-        { key: 'textShadow', label: 'Тень текста', type: 'text', placeholder: '0 4px 16px rgba(15,23,42,0.15)' },
-        {
-          key: 'positionMode',
-          label: 'Расположение',
-          type: 'select',
-          options: [
-            { value: 'flow', label: 'В потоке' },
-            { value: 'free', label: 'Свободное' }
-          ]
-        },
-        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
-        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
-        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '10' }
-      ]
-    },
-    button: {
-      label: 'Кнопка',
-      icon: 'fa-solid fa-hand-pointer',
-      defaultData: () => ({
-        text: 'Новая кнопка',
-        style: 'primary',
-        action: 'scrollMenu',
-        href: '',
-        align: 'left',
-        marginTop: '0px',
-        marginBottom: '0px',
-        backgroundColor: '#ffffff',
-        textColor: '#dc2626',
-        hoverBackgroundColor: '#f3f4f6',
-        hoverTextColor: '#b91c1c',
-        borderRadius: '9999px',
-        borderWidth: '0px',
-        borderColor: '#ffffff',
-        paddingX: '28px',
-        paddingY: '14px',
-        fontSize: '16px',
-        fontFamily: '',
-        fontWeight: '600',
-        boxShadow: '0 15px 40px rgba(255,255,255,0.18)',
-        positionMode: 'flow',
-        positionX: '0px',
-        positionY: '0px',
-        zIndex: '20',
-        width: ''
-      }),
-      fields: [
-        { key: 'text', label: 'Текст кнопки', type: 'text', placeholder: 'Например, Заказать' },
-        {
-          key: 'style',
-          label: 'Стиль',
-          type: 'select',
-          options: [
-            { value: 'primary', label: 'Заливка' },
-            { value: 'secondary', label: 'Контур' }
-          ]
-        },
-        {
-          key: 'action',
-          label: 'Действие',
-          type: 'select',
-          options: [
-            { value: 'scrollMenu', label: 'Прокрутка к меню' },
-            { value: 'openCart', label: 'Открыть корзину' },
-            { value: 'link', label: 'Ссылка' }
-          ]
-        },
-        { key: 'href', label: 'Ссылка', type: 'text', placeholder: 'https://...' },
-        { key: 'fontSize', label: 'Размер шрифта (px)', type: 'text', placeholder: '16px' },
-        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Nunito"' },
-        {
-          key: 'fontWeight',
-          label: 'Начертание',
-          type: 'select',
-          options: [
-            { value: '500', label: 'Средний' },
-            { value: '600', label: 'Полужирный' },
-            { value: '700', label: 'Жирный' }
-          ]
-        },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' },
-        { key: 'backgroundColor', label: 'Цвет фона', type: 'color' },
-        { key: 'textColor', label: 'Цвет текста', type: 'color' },
-        { key: 'hoverBackgroundColor', label: 'Фон при наведении', type: 'color' },
-        { key: 'hoverTextColor', label: 'Текст при наведении', type: 'color' },
-        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '9999px' },
-        { key: 'borderWidth', label: 'Толщина границы', type: 'text', placeholder: '0px' },
-        { key: 'borderColor', label: 'Цвет границы', type: 'color' },
-        { key: 'paddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '28px' },
-        { key: 'paddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '14px' },
-        { key: 'boxShadow', label: 'Тень', type: 'text', placeholder: '0 15px 40px rgba(255,255,255,0.18)' },
-        {
-          key: 'positionMode',
-          label: 'Расположение',
-          type: 'select',
-          options: [
-            { value: 'flow', label: 'В потоке' },
-            { value: 'free', label: 'Свободное' }
-          ]
-        },
-        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
-        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
-        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '20' },
-        { key: 'width', label: 'Ширина', type: 'text', placeholder: 'auto' }
-      ]
-    },
-    image: {
-      label: 'Изображение',
-      icon: 'fa-solid fa-image',
-      defaultData: () => ({
-        src: '',
-        alt: 'Изображение',
-        width: '320px',
-        height: 'auto',
-        align: 'left',
-        borderRadius: '16px',
-        marginTop: '0px',
-        marginBottom: '16px',
-        objectFit: 'cover',
-        boxShadow: '0 25px 60px rgba(15,23,42,0.35)',
-        borderWidth: '0px',
-        borderColor: 'rgba(255,255,255,0.2)',
-        backgroundColor: 'transparent',
-        positionMode: 'flow',
-        positionX: '0px',
-        positionY: '0px',
-        zIndex: '5'
-      }),
-      fields: [
-        { key: 'src', label: 'URL изображения', type: 'text', placeholder: 'https://...' },
-        { key: 'alt', label: 'Alt текст', type: 'text', placeholder: 'Подпись' },
-        { key: 'width', label: 'Ширина', type: 'text', placeholder: '320px' },
-        { key: 'height', label: 'Высота', type: 'text', placeholder: 'auto' },
-        {
-          key: 'align',
-          label: 'Выравнивание',
-          type: 'select',
-          options: [
-            { value: 'left', label: 'Слева' },
-            { value: 'center', label: 'По центру' },
-            { value: 'right', label: 'Справа' }
-          ]
-        },
-        { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '16px' },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
-        {
-          key: 'objectFit',
-          label: 'Вписывание',
-          type: 'select',
-          options: [
-            { value: 'cover', label: 'Cover' },
-            { value: 'contain', label: 'Contain' },
-            { value: 'fill', label: 'Fill' }
-          ]
-        },
-        { key: 'boxShadow', label: 'Тень', type: 'text', placeholder: '0 25px 60px rgba(15,23,42,0.35)' },
-        { key: 'borderWidth', label: 'Толщина границы', type: 'text', placeholder: '0px' },
-        { key: 'borderColor', label: 'Цвет границы', type: 'color' },
-        { key: 'backgroundColor', label: 'Фон', type: 'color' },
-        {
-          key: 'positionMode',
-          label: 'Расположение',
-          type: 'select',
-          options: [
-            { value: 'flow', label: 'В потоке' },
-            { value: 'free', label: 'Свободное' }
-          ]
-        },
-        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
-        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
-        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '5' }
-      ]
-    },
-    feature: {
-      label: 'Преимущество',
-      icon: 'fa-solid fa-star',
-      defaultData: () => ({
-        text: 'Новое преимущество',
-        icon: 'fa-solid fa-check',
-        color: '#111827',
-        fontSize: 'text-base',
-        marginTop: '0px',
-        marginBottom: '8px',
-        fontFamily: '',
-        fontWeight: '500',
-        lineHeight: '1.4',
-        letterSpacing: '0px',
-        textTransform: 'none',
-        iconColor: '#f97316',
-        iconBackground: 'rgba(249, 115, 22, 0.12)',
-        iconShape: 'circle',
-        positionMode: 'flow',
-        positionX: '0px',
-        positionY: '0px',
-        zIndex: '15'
-      }),
-      fields: [
-        { key: 'text', label: 'Текст', type: 'text', placeholder: 'Например, Бесплатная доставка' },
-        { key: 'icon', label: 'Иконка FontAwesome', type: 'text', placeholder: 'fa-solid fa-check' },
-        { key: 'fontFamily', label: 'Шрифт', type: 'text', placeholder: 'Например, "Open Sans"' },
-        {
-          key: 'fontWeight',
-          label: 'Начертание',
-          type: 'select',
-          options: [
-            { value: '400', label: 'Обычный' },
-            { value: '500', label: 'Средний' },
-            { value: '600', label: 'Полужирный' }
-          ]
-        },
-        {
-          key: 'color',
-          label: 'Цвет текста',
-          type: 'color'
-        },
-        {
-          key: 'fontSize',
-          label: 'Размер',
-          type: 'select',
-          options: [
-            { value: 'text-sm', label: 'Маленький' },
-            { value: 'text-base', label: 'Стандартный' },
-            { value: 'text-lg', label: 'Крупный' }
-          ]
-        },
-        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.4' },
-        { key: 'letterSpacing', label: 'Интервал между буквами', type: 'text', placeholder: '0px' },
-        {
-          key: 'textTransform',
-          label: 'Регистр',
-          type: 'select',
-          options: [
-            { value: 'none', label: 'Обычный' },
-            { value: 'uppercase', label: 'Верхний' },
-            { value: 'capitalize', label: 'Каждое слово' }
-          ]
-        },
-        { key: 'iconColor', label: 'Цвет иконки', type: 'color' },
-        { key: 'iconBackground', label: 'Фон иконки', type: 'color' },
-        {
-          key: 'iconShape',
-          label: 'Форма иконки',
-          type: 'select',
-          options: [
-            { value: 'circle', label: 'Круг' },
-            { value: 'rounded', label: 'Скруглённый квадрат' },
-            { value: 'square', label: 'Квадрат' }
-          ]
-        },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '8px' },
-        {
-          key: 'positionMode',
-          label: 'Расположение',
-          type: 'select',
-          options: [
-            { value: 'flow', label: 'В потоке' },
-            { value: 'free', label: 'Свободное' }
-          ]
-        },
-        { key: 'positionX', label: 'Позиция X', type: 'text', placeholder: '0px' },
-        { key: 'positionY', label: 'Позиция Y', type: 'text', placeholder: '0px' },
-        { key: 'zIndex', label: 'Слой (z-index)', type: 'text', placeholder: '15' }
-      ]
-    },
-    spacer: {
-      label: 'Отступ',
-      icon: 'fa-solid fa-ruler-vertical',
-      defaultData: () => ({
-        height: '24px',
-        marginTop: '0px',
-        marginBottom: '0px'
-      }),
-      fields: [
-        { key: 'height', label: 'Высота', type: 'text', placeholder: '24px' },
-        { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' }
-      ]
-    }
-  };
+  const builder = window.SiteBuilder;
+  if (!builder) {
+    console.error('SiteBuilder core module is not loaded. AdminSiteSettingsView не может инициализироваться.');
+    return;
+  }
+  const { elementRegistry, blockRegistry, deepClone, generateId, normalizeElement, createBlockInstance } = builder;
 
-  const blockRegistry = {
-    hero: {
-      name: 'Hero-блок',
-      icon: 'fa-solid fa-fire',
-      defaultData: () => ({
-        heading: 'Быстро и вкусно',
-        subheading: 'Попробуйте наши фирменные суши',
-        description: 'Свежие роллы, пицца и десерты с доставкой за 30 минут.',
-        buttonText: 'Выбрать блюда',
-        buttonStyle: 'primary',
-        buttonAction: 'scrollMenu',
-        buttonLink: '',
-        backgroundImage: 'https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d',
-        previewImage: 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
-        imageSide: 'right',
-        showRightImage: true,
-        waveEnabled: true,
-        waveColor: '#f9f4e5',
-        overlayColor: 'rgba(17, 24, 39, 0.55)',
-        contentMaxWidth: '620px',
-        contentPaddingX: '96px',
-        contentPaddingY: '120px',
-        contentGap: '40px',
-        minHeight: '640px',
-        freeformHeight: '640px',
-        layout: 'split',
-        backgroundPosition: 'center center',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        overlayBlur: '0',
-        elements: [
-          {
-            type: 'heading',
-            data: {
-              text: 'Быстро и вкусно',
-              level: 'h1',
-              fontSize: 'text-5xl',
-              color: '#ffffff',
-              align: 'left',
-              marginTop: '0px',
-              marginBottom: '16px'
-            }
-          },
-          {
-            type: 'subheading',
-            data: {
-              text: 'Попробуйте фирменные роллы сегодня',
-              fontSize: 'text-2xl',
-              color: '#fbbf24',
-              align: 'left',
-              marginTop: '0px',
-              marginBottom: '12px'
-            }
-          },
-          {
-            type: 'paragraph',
-            data: {
-              text: 'Комбинируйте суши, пиццу и десерты. Мы доставим всё тёплым и свежим.',
-              fontSize: 'text-lg',
-              color: '#f9fafb',
-              align: 'left',
-              marginTop: '0px',
-              marginBottom: '20px'
-            }
-          },
-          {
-            type: 'button',
-            data: {
-              text: 'Собрать заказ',
-              style: 'primary',
-              action: 'scrollMenu',
-              align: 'left',
-              marginTop: '0px',
-              marginBottom: '0px'
-            }
-          }
-        ]
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Быстро и вкусно' },
-            { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'Попробуйте наши фирменные суши' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Коротко о предложении' }
-          ]
-        },
-        {
-          label: 'Кнопка',
-          fields: [
-            { key: 'buttonText', label: 'Текст кнопки', type: 'text', placeholder: 'Выбрать блюда' },
-            {
-              key: 'buttonStyle',
-              label: 'Стиль кнопки',
-              type: 'select',
-              options: [
-                { value: 'primary', label: 'Основная' },
-                { value: 'secondary', label: 'Вторичная' }
-              ]
-            },
-            {
-              key: 'buttonAction',
-              label: 'Действие',
-              type: 'select',
-              options: [
-                { value: 'scrollMenu', label: 'Прокрутка к меню' },
-                { value: 'openCart', label: 'Открыть корзину' },
-                { value: 'link', label: 'Перейти по ссылке' }
-              ]
-            },
-            { key: 'buttonLink', label: 'Ссылка (для действия "Ссылка")', type: 'text', placeholder: 'https://...' }
-          ]
-        },
-        {
-          label: 'Макет',
-          fields: [
-            {
-              key: 'layout',
-              label: 'Расположение',
-              type: 'select',
-              options: [
-                { value: 'split', label: 'Текст и изображение' },
-                { value: 'stacked', label: 'Только текст' },
-                { value: 'spotlight', label: 'Текст над изображением' },
-                { value: 'freeform', label: 'Свободное расположение' }
-              ]
-            },
-            { key: 'contentMaxWidth', label: 'Ширина контента', type: 'text', placeholder: '620px' },
-            { key: 'contentPaddingX', label: 'Горизонтальные отступы', type: 'text', placeholder: '96px' },
-            { key: 'contentPaddingY', label: 'Вертикальные отступы', type: 'text', placeholder: '120px' },
-            { key: 'contentGap', label: 'Отступ между колонками', type: 'text', placeholder: '40px' },
-            { key: 'minHeight', label: 'Минимальная высота', type: 'text', placeholder: '640px' },
-            { key: 'freeformHeight', label: 'Высота для свободного режима', type: 'text', placeholder: '640px' }
-          ]
-        },
-        {
-          label: 'Оформление',
-          fields: [
-            { key: 'backgroundImage', label: 'Фоновое изображение', type: 'image' },
-            { key: 'previewImage', label: 'Изображение справа', type: 'image' },
-            {
-              key: 'imageSide',
-              label: 'Расположение изображения',
-              type: 'select',
-              options: [
-                { value: 'left', label: 'Слева' },
-                { value: 'right', label: 'Справа' }
-              ]
-            },
-            { key: 'showRightImage', label: 'Показывать изображение', type: 'toggle' },
-            { key: 'waveEnabled', label: 'Декоративная волна', type: 'toggle' },
-            { key: 'waveColor', label: 'Цвет волны', type: 'color' },
-            { key: 'overlayColor', label: 'Цвет наложения', type: 'color' },
-            { key: 'backgroundPosition', label: 'Позиция фона', type: 'text', placeholder: 'center center' },
-            { key: 'backgroundSize', label: 'Размер фона', type: 'text', placeholder: 'cover' },
-            { key: 'backgroundRepeat', label: 'Повторение фона', type: 'text', placeholder: 'no-repeat' },
-            { key: 'overlayBlur', label: 'Размытие наложения (px)', type: 'text', placeholder: '0' }
-          ]
-        }
-      ],
-      elements: ['heading', 'subheading', 'paragraph', 'button', 'image', 'feature', 'spacer']
-    },
-    categories: {
-      name: 'Категории',
-      icon: 'fa-solid fa-tags',
-      defaultData: () => ({
-        heading: 'Категории и блюда',
-        subheading: 'которые вы нигде не найдете',
-        description: 'Уникальные подборки от наших шефов',
-        backgroundColor: '#f9f4e5',
-        accentColor: '#f97316',
-        cardStyle: 'rounded'
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Категории и блюда' },
-            { key: 'subheading', label: 'Подзаголовок', type: 'text', placeholder: 'которые вы нигде не найдете' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Опишите секцию' }
-          ]
-        },
-        {
-          label: 'Оформление',
-          fields: [
-            { key: 'backgroundColor', label: 'Фон блока', type: 'color' },
-            { key: 'accentColor', label: 'Акцентный цвет', type: 'color' },
-            {
-              key: 'cardStyle',
-              label: 'Стиль карточек',
-              type: 'select',
-              options: [
-                { value: 'rounded', label: 'Скруглённые' },
-                { value: 'flat', label: 'Плоские' },
-                { value: 'glass', label: 'Стекло' }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    menu: {
-      name: 'Меню',
-      icon: 'fa-solid fa-utensils',
-      defaultData: () => ({
-        heading: 'Популярные блюда',
-        description: 'Выберите категорию и сформируйте свой сет',
-        showSearch: true,
-        highlightHits: true
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Популярные блюда' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Выберите категорию и сформируйте свой сет' }
-          ]
-        },
-        {
-          label: 'Функции',
-          fields: [
-            { key: 'showSearch', label: 'Показывать поиск', type: 'toggle' },
-            { key: 'highlightHits', label: 'Подсвечивать хиты', type: 'toggle' }
-          ]
-        }
-      ]
-    },
-    delivery: {
-      name: 'Доставка',
-      icon: 'fa-solid fa-truck-fast',
-      defaultData: () => ({
-        heading: 'Быстрая доставка',
-        description: 'Привезём заказ за 30 минут или подарим ролл',
-        features: [
-          'Бесплатная доставка от 1500 ₽',
-          'Прозрачный трекинг курьера',
-          'Термосумки для горячих блюд'
-        ],
-        backgroundColor: '#fff7ed',
-        contactPhone: '+7 (900) 000-00-00',
-        minOrder: '1500'
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Быстрая доставка' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Расскажите об условиях доставки' }
-          ]
-        },
-        {
-          label: 'Преимущества',
-          fields: [
-            { key: 'features', label: 'Список преимуществ', type: 'list', placeholder: 'Каждое с новой строки' }
-          ]
-        },
-        {
-          label: 'Дополнительно',
-          fields: [
-            { key: 'contactPhone', label: 'Телефон курьера', type: 'text', placeholder: '+7 (900) 000-00-00' },
-            { key: 'minOrder', label: 'Минимальный заказ', type: 'text', placeholder: '1500' },
-            { key: 'backgroundColor', label: 'Цвет фона', type: 'color' }
-          ]
-        }
-      ]
-    },
-    reviews: {
-      name: 'Отзывы',
-      icon: 'fa-solid fa-comments',
-      defaultData: () => ({
-        heading: 'Отзывы наших гостей',
-        description: 'Более 1000 довольных клиентов в этом месяце',
-        autoPlay: true,
-        layout: 'grid'
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Отзывы наших гостей' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Более 1000 довольных клиентов' }
-          ]
-        },
-        {
-          label: 'Настройки',
-          fields: [
-            { key: 'autoPlay', label: 'Автопрокрутка', type: 'toggle' },
-            {
-              key: 'layout',
-              label: 'Макет',
-              type: 'select',
-              options: [
-                { value: 'grid', label: 'Сетка' },
-                { value: 'carousel', label: 'Карусель' }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    map: {
-      name: 'Карта и контакты',
-      icon: 'fa-solid fa-map-location-dot',
-      defaultData: () => ({
-        heading: 'Зоны доставки',
-        description: 'Нажмите на нужный район, чтобы узнать условия доставки',
-        iframeSrc: 'https://yandex.ru/map-widget/v1/?lang=ru_RU&scroll=true&source=constructor-api&um=constructor%3A1569f1da7d596921cd82db1f441ffc63d2a386db371645fede23dbc26dc86a74',
-        address: 'г. Санкт-Петербург, ул. Суши, 5',
-        workHours: 'Ежедневно 10:00 — 23:00',
-        phone: '+7 (812) 000-00-00'
-      }),
-      inspector: [
-        {
-          label: 'Контент',
-          fields: [
-            { key: 'heading', label: 'Заголовок', type: 'text', placeholder: 'Зоны доставки' },
-            { key: 'description', label: 'Описание', type: 'textarea', rows: 3, placeholder: 'Опишите как работает доставка' }
-          ]
-        },
-        {
-          label: 'Контакты',
-          fields: [
-            { key: 'address', label: 'Адрес', type: 'text', placeholder: 'г. Санкт-Петербург...' },
-            { key: 'phone', label: 'Телефон', type: 'text', placeholder: '+7 (...)' },
-            { key: 'workHours', label: 'Время работы', type: 'text', placeholder: '10:00 — 23:00' }
-          ]
-        },
-        {
-          label: 'Карта',
-          fields: [
-            { key: 'iframeSrc', label: 'Ссылка на карту (iframe)', type: 'textarea', rows: 2 }
-          ]
-        }
-      ]
-    }
-  };
-
-  const deepClone = (value) => JSON.parse(JSON.stringify(value));
-
-  function generateId(prefix) {
-    return `${prefix}_${Math.random().toString(36).slice(2, 8)}_${Date.now().toString(36)}`;
+  const styleHelpers = builder.styles || window.SiteBuilderStyles;
+  if (!styleHelpers) {
+    console.error('SiteBuilder style helpers module is not loaded. AdminSiteSettingsView не может инициализироваться.');
+    return;
   }
 
-  function normalizeElement(elementLike) {
-    if (!elementLike) {
-      return null;
-    }
-    const type = elementLike.type || 'paragraph';
-    const definition = elementRegistry[type];
-    if (!definition) {
-      return null;
-    }
-    const base = definition.defaultData ? definition.defaultData() : {};
-    const incoming = elementLike.data || {};
-    return {
-      id: elementLike.id || generateId('element'),
-      type,
-      data: { ...base, ...incoming }
-    };
-  }
+  const {
+    heroImageProps,
+    sectionBackgroundStyle,
+    sectionOverlayStyle,
+    blockButtonWrapperStyle,
+    blockButtonClass,
+    blockButtonStyle,
+    categoriesSectionStyle,
+    categoriesOverlayStyle,
+    categoriesHeaderStyle,
+    categoriesHeadingStyle,
+    categoriesSubheadingStyle,
+    categoriesDescriptionStyle,
+    categoriesGridStyle,
+    categoriesCardStyle,
+    categoriesIconWrapperStyle,
+    categoriesCardTitleStyle,
+    categoriesCardDescriptionStyle,
+    menuSectionStyle,
+    menuOverlayStyle,
+    menuHeaderStyle,
+    menuHeadingStyle,
+    menuDescriptionStyle,
+    menuFilterSurfaceStyle,
+    menuTabsWrapperStyle,
+    menuActiveTabStyle,
+    menuTabStyle,
+    menuGridStyle,
+    menuCardStyle,
+    menuCardImageStyle,
+    menuCardTitleStyle,
+    menuCardDescriptionStyle,
+    menuPriceStyle,
+    menuTagStyle,
+    deliverySectionStyle,
+    deliveryOverlayStyle,
+    deliveryTextColumnStyle,
+    deliveryHeadingStyle,
+    deliveryDescriptionStyle,
+    deliveryFeatureIconStyle,
+    deliveryFeatureTextStyle,
+    deliveryContactsStyle,
+    deliveryTrackingCardStyle,
+    deliveryTrackingBarStyle,
+    deliveryTrackingTitleStyle,
+    deliveryTrackingDescriptionStyle,
+    deliveryTrackingProgressStyle,
+    reviewsSectionStyle,
+    reviewsOverlayStyle,
+    reviewsHeaderStyle,
+    reviewsHeadingStyle,
+    reviewsDescriptionStyle,
+    reviewsGridStyle,
+    reviewsCardStyle,
+    reviewsAvatarStyle,
+    reviewsCardTitleStyle,
+    reviewsCardSubtitleStyle,
+    reviewsRatingStyle,
+    reviewsQuoteStyle,
+    mapSectionStyle,
+    mapOverlayStyle,
+    mapFrameStyle,
+    mapIframeStyle,
+    mapInfoCardStyle,
+    mapHeadingStyle,
+    mapDescriptionStyle,
+    mapContactRowStyle,
+    mapContactIconStyle,
+    heroWrapperStyle,
+    heroBackgroundStyle,
+    heroOverlayStyle,
+    heroContainerClasses,
+    heroContainerStyle,
+    heroContentColumnClasses,
+    heroContentStyle,
+    heroMediaWrapperClasses,
+    heroFeatureIconWrapperStyle,
+    asCssSize,
+    parseCssNumber,
+    clampNumber
+  } = styleHelpers;
 
-  function createBlockInstance(type, source = {}) {
-    const definition = blockRegistry[type];
-    if (!definition) {
-      return null;
-    }
-    const defaults = definition.defaultData ? definition.defaultData() : {};
-    const data = source.data || source || {};
-    const merged = { ...defaults, ...data };
-
-    if (definition.elements) {
-      const elements = Array.isArray(data.elements) ? data.elements : defaults.elements;
-      merged.elements = Array.isArray(elements)
-        ? elements.map(el => normalizeElement(el)).filter(Boolean)
-        : [];
-    }
-
-    return {
-      id: source.id || generateId('block'),
-      type,
-      name: definition.name,
-      icon: definition.icon,
-      data: merged,
-      meta: {
-        hidden: !!(source.hidden || (source.meta && source.meta.hidden))
-      }
-    };
-  }
-
-  window.AdminSiteSettingsView = {
+window.AdminSiteSettingsView = {
     name: 'AdminSiteSettingsView',
     template: /* html */`
       <div class="min-h-screen bg-gray-50 py-8">
@@ -1435,77 +551,160 @@
                           </template>
 
                           <template v-else-if="block.type === 'categories'">
-                            <div class="py-14 px-10" :style="{ backgroundColor: block.data.backgroundColor || '#f9f4e5' }">
-                              <div class="text-center max-w-3xl mx-auto">
-                                <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                <p class="text-orange-600 font-semibold mt-1">{{ block.data.subheading }}</p>
-                                <p class="text-gray-600 mt-3">{{ block.data.description }}</p>
-                              </div>
-                              <div class="grid sm:grid-cols-2 gap-6 mt-10">
-                                <div v-for="n in 4" :key="n" class="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition">
-                                  <div class="w-20 h-20 rounded-full bg-orange-100 mx-auto mb-4"></div>
-                                  <h3 class="font-semibold text-lg text-gray-900 text-center">Категория {{ n }}</h3>
-                                  <p class="text-sm text-gray-500 text-center">Управляется в админке категорий</p>
+                            <div class="relative overflow-hidden" :style="categoriesSectionStyle(block)">
+                              <div
+                                v-if="categoriesOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="categoriesOverlayStyle(block)"
+                              ></div>
+                              <div class="relative space-y-10">
+                                <div :style="categoriesHeaderStyle(block)" class="space-y-3">
+                                  <h2 class="font-bold" :style="categoriesHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p class="font-semibold" :style="categoriesSubheadingStyle(block)">{{ block.data.subheading }}</p>
+                                  <p :style="categoriesDescriptionStyle(block)">{{ block.data.description }}</p>
+                                </div>
+                                <div class="grid" :style="categoriesGridStyle(block)">
+                                  <div v-for="n in 4" :key="n" :style="categoriesCardStyle(block)" class="transition">
+                                    <div :style="categoriesIconWrapperStyle(block)" class="mb-4">
+                                      <i class="fa-solid fa-bowl-food"></i>
+                                    </div>
+                                    <h3 class="font-semibold text-lg text-center" :style="categoriesCardTitleStyle(block)">
+                                      Категория {{ n }}
+                                    </h3>
+                                    <p class="mt-2 text-sm text-center" :style="categoriesCardDescriptionStyle(block)">
+                                      Управляется в разделе категорий
+                                    </p>
+                                  </div>
+                                </div>
+                                <div v-if="block.data.buttonVisible" :style="blockButtonWrapperStyle(block.data)">
+                                  <button
+                                    :class="blockButtonClass(block.data)"
+                                    :style="blockButtonStyle(block.data, { background: '#f97316', textColor: '#ffffff', secondaryBackground: '#ffffff', secondaryText: '#111827', shadow: block.data.buttonShadow || '0 16px 40px rgba(15,23,42,0.18)' })"
+                                  >
+                                    <span>{{ block.data.buttonText || 'Все категории' }}</span>
+                                    <i class="fa-solid fa-arrow-right-long" v-if="block.data.buttonStyle !== 'link'"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
                           </template>
 
                           <template v-else-if="block.type === 'menu'">
-                            <div class="py-16 px-10 bg-gradient-to-br from-orange-50 to-red-50">
-                              <div class="text-center max-w-2xl mx-auto">
-                                <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                <p class="text-gray-600 mt-3">{{ block.data.description }}</p>
-                              </div>
-                              <div class="grid md:grid-cols-3 gap-6 mt-12">
-                                <div v-for="n in 3" :key="n" class="bg-white rounded-2xl shadow p-5 space-y-4">
-                                  <div class="h-32 rounded-xl bg-gray-100"></div>
-                                  <div class="font-semibold text-gray-900">Популярное блюдо {{ n }}</div>
-                                  <p class="text-sm text-gray-500">Описание и цена подтягиваются из каталога</p>
-                                  <div class="flex items-center justify-between text-sm text-gray-600">
-                                    <span>450 ₽</span>
-                                    <span class="inline-flex items-center space-x-1 text-orange-600">
-                                      <i class="fa-solid fa-star"></i>
-                                      <span>Хит</span>
-                                    </span>
+                            <div class="relative overflow-hidden" :style="menuSectionStyle(block)">
+                              <div
+                                v-if="menuOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="menuOverlayStyle(block)"
+                              ></div>
+                              <div class="relative space-y-10">
+                                <div :style="menuHeaderStyle(block)" class="space-y-3">
+                                  <h2 class="font-bold" :style="menuHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p :style="menuDescriptionStyle(block)">{{ block.data.description }}</p>
+                                </div>
+                                <div
+                                  v-if="block.data.showSearch || block.data.showFilters || block.data.showCategoryTabs"
+                                  class="space-y-4"
+                                >
+                                  <div v-if="block.data.showSearch" class="flex items-center" :style="menuFilterSurfaceStyle(block)">
+                                    <i class="fa-solid fa-magnifying-glass opacity-70 mr-3"></i>
+                                    <span class="text-sm opacity-80">Поиск будет доступен посетителям</span>
                                   </div>
+                                  <div v-if="block.data.showCategoryTabs" class="flex flex-wrap gap-2" :style="menuTabsWrapperStyle(block)">
+                                    <span class="px-4 py-2 rounded-full text-sm font-medium" :style="menuActiveTabStyle(block)">
+                                      Суши
+                                    </span>
+                                    <span class="px-4 py-2 rounded-full text-sm" :style="menuTabStyle(block)">Роллы</span>
+                                    <span class="px-4 py-2 rounded-full text-sm" :style="menuTabStyle(block)">Сеты</span>
+                                  </div>
+                                  <div v-if="block.data.showFilters" class="flex items-center gap-2" :style="menuFilterSurfaceStyle(block)">
+                                    <i class="fa-solid fa-sliders opacity-70"></i>
+                                    <span class="text-sm opacity-80">Фильтры включены</span>
+                                  </div>
+                                </div>
+                                <div class="grid" :style="menuGridStyle(block)">
+                                  <div
+                                    v-for="n in Math.max(3, Number(block.data.cardsPerRow) || 3)"
+                                    :key="n"
+                                    :style="menuCardStyle(block)"
+                                    class="transition"
+                                  >
+                                    <div :style="menuCardImageStyle(block)">
+                                      <div class="w-full h-full flex items-center justify-center text-3xl text-orange-500">
+                                        🍣
+                                      </div>
+                                    </div>
+                                    <div class="mt-4 font-semibold" :style="menuCardTitleStyle(block)">
+                                      Популярное блюдо {{ n }}
+                                    </div>
+                                    <p class="mt-2 text-sm" :style="menuCardDescriptionStyle(block)">
+                                      Описание и цена берутся из каталога
+                                    </p>
+                                    <div class="mt-4 flex items-center justify-between text-sm">
+                                      <span :style="menuPriceStyle(block)">450 ₽</span>
+                                      <span
+                                        v-if="block.data.highlightHits"
+                                        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                                        :style="menuTagStyle(block)"
+                                      >
+                                        <i class="fa-solid fa-star"></i>
+                                        <span>Хит</span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div v-if="block.data.buttonVisible" :style="blockButtonWrapperStyle(block.data)">
+                                  <button
+                                    :class="blockButtonClass(block.data)"
+                                    :style="blockButtonStyle(block.data, { background: '#f97316', textColor: '#ffffff', secondaryBackground: '#ffffff', secondaryText: '#111827', shadow: block.data.buttonShadow || '0 16px 40px rgba(249,115,22,0.35)' })"
+                                  >
+                                    <span>{{ block.data.buttonText || 'Открыть меню' }}</span>
+                                    <i class="fa-solid fa-arrow-right-long" v-if="block.data.buttonStyle !== 'link'"></i>
+                                  </button>
                                 </div>
                               </div>
                             </div>
                           </template>
 
                           <template v-else-if="block.type === 'delivery'">
-                            <div class="py-16 px-10" :style="{ backgroundColor: block.data.backgroundColor || '#fff7ed' }">
-                              <div class="grid lg:grid-cols-2 gap-10 items-start">
-                                <div class="space-y-4">
-                                  <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                  <p class="text-gray-600">{{ block.data.description }}</p>
+                            <div class="relative overflow-hidden" :style="deliverySectionStyle(block)">
+                              <div
+                                v-if="deliveryOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="deliveryOverlayStyle(block)"
+                              ></div>
+                              <div class="relative" :class="deliveryLayoutClass(block)">
+                                <div class="space-y-4" :style="deliveryTextColumnStyle(block)">
+                                  <h2 class="font-bold" :style="deliveryHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p :style="deliveryDescriptionStyle(block)">{{ block.data.description }}</p>
                                   <ul class="space-y-3">
-                                    <li
-                                      v-for="feature in block.data.features"
-                                      :key="feature"
-                                      class="flex items-start space-x-3"
-                                    >
-                                      <span class="mt-1 inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white text-xs">
-                                        <i class="fa-solid fa-check"></i>
-                                      </span>
-                                      <span class="text-gray-700 text-sm">{{ feature }}</span>
+                                    <li v-for="feature in block.data.features" :key="feature" class="flex items-start gap-3">
+                                      <span :style="deliveryFeatureIconStyle(block)"><i class="fa-solid fa-check"></i></span>
+                                      <span :style="deliveryFeatureTextStyle(block)">{{ feature }}</span>
                                     </li>
                                   </ul>
-                                  <div class="flex items-center space-x-4 text-sm text-gray-600 pt-4">
-                                    <span class="inline-flex items-center space-x-2"><i class="fa-solid fa-phone"></i><span>{{ block.data.contactPhone }}</span></span>
-                                    <span class="inline-flex items-center space-x-2"><i class="fa-solid fa-box"></i><span>Мин. заказ {{ block.data.minOrder }} ₽</span></span>
+                                  <div class="flex flex-wrap gap-4 text-sm pt-4" :style="deliveryContactsStyle(block)">
+                                    <span class="inline-flex items-center gap-2"><i class="fa-solid fa-phone"></i><span>{{ block.data.contactPhone }}</span></span>
+                                    <span class="inline-flex items-center gap-2"><i class="fa-solid fa-box"></i><span>Мин. заказ {{ block.data.minOrder }} ₽</span></span>
+                                  </div>
+                                  <div v-if="block.data.buttonVisible" :style="blockButtonWrapperStyle(block.data)">
+                                    <button
+                                      :class="blockButtonClass(block.data)"
+                                      :style="blockButtonStyle(block.data, { background: '#111827', textColor: '#ffffff', secondaryBackground: '#ffffff', secondaryText: '#111827', shadow: block.data.buttonShadow || '0 16px 36px rgba(15,23,42,0.18)' })"
+                                    >
+                                      <span>{{ block.data.buttonText || 'Условия доставки' }}</span>
+                                      <i class="fa-solid fa-arrow-right-long" v-if="block.data.buttonStyle !== 'link'"></i>
+                                    </button>
                                   </div>
                                 </div>
-                                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-                                  <div class="bg-gradient-to-r from-orange-400 to-red-500 h-12"></div>
+                                <div v-if="block.data.showTrackingCard" :style="deliveryTrackingCardStyle(block)">
+                                  <div :style="deliveryTrackingBarStyle(block)"></div>
                                   <div class="p-6 space-y-4">
-                                    <h3 class="font-semibold text-gray-900">Трекинг курьера</h3>
+                                    <h3 class="font-semibold" :style="deliveryTrackingTitleStyle(block)">{{ block.data.trackingTitle }}</h3>
                                     <div class="space-y-2">
                                       <div class="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
-                                        <div class="h-full bg-gradient-to-r from-orange-500 to-red-500 w-3/4"></div>
+                                        <div class="h-full" :style="deliveryTrackingProgressStyle(block)"></div>
                                       </div>
-                                      <p class="text-xs text-gray-500">Курьер уже рядом – доставит заказ в течение 10 минут</p>
+                                      <p class="text-xs" :style="deliveryTrackingDescriptionStyle(block)">{{ block.data.trackingDescription }}</p>
                                     </div>
                                   </div>
                                 </div>
@@ -1514,60 +713,81 @@
                           </template>
 
                           <template v-else-if="block.type === 'reviews'">
-                            <div class="py-16 px-10 bg-gradient-to-br from-orange-50 to-red-50">
-                              <div class="text-center max-w-2xl mx-auto">
-                                <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                <p class="text-gray-600 mt-3">{{ block.data.description }}</p>
-                              </div>
-                              <div class="grid md:grid-cols-3 gap-6 mt-12">
-                                <div v-for="n in 3" :key="n" class="bg-white rounded-2xl shadow p-6 space-y-3">
-                                  <div class="flex items-center space-x-3">
-                                    <div class="w-12 h-12 rounded-full bg-orange-100"></div>
-                                    <div>
-                                      <div class="font-semibold text-gray-900">Клиент {{ n }}</div>
-                                      <div class="text-xs text-gray-500">Постоянный клиент</div>
+                            <div class="relative overflow-hidden" :style="reviewsSectionStyle(block)">
+                              <div
+                                v-if="reviewsOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="reviewsOverlayStyle(block)"
+                              ></div>
+                              <div class="relative space-y-10">
+                                <div :style="reviewsHeaderStyle(block)" class="space-y-3">
+                                  <h2 class="font-bold" :style="reviewsHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p :style="reviewsDescriptionStyle(block)">{{ block.data.description }}</p>
+                                </div>
+                                <div class="grid" :style="reviewsGridStyle(block)">
+                                  <div v-for="n in 3" :key="n" :style="reviewsCardStyle(block)">
+                                    <div class="flex items-center gap-3">
+                                      <div :style="reviewsAvatarStyle(block)">К{{ n }}</div>
+                                      <div>
+                                        <div class="font-semibold" :style="reviewsCardTitleStyle(block)">Клиент {{ n }}</div>
+                                        <div class="text-xs" :style="reviewsCardSubtitleStyle(block)">Постоянный клиент</div>
+                                      </div>
                                     </div>
+                                    <div class="flex space-x-1 text-sm mt-3" :style="reviewsRatingStyle(block)">
+                                      <i v-for="star in 5" :key="star" class="fa-solid fa-star"></i>
+                                    </div>
+                                    <p class="mt-3 text-sm" :style="reviewsQuoteStyle(block)">
+                                      «Каждый заказ приезжает горячим. Любим за сервис и бонусы»
+                                    </p>
                                   </div>
-                                  <div class="flex space-x-1 text-orange-500 text-sm">
-                                    <i v-for="star in 5" :key="star" class="fa-solid fa-star"></i>
-                                  </div>
-                                  <p class="text-sm text-gray-600">«Каждый заказ приезжает горячим. Любим за сервис и бонусы»</p>
                                 </div>
                               </div>
                             </div>
                           </template>
 
                           <template v-else-if="block.type === 'map'">
-                            <div class="py-16 px-10 bg-white">
-                              <div class="grid lg:grid-cols-3 gap-8">
+                            <div class="relative overflow-hidden" :style="mapSectionStyle(block)">
+                              <div
+                                v-if="mapOverlayStyle(block)"
+                                class="absolute inset-0 pointer-events-none"
+                                :style="mapOverlayStyle(block)"
+                              ></div>
+                              <div class="relative grid lg:grid-cols-3 gap-8">
                                 <div class="lg:col-span-2">
-                                  <div class="aspect-[3/2] rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+                                  <div :style="mapFrameStyle(block)">
                                     <iframe
                                       :src="block.data.iframeSrc"
-                                      width="100%"
-                                      height="100%"
-                                      style="border:0"
                                       allowfullscreen
                                       loading="lazy"
+                                      :style="mapIframeStyle(block)"
                                     ></iframe>
                                   </div>
                                 </div>
-                                <div class="space-y-4">
-                                  <h2 class="text-3xl font-bold text-gray-900">{{ block.data.heading }}</h2>
-                                  <p class="text-gray-600">{{ block.data.description }}</p>
-                                  <div class="space-y-3 text-sm text-gray-700">
-                                    <div class="flex items-center space-x-2">
-                                      <i class="fa-solid fa-location-dot text-orange-500"></i>
+                                <div class="space-y-4" :style="mapInfoCardStyle(block)">
+                                  <h2 class="font-bold" :style="mapHeadingStyle(block)">{{ block.data.heading }}</h2>
+                                  <p :style="mapDescriptionStyle(block)">{{ block.data.description }}</p>
+                                  <div class="space-y-3 text-sm">
+                                    <div class="flex items-center gap-2" :style="mapContactRowStyle(block)">
+                                      <i class="fa-solid fa-location-dot" :style="mapContactIconStyle(block)"></i>
                                       <span>{{ block.data.address }}</span>
                                     </div>
-                                    <div class="flex items-center space-x-2">
-                                      <i class="fa-solid fa-clock text-orange-500"></i>
+                                    <div class="flex items-center gap-2" :style="mapContactRowStyle(block)">
+                                      <i class="fa-solid fa-clock" :style="mapContactIconStyle(block)"></i>
                                       <span>{{ block.data.workHours }}</span>
                                     </div>
-                                    <div class="flex items-center space-x-2">
-                                      <i class="fa-solid fa-phone text-orange-500"></i>
+                                    <div class="flex items-center gap-2" :style="mapContactRowStyle(block)">
+                                      <i class="fa-solid fa-phone" :style="mapContactIconStyle(block)"></i>
                                       <span>{{ block.data.phone }}</span>
                                     </div>
+                                  </div>
+                                  <div v-if="block.data.buttonVisible" :style="blockButtonWrapperStyle(block.data)">
+                                    <button
+                                      :class="blockButtonClass(block.data)"
+                                      :style="blockButtonStyle(block.data, { background: '#f97316', textColor: '#ffffff', secondaryBackground: '#ffffff', secondaryText: '#111827', shadow: block.data.buttonShadow || '0 18px 40px rgba(249,115,22,0.35)' })"
+                                    >
+                                      <span>{{ block.data.buttonText || 'Позвонить нам' }}</span>
+                                      <i class="fa-solid fa-phone"></i>
+                                    </button>
                                   </div>
                                 </div>
                               </div>
@@ -2114,24 +1334,80 @@
         };
       }
 
-      function heroImageProps(element) {
-        const data = element.data || {};
-        return {
-          src: data.src || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
-          alt: data.alt || 'Изображение',
-          style: {
-            width: asCssSize(data.width, '320px'),
-            height: data.height ? asCssSize(data.height, 'auto') : 'auto',
-            borderRadius: asCssSize(data.borderRadius, '16px'),
-            objectFit: data.objectFit || 'cover',
-            boxShadow: data.boxShadow || '0 25px 60px rgba(15,23,42,0.35)',
-            borderWidth: asCssSize(data.borderWidth, '0px'),
-            borderStyle: 'solid',
-            borderColor: data.borderColor || 'rgba(255,255,255,0.2)',
-            backgroundColor: data.backgroundColor || 'transparent'
-          }
-        };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      function deliveryLayoutClass(block) {
+        const layout = block?.data?.layout || 'two-column';
+        if (layout === 'stacked') {
+          return 'flex flex-col gap-10';
+        }
+        return 'grid lg:grid-cols-2 gap-10 items-start';
       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       function setDevice(device) {
         canvas.device = device;
@@ -2470,40 +1746,8 @@
         nextTick(scheduleSelectionOverlay);
       }
 
-      function asCssSize(value, fallback) {
-        if (value === null || value === undefined) {
-          return fallback;
-        }
-        const trimmed = String(value).trim();
-        if (!trimmed) {
-          return fallback;
-        }
-        if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
-          return `${trimmed}px`;
-        }
-        return trimmed;
-      }
 
-      function parseCssNumber(value, fallback = 0) {
-        if (value === null || value === undefined) {
-          return fallback;
-        }
-        const match = String(value).match(/-?\d+(\.\d+)?/);
-        return match ? Number(match[0]) : fallback;
-      }
 
-      function clampNumber(value, min, max) {
-        if (!Number.isFinite(value)) {
-          return min;
-        }
-        if (value < min) {
-          return min;
-        }
-        if (value > max) {
-          return max;
-        }
-        return value;
-      }
 
       function getElementKey(blockId, elementId) {
         return `${blockId}:${elementId}`;
@@ -2596,148 +1840,14 @@
         scheduleSelectionOverlay();
       }
 
-      function heroWrapperStyle(block) {
-        const data = block.data || {};
-        const layout = data.layout || 'split';
-        const heightValue = layout === 'freeform'
-          ? asCssSize(data.freeformHeight || data.minHeight, '640px')
-          : asCssSize(data.minHeight, '560px');
-        return {
-          minHeight: heightValue,
-          padding: `${asCssSize(data.contentPaddingY, '120px')} ${asCssSize(data.contentPaddingX, '96px')}`,
-          position: 'relative'
-        };
-      }
 
-      function heroBackgroundStyle(block) {
-        const data = block.data || {};
-        const image = data.backgroundImage ? `url(${data.backgroundImage})` : 'none';
-        return {
-          backgroundImage: image,
-          backgroundPosition: data.backgroundPosition || 'center center',
-          backgroundSize: data.backgroundSize || 'cover',
-          backgroundRepeat: data.backgroundRepeat || 'no-repeat'
-        };
-      }
 
-      function heroOverlayStyle(block) {
-        const data = block.data || {};
-        const styles = {
-          background: data.overlayColor || 'rgba(17, 24, 39, 0.55)'
-        };
-        const blurValue = parseFloat(data.overlayBlur);
-        if (!Number.isNaN(blurValue) && blurValue > 0) {
-          styles.backdropFilter = `blur(${blurValue}px)`;
-        }
-        return styles;
-      }
 
-      function heroContainerClasses(block) {
-        const data = block.data || {};
-        const layout = data.layout || 'split';
-        if (layout === 'split') {
-          const classes = ['relative', 'grid', 'items-center', 'w-full'];
-          if (data.showRightImage) {
-            classes.push('lg:grid-cols-2');
-          } else {
-            classes.push('grid-cols-1');
-          }
-          return classes.join(' ');
-        }
-        if (layout === 'freeform') {
-          return 'relative flex flex-col w-full';
-        }
-        return 'relative flex flex-col items-center w-full';
-      }
 
-      function heroContainerStyle(block) {
-        const data = block.data || {};
-        const layout = data.layout || 'split';
-        if (layout === 'freeform') {
-          return {
-            gap: '0px',
-            position: 'relative',
-            width: '100%'
-          };
-        }
-        return {
-          gap: asCssSize(data.contentGap, '40px')
-        };
-      }
 
-      function heroContentColumnClasses(block) {
-        const data = block.data || {};
-        const layout = data.layout || 'split';
-        if (layout === 'freeform') {
-          return 'relative w-full min-h-[320px]';
-        }
-        const classes = ['space-y-4', 'w-full'];
-        if (layout === 'split') {
-          classes.push('text-left');
-          if (data.imageSide === 'left' && data.showRightImage) {
-            classes.push('lg:order-2');
-          }
-        } else {
-          classes.push('mx-auto', 'text-center');
-          if (layout === 'spotlight') {
-            classes.push('order-2');
-          }
-        }
-        return classes.join(' ');
-      }
 
-      function heroContentStyle(block) {
-        const data = block.data || {};
-        const style = {
-          maxWidth: asCssSize(data.contentMaxWidth, '620px'),
-          width: '100%'
-        };
-        if (data.layout === 'freeform') {
-          style.position = 'relative';
-          style.minHeight = asCssSize(data.freeformHeight || data.minHeight, '640px');
-        } else if (data.layout && data.layout !== 'split') {
-          style.marginLeft = 'auto';
-          style.marginRight = 'auto';
-        }
-        return style;
-      }
 
-      function heroMediaWrapperClasses(block) {
-        const data = block.data || {};
-        if (!data.showRightImage) {
-          return 'hidden';
-        }
-        const layout = data.layout || 'split';
-        if (layout === 'freeform') {
-          return 'hidden';
-        }
-        if (layout === 'split') {
-          const classes = ['hidden', 'lg:flex', 'items-center', 'justify-center'];
-          if (data.imageSide === 'left') {
-            classes.push('lg:order-1');
-          }
-          return classes.join(' ');
-        }
-        if (layout === 'spotlight') {
-          return 'flex justify-center order-1 w-full mb-10';
-        }
-        return 'flex justify-center w-full mt-10';
-      }
 
-      function heroFeatureIconWrapperStyle(element) {
-        const data = element.data || {};
-        let borderRadius = '9999px';
-        if (data.iconShape === 'square') {
-          borderRadius = '12px';
-        } else if (data.iconShape === 'rounded') {
-          borderRadius = '18px';
-        }
-        return {
-          backgroundColor: data.iconBackground || 'rgba(249, 115, 22, 0.12)',
-          color: data.iconColor || '#f97316',
-          borderRadius
-        };
-      }
 
       function handleWindowResize() {
         scheduleSelectionOverlay();
@@ -3161,7 +2271,74 @@
         heroContentColumnClasses,
         heroContentStyle,
         heroMediaWrapperClasses,
-        heroFeatureIconWrapperStyle
+        heroFeatureIconWrapperStyle,
+        sectionBackgroundStyle,
+        sectionOverlayStyle,
+        blockButtonWrapperStyle,
+        blockButtonClass,
+        blockButtonStyle,
+        categoriesSectionStyle,
+        categoriesOverlayStyle,
+        categoriesHeaderStyle,
+        categoriesHeadingStyle,
+        categoriesSubheadingStyle,
+        categoriesDescriptionStyle,
+        categoriesGridStyle,
+        categoriesCardStyle,
+        categoriesIconWrapperStyle,
+        categoriesCardTitleStyle,
+        categoriesCardDescriptionStyle,
+        menuSectionStyle,
+        menuOverlayStyle,
+        menuHeaderStyle,
+        menuHeadingStyle,
+        menuDescriptionStyle,
+        menuFilterSurfaceStyle,
+        menuTabsWrapperStyle,
+        menuActiveTabStyle,
+        menuTabStyle,
+        menuGridStyle,
+        menuCardStyle,
+        menuCardImageStyle,
+        menuCardTitleStyle,
+        menuCardDescriptionStyle,
+        menuPriceStyle,
+        menuTagStyle,
+        deliverySectionStyle,
+        deliveryOverlayStyle,
+        deliveryLayoutClass,
+        deliveryTextColumnStyle,
+        deliveryHeadingStyle,
+        deliveryDescriptionStyle,
+        deliveryFeatureIconStyle,
+        deliveryFeatureTextStyle,
+        deliveryContactsStyle,
+        deliveryTrackingCardStyle,
+        deliveryTrackingBarStyle,
+        deliveryTrackingTitleStyle,
+        deliveryTrackingDescriptionStyle,
+        deliveryTrackingProgressStyle,
+        reviewsSectionStyle,
+        reviewsOverlayStyle,
+        reviewsHeaderStyle,
+        reviewsHeadingStyle,
+        reviewsDescriptionStyle,
+        reviewsGridStyle,
+        reviewsCardStyle,
+        reviewsAvatarStyle,
+        reviewsCardTitleStyle,
+        reviewsCardSubtitleStyle,
+        reviewsRatingStyle,
+        reviewsQuoteStyle,
+        mapSectionStyle,
+        mapOverlayStyle,
+        mapFrameStyle,
+        mapIframeStyle,
+        mapInfoCardStyle,
+        mapHeadingStyle,
+        mapDescriptionStyle,
+        mapContactRowStyle,
+        mapContactIconStyle
       };
     }
   };
