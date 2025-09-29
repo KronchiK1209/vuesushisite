@@ -1,6 +1,6 @@
 // Админ-модуль: Настройки сайта и визуальный конструктор главной страницы
 (function(){
-  const { ref, reactive, computed, watch, onMounted } = Vue;
+  const { ref, reactive, computed, watch, onMounted, onUnmounted } = Vue;
 
   const elementRegistry = {
     heading: {
@@ -9,11 +9,24 @@
       defaultData: () => ({
         text: 'Новый заголовок',
         level: 'h2',
-        fontSize: 'text-3xl',
+        fontSize: 'text-4xl',
+        customFontSize: '',
+        fontWeight: '700',
+        lineHeight: '1.2',
+        letterSpacing: '0em',
         color: '#111827',
         align: 'left',
+        maxWidth: '520px',
+        backgroundColor: 'transparent',
+        paddingX: '0px',
+        paddingY: '0px',
+        shadow: 'none',
         marginTop: '0px',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        width: 'auto',
+        positionX: 18,
+        positionY: 28,
+        zIndex: 5
       }),
       fields: [
         { key: 'text', label: 'Текст', type: 'text', placeholder: 'Введите заголовок' },
@@ -29,14 +42,15 @@
         },
         {
           key: 'fontSize',
-          label: 'Размер',
+          label: 'Размер (Tailwind)',
           type: 'select',
           options: [
-            { value: 'text-2xl', label: 'Крупный (2xl)' },
             { value: 'text-3xl', label: 'Очень крупный (3xl)' },
-            { value: 'text-4xl', label: 'Заголовок (4xl)' }
+            { value: 'text-4xl', label: 'Заголовок (4xl)' },
+            { value: 'text-5xl', label: 'Героический (5xl)' }
           ]
         },
+        { key: 'customFontSize', label: 'Своя величина', type: 'text', placeholder: '48px' },
         {
           key: 'color',
           label: 'Цвет текста',
@@ -52,8 +66,39 @@
             { value: 'right', label: 'Справа' }
           ]
         },
+        {
+          key: 'fontWeight',
+          label: 'Жирность',
+          type: 'select',
+          options: [
+            { value: '400', label: 'Обычный' },
+            { value: '500', label: 'Полужирный' },
+            { value: '600', label: 'Жирный' },
+            { value: '700', label: 'Сверхжирный' }
+          ]
+        },
+        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.2' },
+        { key: 'letterSpacing', label: 'Межбуквенный интервал', type: 'text', placeholder: '0em' },
+        { key: 'maxWidth', label: 'Макс. ширина', type: 'text', placeholder: '520px' },
+        { key: 'backgroundColor', label: 'Цвет подложки', type: 'color' },
+        { key: 'paddingX', label: 'Гор. отступ', type: 'text', placeholder: '0px' },
+        { key: 'paddingY', label: 'Верт. отступ', type: 'text', placeholder: '0px' },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
+        { key: 'width', label: 'Ширина', type: 'text', placeholder: 'auto' },
+        {
+          key: 'shadow',
+          label: 'Тень',
+          type: 'select',
+          options: [
+            { value: 'none', label: 'Без тени' },
+            { value: 'soft', label: 'Мягкая' },
+            { value: 'strong', label: 'Объёмная' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'positionY', label: 'Позиция Y (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'zIndex', label: 'Слой', type: 'number', placeholder: '5' }
       ]
     },
     subheading: {
@@ -62,16 +107,29 @@
       defaultData: () => ({
         text: 'Новый подзаголовок',
         fontSize: 'text-xl',
+        customFontSize: '',
+        fontWeight: '600',
+        lineHeight: '1.3',
+        letterSpacing: '0em',
         color: '#f97316',
         align: 'left',
+        maxWidth: '520px',
+        backgroundColor: 'transparent',
+        paddingX: '0px',
+        paddingY: '0px',
+        shadow: 'none',
         marginTop: '0px',
-        marginBottom: '12px'
+        marginBottom: '12px',
+        width: 'auto',
+        positionX: 20,
+        positionY: 38,
+        zIndex: 4
       }),
       fields: [
         { key: 'text', label: 'Текст', type: 'text', placeholder: 'Введите подзаголовок' },
         {
           key: 'fontSize',
-          label: 'Размер',
+          label: 'Размер (Tailwind)',
           type: 'select',
           options: [
             { value: 'text-lg', label: 'Крупный' },
@@ -79,6 +137,7 @@
             { value: 'text-2xl', label: 'Заголовочный' }
           ]
         },
+        { key: 'customFontSize', label: 'Своя величина', type: 'text', placeholder: '28px' },
         {
           key: 'color',
           label: 'Цвет текста',
@@ -94,8 +153,38 @@
             { value: 'right', label: 'Справа' }
           ]
         },
+        {
+          key: 'fontWeight',
+          label: 'Жирность',
+          type: 'select',
+          options: [
+            { value: '400', label: 'Обычный' },
+            { value: '500', label: 'Полужирный' },
+            { value: '600', label: 'Жирный' }
+          ]
+        },
+        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.3' },
+        { key: 'letterSpacing', label: 'Межбуквенный интервал', type: 'text', placeholder: '0em' },
+        { key: 'maxWidth', label: 'Макс. ширина', type: 'text', placeholder: '520px' },
+        { key: 'backgroundColor', label: 'Цвет подложки', type: 'color' },
+        { key: 'paddingX', label: 'Гор. отступ', type: 'text', placeholder: '0px' },
+        { key: 'paddingY', label: 'Верт. отступ', type: 'text', placeholder: '0px' },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '12px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '12px' },
+        { key: 'width', label: 'Ширина', type: 'text', placeholder: 'auto' },
+        {
+          key: 'shadow',
+          label: 'Тень',
+          type: 'select',
+          options: [
+            { value: 'none', label: 'Без тени' },
+            { value: 'soft', label: 'Мягкая' },
+            { value: 'strong', label: 'Объёмная' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'positionY', label: 'Позиция Y (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'zIndex', label: 'Слой', type: 'number', placeholder: '4' }
       ]
     },
     paragraph: {
@@ -104,16 +193,29 @@
       defaultData: () => ({
         text: 'Добавьте описание секции или товара',
         fontSize: 'text-base',
+        customFontSize: '',
+        fontWeight: '400',
+        lineHeight: '1.5',
+        letterSpacing: '0em',
         color: '#4b5563',
         align: 'left',
+        maxWidth: '560px',
+        backgroundColor: 'transparent',
+        paddingX: '0px',
+        paddingY: '0px',
+        shadow: 'none',
         marginTop: '0px',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        width: 'auto',
+        positionX: 22,
+        positionY: 50,
+        zIndex: 3
       }),
       fields: [
         { key: 'text', label: 'Текст', type: 'textarea', rows: 3, placeholder: 'Расскажите подробнее' },
         {
           key: 'fontSize',
-          label: 'Размер',
+          label: 'Размер (Tailwind)',
           type: 'select',
           options: [
             { value: 'text-sm', label: 'Маленький' },
@@ -121,6 +223,7 @@
             { value: 'text-lg', label: 'Крупный' }
           ]
         },
+        { key: 'customFontSize', label: 'Своя величина', type: 'text', placeholder: '18px' },
         {
           key: 'color',
           label: 'Цвет текста',
@@ -136,8 +239,37 @@
             { value: 'right', label: 'Справа' }
           ]
         },
+        {
+          key: 'fontWeight',
+          label: 'Жирность',
+          type: 'select',
+          options: [
+            { value: '400', label: 'Стандарт' },
+            { value: '500', label: 'Полужирный' }
+          ]
+        },
+        { key: 'lineHeight', label: 'Межстрочный интервал', type: 'text', placeholder: '1.5' },
+        { key: 'letterSpacing', label: 'Межбуквенный интервал', type: 'text', placeholder: '0em' },
+        { key: 'maxWidth', label: 'Макс. ширина', type: 'text', placeholder: '560px' },
+        { key: 'backgroundColor', label: 'Цвет подложки', type: 'color' },
+        { key: 'paddingX', label: 'Гор. отступ', type: 'text', placeholder: '0px' },
+        { key: 'paddingY', label: 'Верт. отступ', type: 'text', placeholder: '0px' },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
+        { key: 'width', label: 'Ширина', type: 'text', placeholder: 'auto' },
+        {
+          key: 'shadow',
+          label: 'Тень',
+          type: 'select',
+          options: [
+            { value: 'none', label: 'Без тени' },
+            { value: 'soft', label: 'Мягкая' },
+            { value: 'strong', label: 'Объёмная' }
+          ]
+        },
+        { key: 'positionX', label: 'Позиция X (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'positionY', label: 'Позиция Y (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'zIndex', label: 'Слой', type: 'number', placeholder: '3' }
       ]
     },
     button: {
@@ -150,7 +282,19 @@
         href: '',
         align: 'left',
         marginTop: '0px',
-        marginBottom: '0px'
+        marginBottom: '0px',
+        textColor: '#111827',
+        backgroundColor: '#ffffff',
+        borderColor: 'transparent',
+        paddingX: '24px',
+        paddingY: '14px',
+        borderRadius: '9999px',
+        fontWeight: '600',
+        shadow: 'soft',
+        width: 'auto',
+        positionX: 22,
+        positionY: 64,
+        zIndex: 6
       }),
       fields: [
         { key: 'text', label: 'Текст кнопки', type: 'text', placeholder: 'Например, Заказать' },
@@ -185,7 +329,37 @@
           ]
         },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' },
+        { key: 'textColor', label: 'Цвет текста', type: 'color' },
+        { key: 'backgroundColor', label: 'Цвет фона', type: 'color' },
+        { key: 'borderColor', label: 'Цвет обводки', type: 'color' },
+        { key: 'paddingX', label: 'Гор. отступ', type: 'text', placeholder: '24px' },
+        { key: 'paddingY', label: 'Верт. отступ', type: 'text', placeholder: '14px' },
+        { key: 'borderRadius', label: 'Радиус скругления', type: 'text', placeholder: '9999px' },
+        {
+          key: 'fontWeight',
+          label: 'Жирность',
+          type: 'select',
+          options: [
+            { value: '500', label: 'Полужирный' },
+            { value: '600', label: 'Жирный' },
+            { value: '700', label: 'Экстра жирный' }
+          ]
+        },
+        {
+          key: 'shadow',
+          label: 'Тень',
+          type: 'select',
+          options: [
+            { value: 'none', label: 'Без тени' },
+            { value: 'soft', label: 'Мягкая' },
+            { value: 'strong', label: 'Объёмная' }
+          ]
+        },
+        { key: 'width', label: 'Ширина', type: 'text', placeholder: 'auto' },
+        { key: 'positionX', label: 'Позиция X (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'positionY', label: 'Позиция Y (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'zIndex', label: 'Слой', type: 'number', placeholder: '6' }
       ]
     },
     image: {
@@ -199,7 +373,14 @@
         align: 'left',
         borderRadius: '16px',
         marginTop: '0px',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        objectFit: 'cover',
+        shadow: 'soft',
+        borderWidth: '0px',
+        borderColor: 'transparent',
+        positionX: 70,
+        positionY: 48,
+        zIndex: 2
       }),
       fields: [
         { key: 'src', label: 'URL изображения', type: 'text', placeholder: 'https://...' },
@@ -218,7 +399,26 @@
         },
         { key: 'borderRadius', label: 'Скругление', type: 'text', placeholder: '16px' },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '16px' },
+        {
+          key: 'objectFit',
+          label: 'Режим обрезки',
+          type: 'select',
+          options: [
+            { value: 'cover', label: 'Заполнить' },
+            { value: 'contain', label: 'Вписать' }
+          ]
+        },
+        { key: 'shadow', label: 'Тень', type: 'select', options: [
+          { value: 'none', label: 'Без тени' },
+          { value: 'soft', label: 'Мягкая' },
+          { value: 'strong', label: 'Объёмная' }
+        ] },
+        { key: 'borderWidth', label: 'Толщина рамки', type: 'text', placeholder: '0px' },
+        { key: 'borderColor', label: 'Цвет рамки', type: 'color' },
+        { key: 'positionX', label: 'Позиция X (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'positionY', label: 'Позиция Y (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'zIndex', label: 'Слой', type: 'number', placeholder: '2' }
       ]
     },
     feature: {
@@ -229,8 +429,16 @@
         icon: 'fa-solid fa-check',
         color: '#111827',
         fontSize: 'text-base',
+        align: 'left',
+        iconColor: '#ffffff',
+        iconBackground: '#f97316',
+        badgeShape: 'circle',
+        fontWeight: '500',
         marginTop: '0px',
-        marginBottom: '8px'
+        marginBottom: '8px',
+        positionX: 24,
+        positionY: 74,
+        zIndex: 3
       }),
       fields: [
         { key: 'text', label: 'Текст', type: 'text', placeholder: 'Например, Бесплатная доставка' },
@@ -250,8 +458,43 @@
             { value: 'text-lg', label: 'Крупный' }
           ]
         },
+        {
+          key: 'fontWeight',
+          label: 'Жирность',
+          type: 'select',
+          options: [
+            { value: '400', label: 'Обычный' },
+            { value: '500', label: 'Полужирный' },
+            { value: '600', label: 'Жирный' }
+          ]
+        },
+        {
+          key: 'align',
+          label: 'Выравнивание',
+          type: 'select',
+          options: [
+            { value: 'left', label: 'Слева' },
+            { value: 'center', label: 'По центру' },
+            { value: 'right', label: 'Справа' }
+          ]
+        },
+        { key: 'iconColor', label: 'Цвет иконки', type: 'color' },
+        { key: 'iconBackground', label: 'Фон иконки', type: 'color' },
+        {
+          key: 'badgeShape',
+          label: 'Форма бейджа',
+          type: 'select',
+          options: [
+            { value: 'circle', label: 'Круг' },
+            { value: 'rounded', label: 'Скругленный квадрат' },
+            { value: 'pill', label: 'Пилюля' }
+          ]
+        },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '8px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '8px' },
+        { key: 'positionX', label: 'Позиция X (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'positionY', label: 'Позиция Y (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'zIndex', label: 'Слой', type: 'number', placeholder: '3' }
       ]
     },
     spacer: {
@@ -260,15 +503,190 @@
       defaultData: () => ({
         height: '24px',
         marginTop: '0px',
-        marginBottom: '0px'
+        marginBottom: '0px',
+        positionX: 50,
+        positionY: 50,
+        width: '100%',
+        zIndex: 1
       }),
       fields: [
         { key: 'height', label: 'Высота', type: 'text', placeholder: '24px' },
         { key: 'marginTop', label: 'Отступ сверху', type: 'text', placeholder: '0px' },
-        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' }
+        { key: 'marginBottom', label: 'Отступ снизу', type: 'text', placeholder: '0px' },
+        { key: 'width', label: 'Ширина', type: 'text', placeholder: '100%' },
+        { key: 'positionX', label: 'Позиция X (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'positionY', label: 'Позиция Y (%)', type: 'range', min: 0, max: 100, step: 1 },
+        { key: 'zIndex', label: 'Слой', type: 'number', placeholder: '1' }
       ]
     }
   };
+
+  const elementShadowStyles = {
+    none: 'none',
+    soft: '0 18px 45px rgba(15, 23, 42, 0.18)',
+    strong: '0 28px 60px rgba(15, 23, 42, 0.28)'
+  };
+
+  const heroBlockElementBindings = {
+    heading: { elementType: 'heading', elementField: 'text' },
+    subheading: { elementType: 'subheading', elementField: 'text' },
+    description: { elementType: 'paragraph', elementField: 'text' },
+    buttonText: { elementType: 'button', elementField: 'text' },
+    buttonStyle: { elementType: 'button', elementField: 'style' },
+    buttonAction: { elementType: 'button', elementField: 'action' },
+    buttonLink: { elementType: 'button', elementField: 'href' }
+  };
+
+  const heroElementBlockBindings = {
+    heading: { text: 'heading' },
+    subheading: { text: 'subheading' },
+    paragraph: { text: 'description' },
+    button: { text: 'buttonText', style: 'buttonStyle', action: 'buttonAction', href: 'buttonLink' }
+  };
+
+  const heroFreeformDefaults = {
+    heading: { positionX: 12, positionY: 26, zIndex: 6 },
+    subheading: { positionX: 14, positionY: 38, zIndex: 5 },
+    paragraph: { positionX: 16, positionY: 50, zIndex: 4 },
+    button: { positionX: 18, positionY: 63, zIndex: 7 },
+    image: { positionX: 64, positionY: 44, zIndex: 3 },
+    feature: { positionX: 22, positionY: 76, zIndex: 4 },
+    spacer: { positionX: 52, positionY: 52, zIndex: 2 },
+    __fallback: { positionX: 30, positionY: 50, zIndex: 1 }
+  };
+
+  const hasOwn = (obj, key) => Object.prototype.hasOwnProperty.call(obj || {}, key);
+
+  function ensureHeroBlockConsistency(block) {
+    if (!block || block.type !== 'hero') {
+      return;
+    }
+    const data = block.data || (block.data = {});
+    const elements = Array.isArray(data.elements) ? data.elements : [];
+    elements.forEach(element => {
+      if (!element || typeof element !== 'object') return;
+      if (!element.data || typeof element.data !== 'object') {
+        element.data = {};
+      }
+    });
+
+    Object.entries(heroBlockElementBindings).forEach(([blockKey, binding]) => {
+      const element = elements.find(el => el.type === binding.elementType);
+      if (!element) return;
+      const elementData = element.data || (element.data = {});
+      const elementHasValue = hasOwn(elementData, binding.elementField);
+      const blockHasValue = hasOwn(data, blockKey);
+      const defaultData = elementRegistry[binding.elementType]?.defaultData?.() || {};
+      let nextValue;
+      if (elementHasValue) {
+        nextValue = elementData[binding.elementField];
+      } else if (blockHasValue) {
+        nextValue = data[blockKey];
+      } else if (hasOwn(defaultData, binding.elementField)) {
+        nextValue = defaultData[binding.elementField];
+      } else {
+        nextValue = '';
+      }
+      elementData[binding.elementField] = nextValue;
+      data[blockKey] = nextValue;
+    });
+  }
+
+  function applyHeroBlockFieldToElement(block, fieldKey, value) {
+    if (!block || block.type !== 'hero') {
+      return;
+    }
+    const binding = heroBlockElementBindings[fieldKey];
+    if (!binding) {
+      return;
+    }
+    const elements = Array.isArray(block.data?.elements) ? block.data.elements : [];
+    const element = elements.find(el => el.type === binding.elementType);
+    if (!element) {
+      return;
+    }
+    if (!element.data || typeof element.data !== 'object') {
+      element.data = {};
+    }
+    element.data[binding.elementField] = value;
+  }
+
+  function applyHeroElementFieldToBlock(block, element, fieldKey, value) {
+    if (!block || block.type !== 'hero' || !element) {
+      return;
+    }
+    const mapping = heroElementBlockBindings[element.type];
+    if (!mapping) {
+      return;
+    }
+    const blockKey = mapping[fieldKey];
+    if (!blockKey) {
+      return;
+    }
+    if (!block.data || typeof block.data !== 'object') {
+      block.data = {};
+    }
+    block.data[blockKey] = value;
+  }
+
+  function ensureHeroFreeformDefaults(block) {
+    if (!block || block.type !== 'hero') {
+      return;
+    }
+    const data = block.data || {};
+    if ((data.layoutMode || 'stacked') !== 'free') {
+      return;
+    }
+    const elements = Array.isArray(data.elements) ? data.elements : [];
+    let highestZ = 0;
+    elements.forEach(el => {
+      const z = Number(el?.data?.zIndex);
+      if (Number.isFinite(z)) {
+        highestZ = Math.max(highestZ, z);
+      }
+    });
+    let zCursor = highestZ;
+    elements.forEach((element, index) => {
+      if (!element || typeof element !== 'object') return;
+      if (!element.data || typeof element.data !== 'object') {
+        element.data = {};
+      }
+      const defaults = heroFreeformDefaults[element.type] || heroFreeformDefaults.__fallback;
+      if (!hasOwn(element.data, 'positionX')) {
+        element.data.positionX = defaults.positionX ?? Math.min(12 + index * 10, 90);
+      }
+      if (!hasOwn(element.data, 'positionY')) {
+        element.data.positionY = defaults.positionY ?? Math.min(18 + index * 12, 90);
+      }
+      if (!hasOwn(element.data, 'zIndex')) {
+        zCursor += 1;
+        element.data.zIndex = defaults.zIndex ?? zCursor;
+      }
+    });
+  }
+
+  function reconcileHeroBlockAfterElementRemoval(block, removedType) {
+    if (!block || block.type !== 'hero') {
+      return;
+    }
+    const elements = Array.isArray(block.data?.elements) ? block.data.elements : [];
+    Object.entries(heroBlockElementBindings).forEach(([blockKey, binding]) => {
+      if (binding.elementType !== removedType) {
+        return;
+      }
+      const fallback = elements.find(el => el.type === removedType);
+      if (fallback && fallback.data && hasOwn(fallback.data, binding.elementField)) {
+        block.data[blockKey] = fallback.data[binding.elementField];
+      } else if (block.data && hasOwn(block.data, blockKey)) {
+        delete block.data[blockKey];
+      }
+    });
+  }
+
+  function prepareHeroBlock(block) {
+    ensureHeroBlockConsistency(block);
+    ensureHeroFreeformDefaults(block);
+  }
 
   const blockRegistry = {
     hero: {
@@ -282,6 +700,13 @@
         buttonStyle: 'primary',
         buttonAction: 'scrollMenu',
         buttonLink: '',
+        layoutMode: 'stacked',
+        canvasHeight: 680,
+        canvasPadding: '96px 72px',
+        contentWidth: '560px',
+        stackGap: '24px',
+        contentAlign: 'left',
+        canvasBackground: 'transparent',
         backgroundImage: 'https://images.unsplash.com/photo-1579952363873-27d3bfad9c0d',
         previewImage: 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
         imageSide: 'right',
@@ -338,6 +763,35 @@
         ]
       }),
       inspector: [
+        {
+          label: 'Полотно',
+          fields: [
+            {
+              key: 'layoutMode',
+              label: 'Режим компоновки',
+              type: 'select',
+              options: [
+                { value: 'stacked', label: 'Колонка' },
+                { value: 'free', label: 'Свободное размещение' }
+              ]
+            },
+            { key: 'canvasHeight', label: 'Высота полотна (px)', type: 'text', placeholder: '680' },
+            { key: 'canvasPadding', label: 'Внутренние отступы', type: 'text', placeholder: '96px 72px' },
+            { key: 'contentWidth', label: 'Ширина контента', type: 'text', placeholder: '560px' },
+            { key: 'stackGap', label: 'Интервал между элементами', type: 'text', placeholder: '24px' },
+            {
+              key: 'contentAlign',
+              label: 'Выравнивание контента',
+              type: 'select',
+              options: [
+                { value: 'left', label: 'Слева' },
+                { value: 'center', label: 'По центру' },
+                { value: 'right', label: 'Справа' }
+              ]
+            },
+            { key: 'canvasBackground', label: 'Цвет полотна', type: 'color' }
+          ]
+        },
         {
           label: 'Контент',
           fields: [
@@ -610,7 +1064,7 @@
         : [];
     }
 
-    return {
+    const instance = {
       id: source.id || generateId('block'),
       type,
       name: definition.name,
@@ -620,6 +1074,12 @@
         hidden: !!(source.hidden || (source.meta && source.meta.hidden))
       }
     };
+
+    if (instance.type === 'hero') {
+      prepareHeroBlock(instance);
+    }
+
+    return instance;
   }
 
   window.AdminSiteSettingsView = {
@@ -931,102 +1391,190 @@
                           ></div>
 
                           <template v-if="block.type === 'hero'">
-                            <div class="relative overflow-hidden rounded-3xl text-white">
+                            <div
+                              class="relative overflow-hidden rounded-3xl text-white"
+                              :style="{ backgroundColor: block.data.canvasBackground || 'transparent' }"
+                            >
                               <img
                                 :src="block.data.backgroundImage"
                                 alt="hero bg"
                                 class="absolute inset-0 w-full h-full object-cover"
                               />
                               <div class="absolute inset-0" :style="{ background: block.data.overlayColor || 'rgba(17,24,39,0.6)' }"></div>
-                              <div class="relative grid lg:grid-cols-2 gap-12 px-12 py-16">
-                                <div class="space-y-4">
+                              <div
+                                class="relative w-full"
+                                :class="isHeroLayoutFree(block) ? 'min-h-[480px]' : 'grid lg:grid-cols-2 gap-12'"
+                                :style="heroCanvasSurfaceStyle(block)"
+                                :ref="el => setHeroCanvasRef(block.id, el)"
+                              >
+                                <template v-if="isHeroLayoutFree(block)">
                                   <div
                                     v-if="!block.data.elements || !block.data.elements.length"
-                                    class="border border-dashed border-white/40 rounded-2xl px-4 py-6 text-sm text-white/70 text-center"
+                                    class="absolute inset-0 flex items-center justify-center text-sm text-white/70 pointer-events-none"
                                   >
-                                    Добавьте элементы через инспектор или перетащите их сюда.
+                                    Добавьте элементы через инспектор и перетащите их на холст.
                                   </div>
-                                  <template v-else>
+                                  <div
+                                    v-if="canvas.showOverlays"
+                                    class="absolute inset-0 border border-dashed border-white/30 rounded-[32px] pointer-events-none"
+                                  ></div>
+                                  <div
+                                    v-for="element in block.data.elements"
+                                    :key="element.id"
+                                    :class="heroElementWrapperClasses(block, element)"
+                                    :style="heroElementWrapperStyle(block, element)"
+                                    @pointerdown="onHeroFreeformPointerDown(block.id, element, $event)"
+                                    @click.stop="selectElement(block.id, element.id)"
+                                  >
                                     <div
-                                      v-for="(element, elementIndex) in block.data.elements"
-                                      :key="element.id"
-                                      class="space-y-2"
+                                      v-if="canvas.showOverlays"
+                                      class="absolute inset-0 rounded-2xl border border-dashed pointer-events-none"
+                                      :class="isElementSelected(element) && selectedBlockId === block.id ? 'border-orange-300' : 'border-white/30'"
+                                    ></div>
+                                    <div class="absolute top-2 right-2 text-[11px] uppercase tracking-wider text-white/80 bg-black/30 px-2 py-1 rounded-full">
+                                      {{ elementRegistry[element.type]?.label || element.type }}
+                                    </div>
+                                    <component
+                                      :is="renderHeroElement(element)"
+                                      v-bind="heroElementProps(block, element)"
                                     >
+                                      <template v-if="element.type === 'button'">
+                                        <span>{{ element.data.text }}</span>
+                                        <i class="fa-solid fa-arrow-right ml-2"></i>
+                                      </template>
+                                      <template v-else-if="element.type === 'image'">
+                                        <img
+                                          :src="heroImageProps(element).src"
+                                          :alt="heroImageProps(element).alt"
+                                          class="object-cover"
+                                          :style="heroImageProps(element).style"
+                                        />
+                                      </template>
+                                      <template v-else-if="element.type === 'feature'">
+                                        <span
+                                          class="inline-flex items-center justify-center w-9 h-9 text-sm font-semibold"
+                                          :style="{
+                                            backgroundColor: element.data.iconBackground || '#f97316',
+                                            color: element.data.iconColor || '#ffffff',
+                                            borderRadius: element.data.badgeShape === 'rounded' ? '16px' : element.data.badgeShape === 'pill' ? '9999px' : '9999px'
+                                          }"
+                                        >
+                                          <i :class="element.data.icon || 'fa-solid fa-check'"></i>
+                                        </span>
+                                        <span>{{ element.data.text }}</span>
+                                      </template>
+                                      <template v-else-if="element.type === 'spacer'"></template>
+                                      <template v-else>{{ element.data.text }}</template>
+                                    </component>
+                                  </div>
+                                </template>
+                                <template v-else>
+                                  <div
+                                    class="relative flex flex-col"
+                                    :class="heroStackContentClasses(block)"
+                                    :style="heroStackColumnStyle(block)"
+                                  >
+                                    <div
+                                      v-if="!block.data.elements || !block.data.elements.length"
+                                      class="border border-dashed border-white/40 rounded-2xl px-4 py-6 text-sm text-white/70 text-center"
+                                    >
+                                      Добавьте элементы через инспектор или перетащите их сюда.
+                                    </div>
+                                    <template v-else>
                                       <div
-                                        class="flex justify-center h-8 transition"
-                                        @dragover.prevent="onHeroElementDragOver(block.id, elementIndex)"
-                                        @dragenter.prevent="onHeroElementDragOver(block.id, elementIndex)"
-                                        @dragleave="onHeroElementDragLeave(block.id, elementIndex)"
-                                        @drop.prevent="onHeroElementDrop(block.id, elementIndex)"
-                                        :class="heroDropWrapperClass(block.id, elementIndex)"
+                                        v-for="(element, elementIndex) in block.data.elements"
+                                        :key="element.id"
+                                        class="relative"
+                                      >
+                                        <div
+                                          class="flex justify-center h-8 transition"
+                                          @dragover.prevent="onHeroElementDragOver(block.id, elementIndex)"
+                                          @dragenter.prevent="onHeroElementDragOver(block.id, elementIndex)"
+                                          @dragleave="onHeroElementDragLeave(block.id, elementIndex)"
+                                          @drop.prevent="onHeroElementDrop(block.id, elementIndex)"
+                                          :class="heroDropWrapperClass(block.id, elementIndex)"
+                                        >
+                                          <div
+                                            class="px-3 py-1 text-[11px] font-medium rounded-full border border-dashed backdrop-blur"
+                                            :class="heroDropLabelClass(block.id, elementIndex)"
+                                          >
+                                            Переместить сюда
+                                          </div>
+                                        </div>
+                                        <div
+                                          :class="heroElementWrapperClasses(block, element)"
+                                          :style="heroElementWrapperStyle(block, element)"
+                                          draggable="true"
+                                          @dragstart="onHeroElementDragStart(block.id, element.id, $event)"
+                                          @dragend="onHeroElementDragEnd"
+                                          @click.stop="selectElement(block.id, element.id)"
+                                        >
+                                          <div
+                                            v-if="canvas.showOverlays"
+                                            class="absolute inset-0 rounded-2xl border border-dashed pointer-events-none"
+                                            :class="isElementSelected(element) && selectedBlockId === block.id ? 'border-orange-300' : 'border-white/30'"
+                                          ></div>
+                                          <div class="absolute top-2 right-2 text-[11px] uppercase tracking-wider text-white/80 bg-black/30 px-2 py-1 rounded-full">
+                                            {{ elementRegistry[element.type]?.label || element.type }}
+                                          </div>
+                                          <component
+                                            :is="renderHeroElement(element)"
+                                            v-bind="heroElementProps(block, element)"
+                                          >
+                                            <template v-if="element.type === 'button'">
+                                              <span>{{ element.data.text }}</span>
+                                              <i class="fa-solid fa-arrow-right ml-2"></i>
+                                            </template>
+                                            <template v-else-if="element.type === 'image'">
+                                              <img
+                                                :src="heroImageProps(element).src"
+                                                :alt="heroImageProps(element).alt"
+                                                class="object-cover"
+                                                :style="heroImageProps(element).style"
+                                              />
+                                            </template>
+                                            <template v-else-if="element.type === 'feature'">
+                                              <span
+                                                class="inline-flex items-center justify-center w-9 h-9 text-sm font-semibold"
+                                                :style="{
+                                                  backgroundColor: element.data.iconBackground || '#f97316',
+                                                  color: element.data.iconColor || '#ffffff',
+                                                  borderRadius: element.data.badgeShape === 'rounded' ? '16px' : element.data.badgeShape === 'pill' ? '9999px' : '9999px'
+                                                }"
+                                              >
+                                                <i :class="element.data.icon || 'fa-solid fa-check'"></i>
+                                              </span>
+                                              <span>{{ element.data.text }}</span>
+                                            </template>
+                                            <template v-else-if="element.type === 'spacer'"></template>
+                                            <template v-else>{{ element.data.text }}</template>
+                                          </component>
+                                        </div>
+                                      </div>
+                                      <div
+                                        class="flex justify-center h-8 transition mt-2"
+                                        @dragover.prevent="onHeroElementDragOver(block.id, block.data.elements.length)"
+                                        @dragenter.prevent="onHeroElementDragOver(block.id, block.data.elements.length)"
+                                        @dragleave="onHeroElementDragLeave(block.id, block.data.elements.length)"
+                                        @drop.prevent="onHeroElementDrop(block.id, block.data.elements.length)"
+                                        :class="heroDropWrapperClass(block.id, block.data.elements.length)"
                                       >
                                         <div
                                           class="px-3 py-1 text-[11px] font-medium rounded-full border border-dashed backdrop-blur"
-                                          :class="heroDropLabelClass(block.id, elementIndex)"
+                                          :class="heroDropLabelClass(block.id, block.data.elements.length)"
                                         >
-                                          Переместить сюда
+                                          Конец блока
                                         </div>
                                       </div>
-                                      <div
-                                        :class="heroElementWrapperClasses(block.id, element)"
-                                        draggable="true"
-                                        @dragstart="onHeroElementDragStart(block.id, element.id, $event)"
-                                        @dragend="onHeroElementDragEnd"
-                                        @click.stop="selectElement(block.id, element.id)"
-                                      >
-                                        <div
-                                          v-if="canvas.showOverlays"
-                                          class="absolute inset-0 rounded-2xl border border-dashed border-white/30 pointer-events-none"
-                                          :class="isElementSelected(element) && selectedBlockId === block.id ? 'border-orange-300' : ''"
-                                        ></div>
-                                        <div class="absolute -left-5 top-1/2 -translate-y-1/2 hidden group-hover:flex flex-col items-center space-y-1 text-white/70">
-                                          <span class="cursor-grab text-xs"><i class="fa-solid fa-grip-vertical"></i></span>
-                                        </div>
-                                        <div class="absolute top-2 right-2 text-[11px] uppercase tracking-wider text-white/80 bg-black/30 px-2 py-1 rounded-full">{{ elementRegistry[element.type]?.label || element.type }}</div>
-                                        <component
-                                          :is="renderHeroElement(element)"
-                                          v-bind="heroElementProps(element)"
-                                        >
-                                          <template v-if="element.type === 'button'">
-                                            <span>{{ element.data.text }}</span>
-                                            <i class="fa-solid fa-arrow-right ml-2"></i>
-                                          </template>
-                                          <template v-else-if="element.type === 'image'">
-                                            <img
-                                              :src="heroImageProps(element).src"
-                                              :alt="heroImageProps(element).alt"
-                                              class="object-cover"
-                                              :style="heroImageProps(element).style"
-                                            />
-                                          </template>
-                                          <template v-else-if="element.type === 'spacer'"></template>
-                                          <template v-else>{{ element.data.text }}</template>
-                                        </component>
-                                      </div>
-                                    </div>
-                                    <div
-                                      class="flex justify-center h-8 transition mt-2"
-                                      @dragover.prevent="onHeroElementDragOver(block.id, block.data.elements.length)"
-                                      @dragenter.prevent="onHeroElementDragOver(block.id, block.data.elements.length)"
-                                      @dragleave="onHeroElementDragLeave(block.id, block.data.elements.length)"
-                                      @drop.prevent="onHeroElementDrop(block.id, block.data.elements.length)"
-                                      :class="heroDropWrapperClass(block.id, block.data.elements.length)"
-                                    >
-                                      <div
-                                        class="px-3 py-1 text-[11px] font-medium rounded-full border border-dashed backdrop-blur"
-                                        :class="heroDropLabelClass(block.id, block.data.elements.length)"
-                                      >
-                                        Конец блока
-                                      </div>
-                                    </div>
-                                  </template>
-                                </div>
-                                <div class="hidden lg:flex items-center justify-center">
-                                  <div v-if="block.data.showRightImage" class="relative">
-                                    <img :src="block.data.previewImage" alt="preview" class="w-80 h-80 object-cover rounded-3xl shadow-2xl" />
-                                    <div class="absolute inset-0 rounded-3xl ring-4 ring-white/20"></div>
+                                    </template>
                                   </div>
-                                </div>
+                                  <div class="hidden lg:flex items-center justify-center">
+                                    <div v-if="block.data.showRightImage" class="relative">
+                                      <img :src="block.data.previewImage" alt="preview" class="w-80 h-80 object-cover rounded-3xl shadow-2xl" />
+                                      <div class="absolute inset-0 rounded-3xl ring-4 ring-white/20"></div>
+                                    </div>
+                                  </div>
+                                </template>
                               </div>
                               <svg v-if="block.data.waveEnabled" class="w-full" height="80" viewBox="0 0 1440 80" preserveAspectRatio="none">
                                 <path :fill="block.data.waveColor || '#f9f4e5'" d="M0,32L80,37.3C160,43,320,53,480,48C640,43,800,21,960,16C1120,11,1280,21,1360,26.7L1440,32V80H0Z"></path>
@@ -1219,6 +1767,19 @@
                     </div>
                   </div>
                   <p class="text-xs text-gray-500">ID блока: {{ selectedBlock.id }}</p>
+                  <div v-if="selectionBreadcrumbs.length" class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+                    <template v-for="(crumb, index) in selectionBreadcrumbs" :key="crumb.type + '-' + crumb.key">
+                      <button
+                        class="inline-flex items-center space-x-1 px-2 py-1 rounded-full border border-gray-200 hover:border-orange-400 hover:text-orange-600 transition"
+                        @click="focusBreadcrumb(crumb)"
+                        type="button"
+                      >
+                        <i :class="crumb.type === 'block' ? 'fa-solid fa-layer-group' : 'fa-solid fa-pen-nib'"></i>
+                        <span>{{ crumb.label }}</span>
+                      </button>
+                      <span v-if="index < selectionBreadcrumbs.length - 1" class="text-gray-400">/</span>
+                    </template>
+                  </div>
                 </div>
 
                 <div v-for="section in inspectorSections" :key="section.label" class="space-y-3">
@@ -1282,6 +1843,31 @@
                             class="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500"
                             placeholder="#ffffff"
                           />
+                        </div>
+                      </template>
+                      <template v-else-if="field.type === 'number'">
+                        <input
+                          type="number"
+                          :value="getFieldValue(selectedBlock, field)"
+                          @input="updateBlockField(field, $event.target.value)"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500"
+                          :min="field.min"
+                          :max="field.max"
+                          :step="field.step || '1'"
+                        />
+                      </template>
+                      <template v-else-if="field.type === 'range'">
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="range"
+                            class="flex-1 accent-orange-500"
+                            :value="getFieldValue(selectedBlock, field)"
+                            @input="updateBlockField(field, $event.target.value)"
+                            :min="field.min ?? 0"
+                            :max="field.max ?? 100"
+                            :step="field.step ?? 1"
+                          />
+                          <span class="text-xs text-gray-500 w-12 text-right">{{ getFieldValue(selectedBlock, field) }}</span>
                         </div>
                       </template>
                       <template v-else-if="field.type === 'list'">
@@ -1420,6 +2006,31 @@
                           />
                         </div>
                       </template>
+                      <template v-else-if="field.type === 'number'">
+                        <input
+                          type="number"
+                          :value="getElementFieldValue(currentElement, field)"
+                          @input="updateElementField(field, $event.target.value)"
+                          class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500"
+                          :min="field.min"
+                          :max="field.max"
+                          :step="field.step || '1'"
+                        />
+                      </template>
+                      <template v-else-if="field.type === 'range'">
+                        <div class="flex items-center space-x-3">
+                          <input
+                            type="range"
+                            class="flex-1 accent-orange-500"
+                            :value="getElementFieldValue(currentElement, field)"
+                            @input="updateElementField(field, $event.target.value)"
+                            :min="field.min ?? 0"
+                            :max="field.max ?? 100"
+                            :step="field.step ?? 1"
+                          />
+                          <span class="text-xs text-gray-500 w-12 text-right">{{ getElementFieldValue(currentElement, field) }}</span>
+                        </div>
+                      </template>
                     </div>
                   </div>
                 </div>
@@ -1454,10 +2065,22 @@
         targetBlockId: null
       });
 
+      const heroCanvasRefs = new Map();
+      const freeformDrag = reactive({
+        active: false,
+        blockId: null,
+        elementId: null,
+        startX: 0,
+        startY: 0,
+        initialX: 0,
+        initialY: 0,
+        containerRect: null
+      });
+
       const canvas = reactive({
         device: 'desktop',
-        zoom: 0.85,
-        mode: 'preview',
+        zoom: 1,
+        mode: 'full',
         showGrid: false,
         showOverlays: true
       });
@@ -1531,11 +2154,38 @@
 
       const currentElementDefinition = computed(() => currentElement.value ? (elementRegistry[currentElement.value.type] || { fields: [] }) : { fields: [] });
 
+      const selectionBreadcrumbs = computed(() => {
+        const crumbs = [];
+        const block = selectedBlock.value;
+        if (block) {
+          crumbs.push({
+            key: block.id,
+            type: 'block',
+            label: block.name || block.type
+          });
+          if (currentElement.value) {
+            crumbs.push({
+              key: currentElement.value.id,
+              type: 'element',
+              blockId: block.id,
+              label: elementRegistry[currentElement.value.type]?.label || currentElement.value.type
+            });
+          }
+        }
+        return crumbs;
+      });
+
       function blockWrapperClasses(block) {
-        return [
+        const classes = [
           'relative transition-all duration-300 cursor-pointer rounded-3xl overflow-hidden',
           'shadow-lg mb-6'
         ];
+        if (selectedBlockId.value === block.id) {
+          classes.push('ring-2 ring-orange-400 ring-offset-2 ring-offset-white');
+        } else {
+          classes.push('hover:ring-2 hover:ring-orange-200 hover:shadow-xl');
+        }
+        return classes;
       }
 
       function renderHeroElement(element) {
@@ -1558,55 +2208,88 @@
         }
       }
 
-      function heroElementProps(element) {
+      function heroElementProps(block, element) {
         const data = element.data || {};
+        const layoutFree = isHeroLayoutFree(block);
         const classes = [];
         const style = {};
 
         if (['heading', 'subheading', 'paragraph', 'feature'].includes(element.type)) {
-          classes.push(data.fontSize || (element.type === 'heading' ? 'text-4xl' : element.type === 'subheading' ? 'text-xl' : 'text-base'));
-          if (element.type === 'heading' || element.type === 'feature') {
-            classes.push('font-bold');
-          } else {
-            classes.push('font-medium');
-          }
+          classes.push(data.fontSize || (element.type === 'heading' ? 'text-4xl' : element.type === 'subheading' ? 'text-2xl' : 'text-base'));
           if (data.align === 'center') classes.push('text-center');
           else if (data.align === 'right') classes.push('text-right');
           else classes.push('text-left');
+
           style.color = data.color || (element.type === 'subheading' ? '#fbbf24' : '#ffffff');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '16px';
+          style.marginTop = layoutFree ? '0px' : (data.marginTop || '0px');
+          style.marginBottom = layoutFree ? '0px' : (data.marginBottom || '16px');
+          style.fontWeight = data.fontWeight || (element.type === 'heading' ? '700' : element.type === 'feature' ? '600' : '500');
+          style.lineHeight = data.lineHeight || undefined;
+          style.letterSpacing = data.letterSpacing || undefined;
+          style.maxWidth = data.maxWidth || undefined;
+          if (data.customFontSize) style.fontSize = data.customFontSize;
+          if (data.backgroundColor && data.backgroundColor !== 'transparent') {
+            style.backgroundColor = data.backgroundColor;
+          }
+          if (data.paddingX) {
+            style.paddingLeft = data.paddingX;
+            style.paddingRight = data.paddingX;
+          }
+          if (data.paddingY) {
+            style.paddingTop = data.paddingY;
+            style.paddingBottom = data.paddingY;
+          }
+          if (data.width && data.width !== 'auto') {
+            style.width = data.width;
+          }
+          style.boxShadow = elementShadowStyles[data.shadow || 'none'];
         }
 
         if (element.type === 'button') {
-          classes.push('px-6 py-3 rounded-full font-semibold inline-flex items-center transition shadow');
-          if (data.style === 'secondary') {
-            classes.push('bg-transparent border-2 border-white text-white hover:bg-white hover:text-red-600');
-          } else {
-            classes.push('bg-white text-red-600 hover:bg-gray-100');
-          }
+          classes.push('inline-flex items-center space-x-2 transition font-semibold rounded-full shadow');
           if (data.align === 'center') classes.push('mx-auto');
           else if (data.align === 'right') classes.push('ml-auto');
           else classes.push('mr-auto');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '0px';
+
+          style.marginTop = layoutFree ? '0px' : (data.marginTop || '0px');
+          style.marginBottom = layoutFree ? '0px' : (data.marginBottom || '0px');
+          style.paddingLeft = data.paddingX || '24px';
+          style.paddingRight = data.paddingX || '24px';
+          style.paddingTop = data.paddingY || '14px';
+          style.paddingBottom = data.paddingY || '14px';
+          style.borderRadius = data.borderRadius || '9999px';
+          style.fontWeight = data.fontWeight || '600';
+          style.backgroundColor = data.backgroundColor || (data.style === 'secondary' ? 'transparent' : '#ffffff');
+          style.color = data.textColor || (data.style === 'secondary' ? '#ffffff' : '#1f2937');
+          style.border = `2px solid ${data.borderColor || (data.style === 'secondary' ? '#ffffff' : 'transparent')}`;
+          style.boxShadow = elementShadowStyles[data.shadow || 'soft'];
+          if (data.width && data.width !== 'auto') {
+            style.width = data.width;
+          }
         }
 
         if (element.type === 'image') {
-          if (data.align === 'center') classes.push('text-center');
-          else if (data.align === 'right') classes.push('text-right');
-          else classes.push('text-left');
-          style.marginTop = data.marginTop || '0px';
-          style.marginBottom = data.marginBottom || '16px';
+          if (data.align === 'center') classes.push('mx-auto');
+          else if (data.align === 'right') classes.push('ml-auto');
+          else classes.push('mr-auto');
+          style.marginTop = layoutFree ? '0px' : (data.marginTop || '0px');
+          style.marginBottom = layoutFree ? '0px' : (data.marginBottom || '16px');
+          if (data.width && data.width !== 'auto') {
+            style.width = data.width;
+          }
         }
 
         if (element.type === 'spacer') {
           style.height = data.height || '24px';
-          classes.push('w-full');
+          style.marginTop = layoutFree ? '0px' : (data.marginTop || '0px');
+          style.marginBottom = layoutFree ? '0px' : (data.marginBottom || '0px');
+          if (data.width) {
+            style.width = data.width;
+          }
         }
 
         if (element.type === 'feature') {
-          classes.push('flex items-center space-x-2');
+          classes.push('flex items-center space-x-3');
         }
 
         return {
@@ -1617,13 +2300,19 @@
 
       function heroImageProps(element) {
         const data = element.data || {};
+        const width = data.width && data.width !== 'auto' ? data.width : (data.width === 'auto' ? 'auto' : '320px');
+        const height = data.height || 'auto';
+        const shadow = elementShadowStyles[data.shadow || 'soft'];
         return {
           src: data.src || 'https://images.unsplash.com/photo-1607301405418-780ee5e6dd10',
           alt: data.alt || 'Изображение',
           style: {
-            width: data.width || '320px',
-            height: data.height || 'auto',
-            borderRadius: data.borderRadius || '16px'
+            width,
+            height,
+            borderRadius: data.borderRadius || '16px',
+            objectFit: data.objectFit || 'cover',
+            boxShadow: shadow,
+            border: `${data.borderWidth || '0px'} solid ${data.borderColor || 'transparent'}`
           }
         };
       }
@@ -1666,6 +2355,9 @@
         if (!block) {
           currentElementId.value = null;
           return;
+        }
+        if (block.type === 'hero') {
+          ensureHeroFreeformDefaults(block);
         }
         if (!block.data?.elements?.length) {
           currentElementId.value = null;
@@ -1789,6 +2481,122 @@
         elementPaletteOpen.value = !elementPaletteOpen.value;
       }
 
+      function focusBreadcrumb(crumb) {
+        if (crumb.type === 'block') {
+          selectBlock(crumb.key);
+        } else if (crumb.type === 'element') {
+          const targetBlockId = crumb.blockId || selectedBlockId.value;
+          if (targetBlockId) {
+            selectElement(targetBlockId, crumb.key);
+          }
+        }
+      }
+
+      function setHeroCanvasRef(blockId, el) {
+        if (el) {
+          heroCanvasRefs.set(blockId, el);
+        } else {
+          heroCanvasRefs.delete(blockId);
+        }
+      }
+
+      function isHeroLayoutFree(block) {
+        return (block?.data?.layoutMode || 'stacked') === 'free';
+      }
+
+      function formatCssUnit(value, fallback) {
+        if (value === undefined || value === null || value === '') {
+          return fallback;
+        }
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          return `${value}px`;
+        }
+        const str = String(value).trim();
+        if (/px$|%$|rem$|vh$|vw$/.test(str)) {
+          return str;
+        }
+        const numeric = Number(str);
+        return Number.isFinite(numeric) ? `${numeric}px` : fallback;
+      }
+
+      function heroCanvasSurfaceStyle(block) {
+        const data = block?.data || {};
+        const style = {
+          padding: data.canvasPadding || '96px 72px',
+          minHeight: formatCssUnit(data.canvasHeight, '640px')
+        };
+        return style;
+      }
+
+      function heroStackContentClasses(block) {
+        const align = block?.data?.contentAlign || 'left';
+        if (align === 'center') return 'items-center text-center';
+        if (align === 'right') return 'items-end text-right';
+        return 'items-start text-left';
+      }
+
+      function heroStackColumnStyle(block) {
+        const data = block?.data || {};
+        const style = {
+          gap: data.stackGap || '24px',
+          maxWidth: data.contentWidth || '560px'
+        };
+        if (data.contentAlign === 'center') {
+          style.marginLeft = 'auto';
+          style.marginRight = 'auto';
+        } else if (data.contentAlign === 'right') {
+          style.marginLeft = 'auto';
+        }
+        return style;
+      }
+
+      function onHeroFreeformPointerDown(blockId, element, event) {
+        if (event.button !== undefined && event.button !== 0) return;
+        const block = pageBlocks.value.find(b => b.id === blockId);
+        if (!block || !isHeroLayoutFree(block)) return;
+        const canvasEl = heroCanvasRefs.get(blockId);
+        if (!canvasEl) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        selectElement(blockId, element.id);
+
+        const rect = canvasEl.getBoundingClientRect();
+        freeformDrag.active = true;
+        freeformDrag.blockId = blockId;
+        freeformDrag.elementId = element.id;
+        freeformDrag.startX = event.clientX;
+        freeformDrag.startY = event.clientY;
+        freeformDrag.initialX = coerceNumber(element.data?.positionX, 0);
+        freeformDrag.initialY = coerceNumber(element.data?.positionY, 0);
+        freeformDrag.containerRect = rect;
+
+        document.addEventListener('pointermove', onHeroFreeformPointerMove);
+        document.addEventListener('pointerup', onHeroFreeformPointerUp, { once: true });
+      }
+
+      function onHeroFreeformPointerMove(event) {
+        if (!freeformDrag.active || !freeformDrag.containerRect) return;
+        const block = pageBlocks.value.find(b => b.id === freeformDrag.blockId);
+        if (!block) return;
+        const element = block.data?.elements?.find(el => el.id === freeformDrag.elementId);
+        if (!element) return;
+        const rect = freeformDrag.containerRect;
+        const deltaX = ((event.clientX - freeformDrag.startX) / rect.width) * 100;
+        const deltaY = ((event.clientY - freeformDrag.startY) / rect.height) * 100;
+        element.data.positionX = clamp(freeformDrag.initialX + deltaX, 0, 100);
+        element.data.positionY = clamp(freeformDrag.initialY + deltaY, 0, 100);
+      }
+
+      function onHeroFreeformPointerUp() {
+        if (!freeformDrag.active) return;
+        document.removeEventListener('pointermove', onHeroFreeformPointerMove);
+        freeformDrag.active = false;
+        freeformDrag.blockId = null;
+        freeformDrag.elementId = null;
+        freeformDrag.containerRect = null;
+      }
+
       function heroDropIsActive(blockId, index) {
         return Boolean(heroDrag.elementId) && heroDrag.targetBlockId === blockId && heroDrag.dropIndex === index;
       }
@@ -1808,14 +2616,57 @@
           : 'border-white/40 text-white/70 bg-black/20';
       }
 
-      function heroElementWrapperClasses(blockId, element) {
-        const classes = ['relative group rounded-2xl px-2 py-1 transition hover:bg-white/10 hover:bg-opacity-30'];
-        if (selectedBlockId.value === blockId && isElementSelected(element)) {
-          classes.push('ring-2 ring-orange-300 bg-white/10 shadow-lg');
+      function heroElementWrapperClasses(block, element) {
+        const classes = ['relative group rounded-2xl transition pointer-events-auto'];
+        const isSelected = selectedBlockId.value === block.id && isElementSelected(element);
+        if (isHeroLayoutFree(block)) {
+          classes.push('cursor-move');
+          if (isSelected) {
+            classes.push('ring-2 ring-orange-300 bg-white/10 shadow-xl');
+          }
         } else {
-          classes.push('ring-1 ring-transparent hover:ring-white/40');
+          classes.push('px-2 py-1 hover:bg-white/10 hover:bg-opacity-30');
+          if (isSelected) {
+            classes.push('ring-2 ring-orange-300 bg-white/10 shadow-lg');
+          } else {
+            classes.push('ring-1 ring-transparent hover:ring-orange-200');
+          }
         }
         return classes.join(' ');
+      }
+
+      function heroElementWrapperStyle(block, element) {
+        const data = element.data || {};
+        const style = {};
+        const zIndex = Number(data.zIndex);
+        if (Number.isFinite(zIndex)) {
+          style.zIndex = zIndex;
+        }
+        if (data.width && data.width !== 'auto') {
+          style.width = data.width;
+        }
+        if (isHeroLayoutFree(block)) {
+          style.position = 'absolute';
+          style.left = `${normalizePercent(data.positionX)}%`;
+          style.top = `${normalizePercent(data.positionY)}%`;
+        }
+        return style;
+      }
+
+      function normalizePercent(value) {
+        return clamp(coerceNumber(value, 0), 0, 100);
+      }
+
+      function coerceNumber(value, fallback = 0) {
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          return value;
+        }
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : fallback;
+      }
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
       }
 
       function onHeroElementDragStart(blockId, elementId, event = null) {
@@ -1900,6 +2751,10 @@
         }
         const element = normalizeElement({ type, data: definition.defaultData ? definition.defaultData() : {} });
         block.data.elements.push(element);
+        if (block.type === 'hero') {
+          ensureHeroBlockConsistency(block);
+          ensureHeroFreeformDefaults(block);
+        }
         currentElementId.value = element.id;
         elementPaletteOpen.value = false;
       }
@@ -1908,6 +2763,9 @@
         const block = pageBlocks.value.find(b => b.id === blockId);
         if (!block || !Array.isArray(block.data.elements)) return;
         const [removed] = block.data.elements.splice(index, 1);
+        if (removed && block.type === 'hero') {
+          reconcileHeroBlockAfterElementRemoval(block, removed.type);
+        }
         if (removed && removed.id === currentElementId.value) {
           currentElementId.value = null;
         }
@@ -1928,6 +2786,9 @@
         if (field.type === 'list') {
           return Array.isArray(value) ? value.join('\n') : '';
         }
+        if (field.type === 'number' || field.type === 'range') {
+          return value ?? (field.type === 'range' ? field.min ?? 0 : '');
+        }
         return value ?? '';
       }
 
@@ -1936,19 +2797,39 @@
         if (!block) return;
         const value = field.type === 'list'
           ? String(rawValue || '').split(/\r?\n/).map(item => item.trim()).filter(Boolean)
-          : rawValue;
+          : (field.type === 'number' || field.type === 'range')
+            ? coerceNumber(rawValue, field.type === 'range' ? field.min ?? 0 : 0)
+            : rawValue;
         block.data[field.key] = value;
+        if (block.type === 'hero') {
+          applyHeroBlockFieldToElement(block, field.key, value);
+          if (field.key === 'layoutMode' && value === 'free') {
+            ensureHeroFreeformDefaults(block);
+          }
+        }
       }
 
       function getElementFieldValue(element, field) {
         if (!element || !element.data) return '';
-        return element.data[field.key] ?? '';
+        const value = element.data[field.key];
+        if (field.type === 'number' || field.type === 'range') {
+          return value ?? (field.type === 'range' ? field.min ?? 0 : 0);
+        }
+        return value ?? '';
       }
 
       function updateElementField(field, value) {
         const element = currentElement.value;
         if (!element) return;
-        element.data[field.key] = value;
+        if (field.type === 'number' || field.type === 'range') {
+          element.data[field.key] = coerceNumber(value, field.type === 'range' ? field.min ?? 0 : 0);
+        } else {
+          element.data[field.key] = value;
+        }
+        const block = selectedBlock.value;
+        if (block) {
+          applyHeroElementFieldToBlock(block, element, field.key, element.data[field.key]);
+        }
       }
 
       function onBlockFileSelected(field, event) {
@@ -1976,6 +2857,9 @@
         if (isHydrating) return;
         const keyed = {};
         pageBlocks.value.forEach(block => {
+          if (block.type === 'hero') {
+            ensureHeroBlockConsistency(block);
+          }
           keyed[block.type] = deepClone(block.data);
         });
         keyed.page = pageBlocks.value.map(block => ({
@@ -2089,6 +2973,10 @@
         }
       });
 
+      onUnmounted(() => {
+        document.removeEventListener('pointermove', onHeroFreeformPointerMove);
+      });
+
       onMounted(async () => {
         await loadSettings();
       });
@@ -2111,6 +2999,7 @@
         inspectorSections,
         elementPalette,
         elementPaletteOpen,
+        selectionBreadcrumbs,
         currentElement,
         currentElementDefinition,
         elementRegistry,
@@ -2134,22 +3023,30 @@
         onDropZoneDrop,
         blockWrapperClasses,
         renderHeroElement,
+        heroCanvasSurfaceStyle,
+        heroStackContentClasses,
+        heroStackColumnStyle,
         heroElementProps,
         heroImageProps,
         heroElementWrapperClasses,
+        heroElementWrapperStyle,
         heroDropWrapperClass,
         heroDropLabelClass,
+        isHeroLayoutFree,
+        setHeroCanvasRef,
         onHeroElementDragStart,
         onHeroElementDragEnd,
         onHeroElementDragOver,
         onHeroElementDragLeave,
         onHeroElementDrop,
+        onHeroFreeformPointerDown,
         selectElement,
         isElementSelected,
         addElement,
         removeElement,
         moveElement,
         toggleElementPalette,
+        focusBreadcrumb,
         getFieldValue,
         updateBlockField,
         onBlockFileSelected,
